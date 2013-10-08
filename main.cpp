@@ -19,7 +19,7 @@ int main(void)
    glfwSetErrorCallback(error_callback);
    if (!glfwInit())
       exit(EXIT_FAILURE);
-   window = glfwCreateWindow(640, 480, "Happy Time Fun Time ALPHA v0.000000000000000000000000001", NULL, NULL);
+   window = glfwCreateWindow(640, 480, "Happy Time Fun Time ALPHA v10E-100", NULL, NULL);
    if (!window)
    {
       glfwTerminate();
