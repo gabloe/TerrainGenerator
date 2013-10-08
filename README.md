@@ -1,3 +1,3 @@
-GabeJeffOpenGLJunk
+TerrainGenerator
 ==================
 To do: Everything.
