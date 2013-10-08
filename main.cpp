@@ -1,6 +1,9 @@
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <cmath>
+
+#define PI 3.14159
 
 static void error_callback(int error, const char* description)
 {
@@ -30,6 +33,14 @@ int main(void)
    while (!glfwWindowShouldClose(window))
    {
       // Main Loop.  Do the stuff!
+      glBegin(GL_LINE_LOOP);
+      for(int i =0; i <= 300; i++){
+         double angle = 2 * PI * i / 300;
+         double x = cos(angle);
+         double y = sin(angle);
+         glVertex2d(x,y);
+      }
+      glEnd(); 
       glfwSwapBuffers(window);
       glfwPollEvents();
    }
