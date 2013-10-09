@@ -1,4 +1,4 @@
-CXX = clang++
+CXX = g++
 CXXFLAGS = -Wall
 LDLIBS = -lglfw3 -lm -lGL -lGLU -lXrandr -lXi
 
