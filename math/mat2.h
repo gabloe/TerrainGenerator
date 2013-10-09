@@ -29,9 +29,9 @@ public:
 	mat2 operator*( mat2 rhs ) {
 		return mat2( 
 			m[0] * rhs.m[0] + m[1] * rhs.m[2] ,
-			m[0] * rhs.m[1] + m[0] * rhs.m[0] ,
-			m[3] * rhs.m[0] + m[0] * rhs.m[0] ,
-			m[3] * rhs.m[0] + m[0] * rhs.m[0]
+			m[0] * rhs.m[1] + m[1] * rhs.m[0] ,
+			m[2] * rhs.m[0] + m[3] * rhs.m[0] ,
+			m[2] * rhs.m[1] + m[3] * rhs.m[0]
 		);
 	}
 
