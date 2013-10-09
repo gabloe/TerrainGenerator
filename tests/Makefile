@@ -2,11 +2,11 @@ CXX = clang++
 CXXFLAGS = -Wall
 LDLIBS = -lglfw3 -lm -lGL -lGLU -lXrandr -lXi
 
-OBJ_DIR = bin
+OBJ_DIR = ../bin
 LIB_DIR = -L/usr/local/lib
 INC_DIR = -I/usr/local/include
-
-SOURCE = main.cpp
+TEST_DIR= tests
+SOURCE = math.cpp
 OBJECTS = ${SOURCE:%.cpp=$(OBJ_DIR)/%.o}
 EXECUTABLE = main
 
@@ -23,8 +23,3 @@ init:
 
 clean:
 	@rm -rf $(OBJ_DIR) $(EXECUTABLE)
-
-test:
-	cd tests
-	make
-	cd ..
