@@ -119,7 +119,7 @@ int main(void) {
 	   cout << obj.data[i + 2] << " ";
        cout << "\n";
     }
-	
+    cout << "Shaders:\n" << obj.vShader << "\n" << obj.fShader << "\n";	
     FreeObject(obj);
     return 0;
     
