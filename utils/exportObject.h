@@ -8,8 +8,8 @@
 typedef struct {
    int i;
    int j;
-   float **data;
-   float **norms;
+   float *data;
+   float *norms;
    char *vShader;
    char *fShader;
 } SerializedObject;
