@@ -2,86 +2,130 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sstream>
+#include <string.h>
 
 using namespace std;
 
-struct glObj {
-    const float* data;
-    const float* norms;
-    const char* vshader;
-    const char* fshader;
-};
+/*
+   Serializes an object with vertices, normals, and shaders.
+   outfile - Filename of resultant serialization
+   i - Number of vertices
+   j - Number of fields per vertex
+   data - vertices
+   norms - normals
+   vshader - filename for vertex shader
+   fshader - filename for fragment shader
+*/
+void serialize(const char *outfile, const int i, const int j, float **data, float **norms, const char *vshader, const char *fshader) {
+   
+   FILE * file = fopen(outfile, "wb");
+   int vsSize = strlen(vshader);
+   int fsSize = strlen(fshader);
+   fwrite(&i, sizeof(int), 1, file);
+   fwrite(&j, sizeof(int), 1, file);
+   fwrite(&vsSize, sizeof(int), 1, file);
+   fwrite(&fsSize, sizeof(int), 1, file);
+   fwrite(&data[0][0], sizeof(float), i * j, file);
+   fwrite(&norms[0][0], sizeof(float), i * j, file);
+   fwrite(&vshader[0], sizeof(char), vsSize, file);
+   fwrite(&fshader[0], sizeof(char), fsSize, file);
+   fclose(file);
 
-void serializeChunk(const char* outfile, const float *data, const float *norms, const char* vshader, const char* fshader) {
-    
-    int offset = 0;
-    
-    // Create output stream
-    ofstream os(outfile, ios::out | ios::binary);
-    
-    // Create buffer big enough to fit the data
-    char *buf = (char *)malloc(sizeof(data) + sizeof(norms) + sizeof(vshader) + sizeof(fshader));
-    
-    // Copy data into buffer.  Also calculate offsets for the header
-    memcpy(buf + offset, data, sizeof(data));
-    offset += sizeof(data);
-    const char *dataHeader = intToCstr(offset);
-    
-    memcpy(buf+offset,norms,sizeof(norms));
-    offset += sizeof(norms);
-    const char *normsHeader = intToCstr(offset);
-
-    memcpy(buf+offset,vshader,sizeof(vshader));
-    offset += sizeof(vshader);
-    const char *vshaderHeader = intToCstr(offset);
-
-    memcpy(buf+offset,fshader,sizeof(fshader));
-    offset += sizeof(fshader);
-    const char *fshaderHeader = intToCstr(offset);
-    
-    char *header = new char[sizeof(int)*4];
-    
-    // Concat the offsets for each piece of data
-    strcat(header,dataHeader);
-    strcat(header,normsHeader);
-    strcat(header,vshaderHeader);
-    strcat(header,fshaderHeader);
-    
-    // Write the header to the buffer
-    memcpy(buf+offset,header,sizeof(header));
-
-    // Write buffer to output stream
-    os.write(buf, sizeof(buf));
-    os.flush();
-    os.close();
-    
 }
 
+SerializedObject import(const char *infile) {
 
-// Convert an integer to a char array
-const char* intToCstr(int number) {
-    std::ostringstream ostr;
-    ostr << number;
-    std::string theNumberString = ostr.str();
-    return (const char*)theNumberString.c_str();
+   SerializedObject obj;
+   FILE * file = fopen(infile, "rb");
+   int dataSize;
+   int vsSize;
+   int fsSize;
+
+   // Read the header
+   fread(&obj.i, sizeof(int), 1, file);
+   fread(&obj.j, sizeof(int), 1, file);
+   fread(&fsSize, sizeof(int), 1, file);
+   fread(&vsSize, sizeof(int), 1, file);
+
+   dataSize = obj.i * obj.j * sizeof(float);
+
+   // Allocate memory to hold the arrays for the data and normals   
+   obj.data = (float**)malloc(obj.i * obj.j * sizeof(float *));
+   obj.norms = (float**)malloc(obj.i * obj.j * sizeof(float *));
+
+   // Allocate memory for each vertex and read in the data from the file
+   for (int i=0;i<obj.i;++i) {
+      obj.data[i] = (float *)calloc(obj.j, sizeof(float));
+      fread(&obj.data[i][0], sizeof(float), obj.j, file);
+   }
+
+   // Allocate memory for each normal and read in the data from the file
+   for (int i=0;i<obj.i;++i) {
+      obj.norms[i] = (float *)calloc(obj.j, sizeof(float));
+      fread(&obj.norms[i][0], sizeof(float), obj.j, file);
+   }
+
+   // Allocate memory for filenames
+   obj.vShader = (char *)malloc(vsSize * sizeof(char));
+   obj.fShader = (char *)malloc(fsSize * sizeof(char));
+
+   // Read filenames
+   fread(&obj.vShader[0], sizeof(char), vsSize, file);
+   fread(&obj.fShader[0], sizeof(char), fsSize, file);
+
+   fclose(file);
+
+   return obj;
+
+}
+
+void freeObject(SerializedObject obj) {
+   for (int i=0;i<obj.i;++i) {
+      free(obj.data[i]);
+      free(obj.norms[i]);
+   }
+   free(obj.data);
+   free(obj.norms);
+   free(obj.vShader);
+   free(obj.fShader);
 }
 
 // Test
 int main(void) {
    
-    float *data = new float[3];
-    float *norms = new float[3];
+    float **data = new float*[1000];
+    float **norms = new float*[1000];
     const char *out = "./test.dat";
     const char *vshader = "./vshader.shd";
     const char *fshader = "./fshader.shd";
-    data[0] = 5.8;
-    data[1] = 2.23454;
-    data[2] = 341.7;
-    norms[0] = 14.0;
-    norms[1] = -13.0;
-    norms[2] = 11.0;
-    serializeChunk(out,data,norms,vshader,fshader);
+    for (int i=0; i< 1000; i++) {
+       data[i] = new float[3];
+       data[i][0] = 1;
+       data[i][1] = 2;
+       data[i][2] = 3;
+    }
+    for (int j=0; j< 1000; j++) {
+       norms[j] = new float[3];
+       norms[j][0] = 1;
+       norms[j][1] = 2;
+       norms[j][2] = 3;
+    }
+    serialize(out,1000,3,data,norms,vshader,fshader);
+    for (int i=0;i<1000;i++) {
+       delete data[i];
+       delete norms[i];
+    }
+    delete data;
+    delete norms;
+    SerializedObject obj = import("./test.dat");
+    cout << "Number of vertices: " << obj.i << "\nNumber of dimensions per vertex: " << obj.j << "Data:\n\n";
+    for (int i=0;i<obj.i;++i) {
+       for (int j=0;j<obj.j;++j) {
+           cout << obj.data[i][j] << " ";
+       }
+       cout << "\n";
+    }
+    freeObject(obj);
     return 0;
     
 }
