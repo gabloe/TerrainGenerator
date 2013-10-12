@@ -54,11 +54,11 @@ SerializedObject importObject(const char *infile) {
    dataSize = obj.i * obj.j * sizeof(float);
 
    // Allocate memory to hold the arrays for the data and normals   
-   obj.data = (float*)malloc(obj.i * obj.j * sizeof(float));
-   obj.norms = (float*)malloc(obj.i * obj.j * sizeof(float));
+   obj.data = (float*)malloc(dataSize);
+   obj.norms = (float*)malloc(dataSize);
 
-   fread( obj.data, sizeof(float) , obj.j * obj.i, file);
-   fread( obj.norms, sizeof(float) , obj.j * obj.i, file);
+   fread(&obj.data[0], sizeof(float) , obj.j * obj.i, file);
+   fread(&obj.norms[0], sizeof(float) , obj.j * obj.i, file);
    
    // Allocate memory for filenames
    obj.vShader = (char *)malloc(vsSize * sizeof(char));
