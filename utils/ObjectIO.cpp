@@ -1,4 +1,4 @@
-#include "ExportObject.h"
+#include "ObjectIO.h"
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +16,7 @@ using namespace std;
    vshader - filename for vertex shader
    fshader - filename for fragment shader
 */
-void exportObject(const char *outfile, const int i, const int j, float *data, float *norms, const char *vshader, const char *fshader) {
+void ExportObject(const char *outfile, const int i, const int j, float *data, float *norms, const char *vshader, const char *fshader) {
   
    FILE * file = fopen(outfile, "wb");
 
@@ -37,7 +37,7 @@ void exportObject(const char *outfile, const int i, const int j, float *data, fl
 
 }
 
-SerializedObject importObject(const char *infile) {
+SerializedObject ImportObject(const char *infile) {
 
    SerializedObject obj;
    FILE * file = fopen(infile, "rb");
@@ -74,7 +74,7 @@ SerializedObject importObject(const char *infile) {
 
 }
 
-void freeObject(SerializedObject obj) {
+void FreeObject(SerializedObject obj) {
    free(obj.data);
    free(obj.norms);
    free(obj.vShader);

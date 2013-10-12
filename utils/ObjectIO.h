@@ -14,10 +14,8 @@ typedef struct {
    char *fShader;
 } SerializedObject;
 
-void exportObject(const char*, const int, const int, float*, float*, const char*, const char*);
+void ExportObject(const char*, const int, const int, float*, float*, const char*, const char*);
 
-SerializedObject importObject(const char*);
+SerializedObject ImportObject(const char*);
 
-void freeObject(SerializedObject);
-
-int main(void);
+void FreeObject(SerializedObject);
