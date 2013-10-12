@@ -1,3 +1,4 @@
 TerrainGenerator
 ==================
-To do: Everything.
+Object import/export (serialization) done. -- Gabe
+Memory manager, in progress. -- Jeff
