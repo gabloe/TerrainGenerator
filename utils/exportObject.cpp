@@ -1,4 +1,4 @@
-#include "exportObject.h"
+#include "ExportObject.h"
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,49 +79,4 @@ void freeObject(SerializedObject obj) {
    free(obj.norms);
    free(obj.vShader);
    free(obj.fShader);
-}
-
-// Test
-int main(void) {
-   
-   const int data_size = 10;
-   
-   //Create data
-    float *data = new float[data_size * 3];
-    float *norms = new float[data_size * 3];
-	
-	// Set filenames
-    const char *out = "./test.dat";
-    const char *vshader = "./vshader.shd";
-    const char *fshader = "./fshader.shd";
-	
-	// Create fake data
-    for (int i=0; i< data_size * 3; i += 3) {
-		data[i] = 1.0f;
-		data[i + 1] = 2.0f;
-		data[i + 2] = 3.0f;
-	   
-		norms[i] = 1.0f;
-		norms[i + 1] = 2.0f;
-		norms[i + 2] = 3.0f;
-    }
-	
-    exportObject(out,data_size,3,data,norms,vshader,fshader);
-	
-    delete data;
-    delete norms;
-
-    SerializedObject obj = importObject("./test.dat");
-	
-    cout << "Number of vertices: " << obj.i << "\nNumber of dimensions per vertex: " << obj.j << "\nData:\n";
-    for (int i = 0;i<obj.i*obj.j; i += obj.j ) {
-       cout << obj.data[i] << " ";
-	   cout << obj.data[i + 1] << " ";
-	   cout << obj.data[i + 2] << " ";
-       cout << "\n";
-    }
-	
-    freeObject(obj);
-    return 0;
-    
 }
