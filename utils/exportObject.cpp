@@ -117,7 +117,7 @@ int main(void) {
     SerializedObject obj = importObject("./test.dat");
 	
     cout << "Number of vertices: " << obj.i << "\nNumber of dimensions per vertex: " << obj.j << "\nData:\n";
-    for (int i = 0;i<obj.i; i += obj.j ) {
+    for (int i = 0;i<obj.i*obj.j; i += obj.j ) {
        cout << obj.data[i] << " ";
 	   cout << obj.data[i + 1] << " ";
 	   cout << obj.data[i + 2] << " ";
