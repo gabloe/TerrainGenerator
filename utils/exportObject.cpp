@@ -16,7 +16,7 @@ using namespace std;
    vshader - filename for vertex shader
    fshader - filename for fragment shader
 */
-void serialize(const char *outfile, const int i, const int j, float **data, float **norms, const char *vshader, const char *fshader) {
+void exportObject(const char *outfile, const int i, const int j, float **data, float **norms, const char *vshader, const char *fshader) {
    
    FILE * file = fopen(outfile, "wb");
    int vsSize = strlen(vshader);
@@ -33,7 +33,7 @@ void serialize(const char *outfile, const int i, const int j, float **data, floa
 
 }
 
-SerializedObject import(const char *infile) {
+SerializedObject importObject(const char *infile) {
 
    SerializedObject obj;
    FILE * file = fopen(infile, "rb");
@@ -110,14 +110,14 @@ int main(void) {
        norms[j][1] = 2;
        norms[j][2] = 3;
     }
-    serialize(out,1000,3,data,norms,vshader,fshader);
+    exportObject(out,1000,3,data,norms,vshader,fshader);
     for (int i=0;i<1000;i++) {
        delete data[i];
        delete norms[i];
     }
     delete data;
     delete norms;
-    SerializedObject obj = import("./test.dat");
+    SerializedObject obj = importObject("./test.dat");
     cout << "Number of vertices: " << obj.i << "\nNumber of dimensions per vertex: " << obj.j << "Data:\n\n";
     for (int i=0;i<obj.i;++i) {
        for (int j=0;j<obj.j;++j) {
