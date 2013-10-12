@@ -75,10 +75,6 @@ SerializedObject importObject(const char *infile) {
 }
 
 void freeObject(SerializedObject obj) {
-   for (int i=0;i<obj.i;++i) {
-      free(obj.data);
-      free(obj.norms);
-   }
    free(obj.data);
    free(obj.norms);
    free(obj.vShader);
