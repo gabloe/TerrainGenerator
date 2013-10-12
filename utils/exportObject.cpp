@@ -28,10 +28,10 @@ void exportObject(const char *outfile, const int i, const int j, float *data, fl
    fwrite( &j, sizeof(int), 1, file);
    fwrite( &vsSize, sizeof(int), 1, file);
    fwrite( &fsSize, sizeof(int), 1, file);
-   fwrite( data, sizeof(float), i * j, file);
-   fwrite( norms, sizeof(float), i * j, file);
-   fwrite( vshader, sizeof(char), vsSize, file);
-   fwrite( fshader, sizeof(char), fsSize, file);
+   fwrite( &data[0], sizeof(float), i * j, file);
+   fwrite( &norms[0], sizeof(float), i * j, file);
+   fwrite( &vshader[0], sizeof(char), vsSize, file);
+   fwrite( &fshader[0], sizeof(char), fsSize, file);
    fclose(file);
 
 }
@@ -111,15 +111,12 @@ int main(void) {
 	
     exportObject(out,data_size,3,data,norms,vshader,fshader);
 	
-    for (int i=0;i< data_size * 3 ;i++) {
-       delete data;
-       delete norms;
-    }
     delete data;
     delete norms;
+
     SerializedObject obj = importObject("./test.dat");
 	
-    cout << "Number of vertices: " << obj.i << "\nNumber of dimensions per vertex: " << obj.j << "Data:\n\n";
+    cout << "Number of vertices: " << obj.i << "\nNumber of dimensions per vertex: " << obj.j << "\nData:\n";
     for (int i = 0;i<obj.i; i += obj.j ) {
        cout << obj.data[i] << " ";
 	   cout << obj.data[i + 1] << " ";
