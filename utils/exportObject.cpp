@@ -19,6 +19,7 @@ using namespace std;
 void exportObject(const char *outfile, const int i, const int j, float *data, float *norms, const char *vshader, const char *fshader) {
   
    FILE * file = fopen(outfile, "wb");
+
    // Get string lengths 
    int vsSize = strlen(vshader);
    int fsSize = strlen(fshader);
@@ -47,8 +48,8 @@ SerializedObject importObject(const char *infile) {
    // Read the header
    fread(&obj.i, sizeof(int), 1, file);
    fread(&obj.j, sizeof(int), 1, file);
-   fread(&fsSize, sizeof(int), 1, file);
    fread(&vsSize, sizeof(int), 1, file);
+   fread(&fsSize, sizeof(int), 1, file);
 
    dataSize = obj.i * obj.j * sizeof(float);
 
