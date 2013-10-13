@@ -88,5 +88,27 @@ void FreeObject(SerializedObject obj) {
      free(obj.fShader);
 }
 
+float* toOneDim(int numVertices, int numFields, float** data) {
+   float* newData = (float *)malloc(numVertices * numFields * sizeof(float));
+   for (int i=0;i<numVertices;++i) {
+      float* orig = data[i];
+      for (int j=0;j<numFields;++j) {
+         newData[j + (i * numFields)] = orig[j];
+      }
+   }
+   return newData;
+}
+
+float** toTwoDim(int numVertices, int numFields, float* data) {
+   float** newData = (float **)malloc(numVertices * numFields * sizeof(float*));
+   for (int i=0;i<numVertices;++i) {
+      newData[i] = (float*)calloc(numFields, sizeof(float));
+      for (int j=0;j<numFields;++j) {
+         newData[i][j] = data[j + (i * numFields)];
+      }
+   }
+   return newData;
+}
+
 #define _OBJECTIO_
 #endif
