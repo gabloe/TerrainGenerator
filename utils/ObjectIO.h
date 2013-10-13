@@ -19,6 +19,14 @@ typedef struct {
     char *fShader;
 } SerializedObject;
 
+void ExportObject(const char*, const int, const int, float*, float*, const char*, const char*);
+SerializedObject ImportObject(const char*);
+void FreeObject(SerializedObject);
+float* toOneDim(int, int, float**);
+float* _toOneDim(int, int, float**);
+float** toTwoDim(int, int, float*);
+float** _toTwoDim(int, int, float*);
+
 /*
 Serializes an object with vertices, normals, and shaders.
 outfile - Filename of resultant serialization
@@ -94,6 +102,15 @@ void FreeObject(SerializedObject obj) {
 }
 
 float* toOneDim(int numVertices, int numFields, float** data) {
+   float* newData = _toOneDim(numVertices, numFields, data);
+   for (int i=0;i<numVertices;++i) {
+      free(data[i]);
+   }
+   free(data);
+   return newData;
+}
+
+float* _toOneDim(int numVertices, int numFields, float** data) {
    float* newData = (float *)malloc(numVertices * numFields * sizeof(float));
    for (int i=0;i<numVertices;++i) {
       float* orig = data[i];
@@ -105,6 +122,12 @@ float* toOneDim(int numVertices, int numFields, float** data) {
 }
 
 float** toTwoDim(int numVertices, int numFields, float* data) {
+   float** newData = _toTwoDim(numVertices, numFields, data);
+   free(data);
+   return newData;
+}
+
+float** _toTwoDim(int numVertices, int numFields, float* data) {
    float** newData = (float **)malloc(numVertices * numFields * sizeof(float*));
    for (int i=0;i<numVertices;++i) {
       newData[i] = (float*)calloc(numFields, sizeof(float));
