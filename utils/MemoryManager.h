@@ -10,16 +10,19 @@
 
 class MemoryManager {
 private:
+	
 	typedef struct PAGE {
-		void *location;
+		int free;
+		unsigned int used;
 	}
+	
+	// Memory allocated for system
+	void* memory;
+	PAGE *page_table;
 	
 	unsigned int memory_size = 0;
 	unsigned int page_size = 0;
 	
-	// Allocated memory
-	PAGE *page_table;
-	void* memory;
 public:
 	MemoryManager( unsigned int startSize) {
 		unsigned int _pages = page_count( startSize );
@@ -50,12 +53,54 @@ public:
 		free( page_table );
 		free( memory );
 	}
+	
+	void releaseMemory( void* pointer ) {
+		unsigned int pos = pointer - memory;
+		int size = page_table[pos].size;
+		while( size ) {
+			page_table[pos].free = false;
+			pos++;
+			size--;
+		}
+	}
 
 	void* requestMemory( unsigned int bytes ) 
 	{
 		if( memory != NULL ) {
 			int pages  =  page_count( bytes );
 		}
+		
+		int pos = 0;
+		while( pos < page_size && !page_table[pos]->free ) {
+			pos++;
+		}
+		
+		if( pos == page_size ) {
+			return NULL;
+		}
+		
+		void *result = NULL;
+		
+		int start = pos;
+		while( pos < page_size ) {
+			// search for a memory space
+			while( page_table[pos].free ) {
+				// Found memory space
+				if( (pos - start) * PAGE_SIZE >= requested ) {
+					page_table[pos].size = (pos - start);
+					result = memory[start];
+					while( start <= pos ) {
+						page_table[start].free = false;
+						start++;
+					}
+					return result;
+				}
+				pos++;
+			}
+			start = pos + 1;
+		}
+		
+		// Could not find, return NULL
 		return NULL;
 	}
 }
