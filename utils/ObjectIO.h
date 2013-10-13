@@ -1,3 +1,8 @@
+/*
+Import and export object data to/from binary files.
+
+Written by: Gabriel Loewen
+*/
 #ifndef _OBJECTIO_
 
 #include <fstream>
