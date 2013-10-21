@@ -1,0 +1,5 @@
+# Latex Temp Junk #
+###################
+*.log
+*.aux
+*.gz
