@@ -1,0 +1,55 @@
+\begin{thebibliography}{1}
+
+\bibitem{B_RTR}
+Tomas Akenine-Moller, Eric Haines, and Naty Hoffman.
+\newblock {\em Real-Time Rendering}.
+\newblock A K Peters/CRC Press, 3 edition, July 2008.
+
+\bibitem{B_INT_CMP_GPH}
+Edward Angel and Dave Shreiner.
+\newblock {\em Interacrtive Computer Graphics: A Top-Down Approach with
+  Shader-Based OpenGL}.
+\newblock Addison-Wesley, 6 edition, April 2011.
+
+\bibitem{B_CMP_GEO}
+Mark de~Berg, Otfried Cheong, Marc~Van Kreveld, and Mark Overmars.
+\newblock {\em Computational Geometry: Algorithms and Applications}.
+\newblock Springer, 3 edition, March 2008.
+
+\bibitem{B_3D_GEA}
+David~H. Eberly.
+\newblock {\em 3D Game Engine Architecture: Engineering Real-Time Applications
+  with Wild Magic}.
+\newblock The Morgan Kaufmann Series in Interactive 3-D Technology. CRC Press,
+  2 edition, December 2004.
+
+\bibitem{B_3D_GED}
+David~H. Eberly.
+\newblock {\em 3D Game Engine Design: A Practical Approache to Real-Time
+  Computer Graphics}.
+\newblock The Morgan Kaufmann Series in Interactive 3-D Technology. CRC, 1
+  edition, November 2006.
+
+\bibitem{B_RTC}
+Christer Ericson.
+\newblock {\em Real-Time Collision Detection}.
+\newblock The Morgan Kaufmann Series in Interactive 3-D Technology. CRC Press,
+  1 edition, December 2004.
+
+\bibitem{B_GEA}
+Jason Gregory.
+\newblock {\em Game Engine Architecture}.
+\newblock A K Peters/CRC Press, 1 edition, June 2009.
+
+\bibitem{B_MTH_FOR_3D}
+Eric Lengyel.
+\newblock {\em Mathematics for 3D Game Programming and Computer Graphics}.
+\newblock Cengage Learning PTR, 3 edition, June 2011.
+
+\bibitem{B_ESS_MTH}
+James M.~Van Verth and Lars~M. Bishop.
+\newblock {\em Essential Mathematics for Games and Interactive Applications: A
+  Programmer's Guide}.
+\newblock Morgan Kaufmann, 2 edition, May 2008.
+
+\end{thebibliography}
