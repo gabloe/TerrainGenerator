@@ -99,11 +99,6 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 		else if (closest_py < iy) {
 			dir_vec[i].my = -1;
 		}
-		int r = rand();
-		if (r % 3 == 0) {
-			dir_vec[i].mx *= -1;
-			dir_vec[i].my *= -1;
-		}
 		++i;
 	}
 
