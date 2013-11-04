@@ -7,12 +7,15 @@
 float min = 1e32;
 float max = -1e32;
 
-#define SQR 3
+#define VALIDATE 0
 
+#define IMG_FILE "depth.pgm"
+#define MESH_FILE "mesh.dat"
+#define NORM_FILE "norm.dat"
 
 #define get(d,x,y) d[(x) + (y) * MESH_SIZE]
 
-#define noise() (((2 * rand() * h) / RAND_MAX) - h)
+#define noise() (((2.0 * rand() * R[0]) / RAND_MAX) - R[0])
 
 #define set(d,x,y,v) \
 { \
@@ -44,138 +47,151 @@ void normal( float* vec1 , float* vec2 , float* vec3 , float* norm ) {
 	
 	float div = sqrt( norm[0] * norm[0] + norm[1]*norm[1] + norm[2]*norm[2] );
 	
-	//*
 	norm[0] = norm[0] / div;
 	norm[1] = norm[1] / div;
 	norm[2] = norm[2] / div;
-	// */
-//	printf("x=%0.5f y=%0.5f z=%0.5f\n" , norm[0] , norm[1] , norm[2] );
-	
 }
 
 void main(int argc , char** args) {
-	if( argc != 7 ) {
-		printf( "%s MESH_SIZE v1 v2 v3 v4 DIV\n", args[0]);
-		return;
-	}
-	double h = 200;
-	double DIV = 2;
-	int MESH_SIZE,MAX_SIZE;
-	
-	sscanf( args[1] , "%d" , &MESH_SIZE );
-	
-	float v1,v2,v3,v4;
-	sscanf( args[2] , "%f" , &v1 );
-	sscanf( args[3] , "%f" , &v2 );
-	sscanf( args[4] , "%f" , &v3 );
-	sscanf( args[5] , "%f" , &v4 );
-	
-	sscanf( args[6] , "%lf" , &DIV );
-	
-	MAX_SIZE = MESH_SIZE * MESH_SIZE;
-	
-	printf("Configuration : \n");
-	printf("MESH_SIZE : %d\n" , MESH_SIZE );
-	printf("MAX_SIZE : %d\n" , MAX_SIZE );
-	srand (time(NULL));
+	// Loop Index
+	int i,j;
 
-	float* data = (float*)calloc( MAX_SIZE , sizeof(float) );
-	if( data == NULL ) {
-		printf("Could not allocate!");
-		return;
-	}
+	// Temporary Vector
+	float tmp_vec[3];
 	
-	if( !data ) {
-		printf("Could not allocate!");
-		return;
-	}
-	// Initial points
-	set( data , 0 , 0, v1 );
-	set( data , MESH_SIZE - 1 , 0, v2 );
-	set( data , 0 , MESH_SIZE - 1 , v3 );
-	set( data , MESH_SIZE - 1 , MESH_SIZE - 1 , v4 );
-	
-	// Generate!
-	int size = MESH_SIZE - 1;
-	while( size > 1) {
-		int offset = size >> 1;
-		// printf("Size = %d Offset = %d\n" , size , offset );
-		
-		// Square
-		int x = 0;
-		while( x < MESH_SIZE - 1  ) {
-			int y = 0;
-			while( y < MESH_SIZE - 1 ) {
-				double comp = get(data, x , y ) + get( data , x + size , y ) + get( data , x , y + size ) + get( data , x + size , y + size );
-				set( data , x + offset , y + offset , comp * 0.25 );
-				y += size;
-			}
-			x += size;
-		}
-		
-		
-		// Inner diamond
-		x = 0;
-		int i = 0;
-		while( x < (MESH_SIZE - 1) ) {
-			int y = (x + offset) % size;
-			while( y < (MESH_SIZE - 1)) {
-				
-				double comp = get( data , (x - offset + MESH_SIZE) % MESH_SIZE , y );
-				comp += get( data , (x + offset) % MESH_SIZE , y );
-				comp += get( data , x , (y - offset + MESH_SIZE) % MESH_SIZE);
-				comp += get( data , x , (y + offset) % MESH_SIZE);
-				set( data , x , y , comp * 0.25 );
-				y += size;
-			}
-			x += offset;
-		}
-		
-		size = offset;
-		h = h / DIV;
-	}
-	
-	// Here
-	FILE* fp = NULL;
-	FILE* fp_norm = NULL;
-	
-	fp = fopen( "mesh" , "wb" );
-	if( !fp ) {
-		free( data );
-		printf("Could not create the file.\n");
-		return;
-	}
-	
-	fp_norm = fopen( "norm" , "wb" );
-	if( !fp_norm ) {
-		fclose( fp );
-		free( data );
-		printf("Error with fp_norm\n");
-		return;
-	}
-//	fprintf( fp , "P2 %d %d 255" , MESH_SIZE , MESH_SIZE );
-	
-	float read_vec[3];
-	
+	// Used with normals
 	float vec1[3];
 	float vec2[3];
 	float vec3[3];
 	float norm[3];
 	
-	fwrite( &MESH_SIZE , sizeof( int ) , 1 , fp );
+	// Initial Corners
+	float C[4];
+	
+	// Rougness parameters
+	double R[2];
+	
+	// Check data
+	if( argc != 8 ) {
+		printf( "%s MESH_SIZE TL TR BL BR H DIV\n", args[0]);
+		return;
+	}
+	
+	srand (time(NULL));
+	
+	int MESH_SIZE,MAX_SIZE,MAX_INDEX;
+	
+	// Size
+	sscanf( args[1] , "%d" , &MESH_SIZE );	
+	MAX_SIZE = MESH_SIZE * MESH_SIZE;
+	MAX_INDEX = MESH_SIZE - 1;
+	
+	if( (MAX_INDEX - 1) & (MAX_INDEX ) ) {
+		printf("MESH_SIZE should be a power of 2 plus 1.");
+		return;
+	}
+	
+	// Corners
+	for( i = 0; i < 4 ; i++ ) {
+		sscanf( args[2 + i] , "%f" , &C[i] );
+	}
+	// Rougness
+	for( i = 0; i < 2 ; i++ ) {
+		sscanf( args[6 + i] , "%lf" , &R[i] );
+	}
+	
+	printf("Configuration : \n");
+	printf("MESH_SIZE : %d\n" , MESH_SIZE );
+	printf("MAX_SIZE : %d\n" , MAX_SIZE );
+	printf("Corners : %0.5f , %0.5f , %0.5f , %0.5f \n" , C[0] , C[1] , C[2] , C[3] );
+	printf("Roughness : %0.5lf , %0.5lf \n" , R[0] , R[1] );
+	
+
+	float* data = (float*)calloc( MAX_SIZE , sizeof(float) );
+	if( !data || data == NULL) {
+		printf("Could not allocate!");
+		return;
+	}
+	
+	// Initial points
+	for( i = 0 ; i < 2 ;i++ ) {
+		for( j = 0 ; j < 2 ; j++ ) {
+			set( data , i * MAX_INDEX , j * MAX_INDEX  , C[j * 2 + i]);
+		}
+	}
+	
+	
+	
+	// Generate!
+	int size = MAX_INDEX;
+	while( size > 1) {
+		int offset = size >> 1;
+		// Square
+		int x = 0,y;
+		for( x = 0 ; x < MAX_INDEX ; x += size ) {
+			for( y = 0 ; y < MAX_INDEX ; y += size ) {
+				double comp = get(data, x , y ) + get( data , x + size , y ) + get( data , x , y + size ) + get( data , x + size , y + size );
+				set( data , x + offset , y + offset , comp * 0.25 );
+			}
+		}		
+		// Diamond
+		x = 0;
+		for( x = 0; x < MAX_INDEX ; x += offset ) {
+			for( y = (x + offset) % size ; y < MAX_INDEX ; y += size ) {
+				double comp = get( data , (x - offset + MESH_SIZE) % MESH_SIZE , y );
+				comp += get( data , (x + offset) % MESH_SIZE , y );
+				comp += get( data , x , (y - offset + MESH_SIZE) % MESH_SIZE);
+				comp += get( data , x , (y + offset) % MESH_SIZE);
+				set( data , x , y , comp * 0.25 );
+			}
+		}
+		size = offset;
+		R[0] = R[0] / R[1];
+	}
+	
+	printf("Max value : %f\n" , max);
+	printf("Min value : %f\n" , min );
+
+	// Output
+	FILE* fp_mesh = NULL;
+	FILE* fp_norm = NULL;
+	FILE* fp_image = NULL;
+	
+	// Open and test for errors
+	if( !(fp_mesh = fopen( MESH_FILE , "wb" )) ) {
+		free( data );
+		printf("Error with mesh file.\n");
+		return;
+	}else if( !(fp_norm = fopen( NORM_FILE , "wb" )) ) {
+		fclose( fp_mesh );
+		free( data );
+		printf("Error with normal file.\n");
+		return;
+	}else if( !(fp_image = fopen( IMG_FILE , "wb" )) ) {
+		fclose( fp_mesh );fclose( fp_norm );
+		free( data );
+		printf("Error with image file.\n");
+		return;
+	}
+	fwrite( &MESH_SIZE , sizeof( int ) , 1 , fp_mesh );
 	fwrite( &MESH_SIZE , sizeof( int ) , 1 , fp_norm );
 	
-	unsigned long long written = sizeof(int);
+	// Keep tally of what was written
+	long long int mesh_written = sizeof(int);
+	long long int norm_written = sizeof(int);
+	long long int img_written = fprintf( fp_image , "P2 %d %d 255" , MESH_SIZE , MESH_SIZE );
 	
-	int i = 0;
-	while( i < MESH_SIZE) {
-		int j = 0;
-		while( j < MESH_SIZE ) {
-			float t = (get( data , i , j ) - min) / (max - min);
-			fwrite( &t , sizeof(float), 1 , fp );
-			written += sizeof(float);
-			
-			// I know I have completed at least one block
+	// Write the data
+	for( i = 0 ; i < MESH_SIZE ; i++) {
+		img_written += fprintf( fp_image , "\n" );
+		for( j = 0 ; j < MESH_SIZE ; j++ ) {
+			float t = (get( data , i , j ) - min) / (max - min);			
+			// Image
+			img_written += fprintf( fp_image , "%3d " , (int)(t * 255) );		
+			// Mesh
+			fwrite( &t , sizeof(float), 1 , fp_mesh );
+			mesh_written += sizeof(float);			
+			// Normals
 			if( i > 0 & j > 0) {
 				vec1[0] = i - 1;
 				vec1[1] = j - 1;
@@ -193,6 +209,7 @@ void main(int argc , char** args) {
 				normal( vec1 , vec2 , vec3 , norm );
 				
 				fwrite( norm , sizeof(float), 3 , fp_norm );
+				mesh_written += 3 * sizeof(float);
 				
 				// bottom and left
 				vec2[0] = i - 1;
@@ -201,97 +218,83 @@ void main(int argc , char** args) {
 				normal( vec1 , vec3 , vec2 , norm );
 				
 				fwrite( norm , sizeof(float), 3 , fp_norm );
+				mesh_written += 3 * sizeof(float);
 			}
-			j++;
 		}
-		i++;
 	}
-	
-	printf("Wrote %u bytes to file." , written );
-	
-	fclose( fp );
+	fclose( fp_mesh );
 	fclose( fp_norm );
+	fclose( fp_image );
 	
-	fp = fopen( "mesh" , "rb" );
-	if( !fp ) {
+	printf("Wrote %lld bytes to %s \n"	, mesh_written , MESH_FILE );
+	printf("Wrote %lld bytes to %s \n"	, norm_written , NORM_FILE );
+	printf("Wrote %lld bytes to %s \n"	, img_written , IMG_FILE );
+	
+#if VALIDATE == 1
+	// Validation Testing
+	if( !(fp_mesh = fopen( MESH_FILE , "rb" )) ) {
 		free( data );
 		printf("Could not create the file.\n");
 		return;
-	}
-	
-	fp_norm = fopen( "norm" , "rb" );
-	if( !fp_norm ) {
-		fclose( fp );
+	}else if(!(fp_norm = fopen( NORM_FILE , "rb" ))) {
+		fclose( fp_mesh );
 		free( data );
 		printf("Error with fp_norm\n");
 		return;
 	}
 	
-	fread( &size , sizeof(int) , 1 , fp );
+	fread( &size , sizeof(int) , 1 , fp_mesh );
 	if( size != MESH_SIZE ) {
 		printf("Mesh : Mesh Size");
 	}
 	fread( &size , sizeof(int) , 1 , fp_norm );
 	if( size != MESH_SIZE ) {
 		printf("Norm : Mesh Size");
-	}
-	
-	i = 0;
-	while( i < MESH_SIZE) {
-		int j = 0;
-		while( j < MESH_SIZE ) {
-			float x = (get( data , i , j ) - min) / (max - min);
-			float t = 0;
-			fread( &t , sizeof(float), 1 , fp );
-			
+	}	
+	for( i = 0 ; i < MESH_SIZE ; i++ ) {
+		for( j = 0 ; j < MESH_SIZE ; j++ ) {
+			float t,x = (get( data , i , j ) - min) / (max - min);
+			fread( &t , sizeof(float), 1 , fp_mesh );
 			if( t != x ) {
 				printf("t=%0.5f x=%0.5f\n" , t , x );
-			}
-			
-			// I know I have completed at least one block
+			}			
 			if( i > 0 & j > 0) {
-			
+				// Top Left
 				vec1[0] = i - 1;
 				vec1[1] = j - 1;
 				vec1[2] = get( data , i - 1, j - 1 );
-				
+				// Bottom Right
 				vec3[0] = i;
 				vec3[1] = j;
 				vec3[2] = get( data , i , j );
-				
-				// Top and right
+				// Bottom and Left
 				vec2[0] = i;
 				vec2[1] = j - 1;
 				vec2[2] = get( data , i , j - 1 );
-				
-				fread( read_vec , sizeof(float), 3 , fp_norm );
-				normal( vec1 , vec2 , vec3 , norm );
-				
-				if( norm[0] != read_vec[0] ) {
-					printf("norm[0]=%0.5f vec[0]=%0.5f\n" , norm[0] , read_vec[0] );
-				}
-				
-				// bottom and left
+				fread( tmp_vec , sizeof(float), 3 , fp_norm );
+				normal( vec1 , vec2 , vec3 , norm );				
+				if( norm[0] != tmp_vec[0] ) {
+					printf("norm[0]=%0.5f vec[0]=%0.5f\n" , norm[0] , tmp_vec[0] );
+				}				
+				// Top and Right
 				vec2[0] = i - 1;
 				vec2[1] = j;
 				vec2[2] = get( data , i - 1, j);
 				normal( vec1 , vec3 , vec2 , norm );
 				
-				fread( read_vec , sizeof(float), 3 , fp_norm );
+				fread( tmp_vec , sizeof(float), 3 , fp_norm );
 				
-				if( norm[0] != read_vec[0] ) {
-					printf("norm[0]=%0.5f vec[0]=%0.5f\n" , norm[0] , read_vec[0] );
+				if( norm[0] != tmp_vec[0] ) {
+					printf("norm[0]=%0.5f vec[0]=%0.5f\n" , norm[0] , tmp_vec[0] );
 				}
 				
 			}
-			j++;
 		}
-		i++;
 	}
-	
-	fclose( fp );
+	// Clean up
+	fclose( fp_mesh );
 	fclose( fp_norm );
+#endif
 	free( data );
-	
 	return;
 }
