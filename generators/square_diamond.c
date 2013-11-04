@@ -4,9 +4,6 @@
 #include <time.h>
 #include <math.h>
 
-float min = 1e32;
-float max = -1e32;
-
 #define VALIDATE 0
 
 #define IMG_FILE "depth.pgm"
@@ -22,7 +19,8 @@ float max = -1e32;
 	get(d,x,y) = v + noise();\
 	if( v < min ) { \
 		min = v; \
-	}else if( v > max ){ \
+	} \
+	if( v > max ){ \
 		max = v;\
 	} \
 }
@@ -71,13 +69,18 @@ void main(int argc , char** args) {
 	// Rougness parameters
 	double R[2];
 	
+	
+	float min = 1e32;
+	float max = -1e32;
+
+	
 	// Check data
 	if( argc != 8 ) {
 		printf( "%s MESH_SIZE TL TR BL BR H DIV\n", args[0]);
 		return;
 	}
 	
-	srand (time(NULL));
+	//srand (time(NULL));
 	
 	int MESH_SIZE,MAX_SIZE,MAX_INDEX;
 	
@@ -133,14 +136,14 @@ void main(int argc , char** args) {
 				double comp = get(data, x , y ) + get( data , x + size , y ) + get( data , x , y + size ) + get( data , x + size , y + size );
 				set( data , x + offset , y + offset , comp * 0.25 );
 			}
-		}		
+		}
 		// Diamond
 		x = 0;
-		for( x = 0; x < MAX_INDEX ; x += offset ) {
-			for( y = (x + offset) % size ; y < MAX_INDEX ; y += size ) {
-				double comp = get( data , (x - offset + MESH_SIZE) % MESH_SIZE , y );
+		for( x = 0; x <= MESH_SIZE ; x += offset ) {
+			for( y = (x + offset) % size ; y < MESH_SIZE ; y += size ) {
+				double comp = get( data , ( (x - offset) + MESH_SIZE) % MESH_SIZE , y );
 				comp += get( data , (x + offset) % MESH_SIZE , y );
-				comp += get( data , x , (y - offset + MESH_SIZE) % MESH_SIZE);
+				comp += get( data , x , ((y - offset) + MESH_SIZE) % MESH_SIZE);
 				comp += get( data , x , (y + offset) % MESH_SIZE);
 				set( data , x , y , comp * 0.25 );
 			}
@@ -185,7 +188,8 @@ void main(int argc , char** args) {
 	for( i = 0 ; i < MESH_SIZE ; i++) {
 		img_written += fprintf( fp_image , "\n" );
 		for( j = 0 ; j < MESH_SIZE ; j++ ) {
-			float t = (get( data , i , j ) - min) / (max - min);			
+			float t = (get( 
+			data , i , j ) - min) / (max - min);			
 			// Image
 			img_written += fprintf( fp_image , "%3d " , (int)(t * 255) );		
 			// Mesh
