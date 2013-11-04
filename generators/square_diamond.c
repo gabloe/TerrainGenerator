@@ -80,7 +80,7 @@ void main(int argc , char** args) {
 		return;
 	}
 	
-	//srand (time(NULL));
+	srand (time(NULL));
 	
 	int MESH_SIZE,MAX_SIZE,MAX_INDEX;
 	
@@ -123,8 +123,6 @@ void main(int argc , char** args) {
 		}
 	}
 	
-	
-	
 	// Generate!
 	int size = MAX_INDEX;
 	while( size > 1) {
@@ -138,18 +136,18 @@ void main(int argc , char** args) {
 			}
 		}
 		// Diamond
-		x = 0;
 		for( x = 0; x <= MESH_SIZE ; x += offset ) {
 			for( y = (x + offset) % size ; y < MESH_SIZE ; y += size ) {
-				double comp = get( data , ( (x - offset) + MESH_SIZE) % MESH_SIZE , y );
-				comp += get( data , (x + offset) % MESH_SIZE , y );
-				comp += get( data , x , ((y - offset) + MESH_SIZE) % MESH_SIZE);
-				comp += get( data , x , (y + offset) % MESH_SIZE);
+				double comp = 0;
+				comp += get( data , x - offset + size * (x == 0) , y ); // Left
+				comp += get( data , x + offset - size * (x == MAX_INDEX) , y ); // Right
+				comp += get( data , x , y - offset + size * (y==0)); // Up
+				comp += get( data , x , y + offset - size * (y == MAX_INDEX) ); // Down
 				set( data , x , y , comp * 0.25 );
 			}
 		}
 		size = offset;
-		R[0] = R[0] / R[1];
+		R[0] /= R[1];
 	}
 	
 	printf("Max value : %f\n" , max);
@@ -191,7 +189,7 @@ void main(int argc , char** args) {
 			float t = (get( 
 			data , i , j ) - min) / (max - min);			
 			// Image
-			img_written += fprintf( fp_image , "%3d " , (int)(t * 255) );		
+			img_written += fprintf( fp_image , "%3d " , max( 0 , min( 255 , (int)(t * 255) ) ) ) ;
 			// Mesh
 			fwrite( &t , sizeof(float), 1 , fp_mesh );
 			mesh_written += sizeof(float);			
