@@ -209,7 +209,7 @@ void main(int argc , char** args) {
 				normal( vec1 , vec2 , vec3 , norm );
 				
 				fwrite( norm , sizeof(float), 3 , fp_norm );
-				mesh_written += 3 * sizeof(float);
+				norm_written += 3 * sizeof(float);
 				
 				// bottom and left
 				vec2[0] = i - 1;
@@ -218,7 +218,7 @@ void main(int argc , char** args) {
 				normal( vec1 , vec3 , vec2 , norm );
 				
 				fwrite( norm , sizeof(float), 3 , fp_norm );
-				mesh_written += 3 * sizeof(float);
+				norm_written += 3 * sizeof(float);
 			}
 		}
 	}
