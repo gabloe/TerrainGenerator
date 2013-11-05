@@ -7,48 +7,60 @@
 void swarm(short*, int*, int, int);
 void display(short*, int);
 void smooth(short*, int);
-void normalize(short*, int);
-void out( const char* , short*, int );
-
-short _min = 32000;
-short _max = -32000;
+void normalize(short*, int , short , short);
+void out( const char* , short*, int , short , short );
 
 #define max(x,y) (x)>(y)?(x):(y)
 #define min(x,y) (x)<(y)?(x):(y)
-
-#define set(d,p,v) { \
-	d[p] = v; \
-	if( v < _min ) _min = v; \
-	if( v > _max ) _max = v; \
-}
+#define set(d,p,v) d[p] = (v)
 
 typedef struct {
 	int mx;
 	int my;
 } Direction;
 
-int main(int argc, char** argv) {
-	int MESH_SIZE = 8;
-	int NUM_PARTICLES = 64;
-	int ITERATIONS = 10;
-	int NUM_PEAKS = 3;
+#define uniform(low,high) ( (double)(low) + (double)( (high) * ((double)rand()) ) / RAND_MAX )
 
+int main(int argc, char** argv) {
+
+	// Used for normalization
+	short _min = 32000;
+	short _max = -32000;
+
+	// Configuration Parameters
+	int MESH_SIZE,NUM_PARTICLES,ITERATIONS,NUM_PEAKS,MAX_SIZE,MAX_INDEX;
+
+	// Read in the paramaters
 	sscanf(argv[1], "%d", &MESH_SIZE);
 	sscanf(argv[2], "%d", &NUM_PARTICLES);
 	sscanf(argv[3], "%d", &ITERATIONS);
 	sscanf(argv[4], "%d", &NUM_PEAKS);
 
-	short* grid = (short*)calloc(sizeof(short), MESH_SIZE * MESH_SIZE);
-	//srand(time(NULL));
+	// Print Configuration
+	printf( "Mesh Size : %d\n", MESH_SIZE);
+	printf( "Number of Particles : %d\n", NUM_PARTICLES);
+	printf( "Iterations : %d\n", ITERATIONS);
+	printf( "Number of Peaks : %d\n", NUM_PEAKS);
+	
+	MAX_SIZE = MESH_SIZE * MESH_SIZE;
+	MAX_INDEX = MAX_SIZE - 1;
+
+	// Allocate data
+	short* grid = (short*)calloc( sizeof(short) , MAX_SIZE );
 	srand(512);
 
 	// Distribute the particles around the mesh
+	int max = 0;
 	int j = 0;
-	while (j < NUM_PARTICLES) {
-		int loc = rand() % (MESH_SIZE*MESH_SIZE);
+	while (j < NUM_PARTICLES ) {
+		int loc = uniform( 0 , MAX_INDEX );
+		if( loc > max ) max = loc;
 		set( grid , loc , grid[loc] + 1 );
-		++j;
+		j++;
 	}
+	printf( "Max Index : %d\n" , MAX_INDEX );
+	printf( "Max Size : %d\n" , MAX_SIZE );
+	printf( "Max location of particles : %d\n" , max );
 
 	// Generate random peak points
 	int p = 0;
@@ -65,30 +77,25 @@ int main(int argc, char** argv) {
 		swarm(grid,peaks,MESH_SIZE,NUM_PEAKS);
 		++i;
 	}
-
-
+	
+	for( j = 0 ; j < MESH_SIZE ; j++ ) {
+		if( grid[j] < _min ) _min = grid[j];
+		if( grid[j] > _max ) _max = grid[j];
+	}
 	printf("Min: %d Max:%d\n" , _min , _max );
-	normalize(grid, MESH_SIZE);
-	out( "file.pgm" , grid, MESH_SIZE);
+	out( "file.pgm" , grid, MESH_SIZE , _min , _max );
 
 	free(grid);
 	free(peaks);
 	return 1;
 }
 
-void normalize(short* grid, int size) {
-	int i = 0;
-	while (i < size*size){
-		grid[i] = (short)max( 0 , min( 255 , 255 * (grid[i] - _min) / (_max - _min) ) );
-		++i;
-	}
-}
-
 // Perform 1 iteration of particle swarm
 void swarm(short* grid, int* peaks, int size, int numPeaks) {
 	int i = 0;
 	Direction * dir_vec = (Direction*)calloc(sizeof(Direction),size * size);
-	while (i < size*size) {
+	while (i < size * size) {
+	
 		// Translate grid location to 2d
 		int ix = i % size;
 		int iy = (int)i / size;
@@ -148,7 +155,7 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 	return;
 }
 
-void out( const char* filename , short *data , int size ) {
+void out( const char* filename , short *data , int size , short _min , short _max  ) {
 	int i,j;
 	FILE *fp;
 	if( !(fp = fopen( filename , "w" ) ) ) {
@@ -161,7 +168,7 @@ void out( const char* filename , short *data , int size ) {
 	for( i = 0 ; i < size ; i++ ) {
 		fprintf( fp , "\n" );
 		for( j = 0 ; j < size ; j++ ) {
-			fprintf( fp , "%d " , data[i * size + j] );
+			fprintf( fp , "%d " , min( 255 , max( 0 , (255  * (data[i * size + j] - _min) ) / (_max - _min ) ) ) );
 		}
 	}
 	fclose( fp );
