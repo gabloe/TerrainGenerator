@@ -6,6 +6,7 @@
 
 void swarm(short*, int*, int, int);
 void display(short*, int);
+void smooth(short*, int);
 
 typedef struct {
 	int mx;
@@ -22,7 +23,7 @@ void main(int argc, char** argv) {
 	sscanf(argv[3], "%d", &ITERATIONS);
 	sscanf(argv[4], "%d", &NUM_PEAKS);
 
-	signed short* grid = (signed short*)calloc(sizeof(signed short), MESH_SIZE * MESH_SIZE);
+	short* grid = (short*)calloc(sizeof(short), MESH_SIZE * MESH_SIZE);
 	srand(time(NULL));
 
 	// Distribute the particles around the mesh
@@ -48,6 +49,8 @@ void main(int argc, char** argv) {
 		swarm(grid,peaks,MESH_SIZE,NUM_PEAKS);
 		++i;
 	}
+	
+	smooth(grid, MESH_SIZE);
 
 	display(grid, MESH_SIZE);
 
@@ -74,7 +77,7 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 		while (j < numPeaks) {
 			int peak_pos = peaks[j];
 			int px = peak_pos % size;
-			int py = (int)peak_pos / size;
+			int py = (int)(peak_pos / size);
 			float dist = sqrt(pow(ix - px, 2) + pow(iy - py,2));
 			// Update local optimal
 			if (dist < closest_dist) {
@@ -108,13 +111,32 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 		if ((dir_vec[j].mx != 0 || dir_vec[j].my != 0) && grid[j] > 0) {
 			if (j + dir_vec[j].mx + dir_vec[j].my * size >= 0 && j + dir_vec[j].mx + dir_vec[j].my * size < size*size) {
 				grid[j]--;
-				grid[j + dir_vec[j].mx + dir_vec[j].my * size]++;
+				grid[j + dir_vec[j].mx + (dir_vec[j].my * size)]++;
 			}
 		}
 		++j;
 	}
 	free(dir_vec);
 	return;
+}
+
+void smooth(short* grid, int size) {
+	int i=0;
+	while (i<size*size) {
+		short avg = 0;
+		int j = -1;
+		while (j<2) {
+			int k = -1;
+			while (k<2) {
+				avg += grid[i+j%size+k%size]
+				++k;
+			}
+			++j;
+		}
+		avg /= 9;
+		grid[i] = (short)avg;
+		++i;
+	}
 }
 
 void display(signed short* grid, int size) {
