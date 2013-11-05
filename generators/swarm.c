@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
 // Perform 1 iteration of particle swarm
 void swarm(short* grid, int* peaks, int size, int numPeaks) {
 	int i = 0;
+	//short* new_grid = calloc( sizeof( short ) , size * size );
 	Direction * dir_vec = (Direction*)calloc(sizeof(Direction),size * size);
 	while (i < size * size) {
 	
@@ -97,42 +98,30 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 		int iy = (int)i / size;
 
 		// Find the closest peak position
-		int j = 0;
-		int closest_px = 0;
-		int closest_py = 0;
-		float closest_dist = 1e16f;
-		while (j < numPeaks) {
-			int peak_pos = peaks[j];
-			int px = peak_pos % size;
-			int py = (int)peak_pos / size;
-			float dist = sqrt(pow(ix - px, 2.f) + pow(iy - py, 2.f));
-			if (dist < closest_dist) {
-				closest_px += px;
-				closest_py += py;
-				closest_dist = dist;
-			}
-			++j;
-		}
+		int peak_pos = peaks[rand() % numPeaks];
+		int closest_px = peak_pos % size;
+		int closest_py = (int)peak_pos / size;
 
 		dir_vec[i].mx = 0;
 		dir_vec[i].my = 0;
 		// Compute directional vector
 		if (closest_px > ix) { // Right
 			dir_vec[i].mx = 1;
-		} else if (closest_px < ix) {
+		} else{
 			dir_vec[i].mx = -1;
-		}
-		if (closest_py > iy) { // Right
+		}if (closest_py > iy) { // Right
 			dir_vec[i].my = 1;
-		}
-		else if (closest_py < iy) {
+		}else {
 			dir_vec[i].my = -1;
 		}
-		int r = rand();
-		if (r % 3 == 0) {
+		int r = rand() % 3;
+		
+		if (r == 1) {
 			dir_vec[i].mx *= -1;
+		}else if( r == 2 ) {
 			dir_vec[i].my *= -1;
 		}
+		
 		++i;
 	}
 
@@ -140,9 +129,10 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 	int j = 0;
 	while (j < size*size) {
 		if ((dir_vec[j].mx != 0 || dir_vec[j].my != 0) && grid[j] > 0) {
-			if (j + dir_vec[j].mx + dir_vec[j].my * size >= 0 && j + dir_vec[j].mx + dir_vec[j].my * size < size*size) {
+			int pos = j + dir_vec[j].mx + dir_vec[j].my * size;
+			if ( pos >= 0 && pos < size*size) {
 				set(grid,j,grid[j]-1);
-				set(grid, j + dir_vec[j].mx + dir_vec[j].my * size, grid[j + dir_vec[j].mx + dir_vec[j].my * size] + 1);
+				set(grid, pos , grid[pos] + 1);
 			}
 		}
 		++j;
