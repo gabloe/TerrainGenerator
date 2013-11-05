@@ -67,7 +67,7 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 	while (i < size*size) {
 		// Translate grid location to 2d
 		int ix = i % size;
-		int iy = (int)i / size;
+		int iy = (int)(i / size);
 
 		// Find the closest peak position
 		int j = 0;
@@ -93,13 +93,13 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 		// Compute directional vector
 		if (closest_px > ix) { // Right
 			dir_vec[i].mx = 1;
-		} else if (closest_px < ix) {
+		} else if (closest_px < ix) { // Left
 			dir_vec[i].mx = -1;
 		}
-		if (closest_py > iy) { // Right
+		if (closest_py > iy) { // Below
 			dir_vec[i].my = 1;
 		}
-		else if (closest_py < iy) {
+		else if (closest_py < iy) { // Above
 			dir_vec[i].my = -1;
 		}
 		++i;
@@ -128,7 +128,7 @@ void smooth(short* grid, int size) {
 		while (j<2) {
 			int k = -1;
 			while (k<2) {
-				avg += grid[i+j%size+k%size]
+				avg += grid[(i+j+k)%size]
 				++k;
 			}
 			++j;
