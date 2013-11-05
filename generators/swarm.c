@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 	int p = 0;
 	int* peaks = (int*)calloc(sizeof(int), NUM_PEAKS);
 	while (p < NUM_PEAKS) {
-		peaks[p] = rand() % (MESH_SIZE*MESH_SIZE - 1);
+		peaks[p] = (short)uniform(0 , MAX_INDEX );
 		++p;
 	}
 
