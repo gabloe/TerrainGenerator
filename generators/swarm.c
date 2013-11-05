@@ -54,13 +54,9 @@ int main(int argc, char** argv) {
 	int j = 0;
 	while (j < NUM_PARTICLES ) {
 		int loc = uniform( 0 , MAX_INDEX );
-		if( loc > max ) max = loc;
 		set( grid , loc , grid[loc] + 1 );
 		j++;
 	}
-	printf( "Max Index : %d\n" , MAX_INDEX );
-	printf( "Max Size : %d\n" , MAX_SIZE );
-	printf( "Max location of particles : %d\n" , max );
 
 	// Generate random peak points
 	int p = 0;
@@ -78,7 +74,7 @@ int main(int argc, char** argv) {
 		++i;
 	}
 	
-	for( j = 0 ; j < MESH_SIZE ; j++ ) {
+	for( j = 0 ; j < MAX_SIZE ; j++ ) {
 		if( grid[j] < _min ) _min = grid[j];
 		if( grid[j] > _max ) _max = grid[j];
 	}
