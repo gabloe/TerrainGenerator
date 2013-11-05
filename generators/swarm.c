@@ -145,7 +145,7 @@ void display(signed short* grid, int size) {
 		if (i % size == 0) {
 			printf("\n");
 		}
-		printf("%d ", grid[i]);
+		printf("%d\t", grid[i]);
 		++i;
 	}
 	printf("\n");
