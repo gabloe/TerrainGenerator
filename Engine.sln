@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generators", "generators\generators.vcxproj", "{7BAED16F-4DD1-4FEA-9623-3566D2A825E1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math", "math\math.vcxproj", "{087D4A7C-4379-4F60-8190-C6FFB81BE5F4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{36AAD93D-6605-4F7D-A9BB-200414FB9FA1}"
+	ProjectSection(SolutionItems) = preProject
+		main.cpp = main.cpp
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utils", "utils\utils.vcxproj", "{ACA0123A-FB53-41FE-A59A-7C0E03A88F7D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7BAED16F-4DD1-4FEA-9623-3566D2A825E1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7BAED16F-4DD1-4FEA-9623-3566D2A825E1}.Debug|Win32.Build.0 = Debug|Win32
+		{7BAED16F-4DD1-4FEA-9623-3566D2A825E1}.Release|Win32.ActiveCfg = Release|Win32
+		{7BAED16F-4DD1-4FEA-9623-3566D2A825E1}.Release|Win32.Build.0 = Release|Win32
+		{087D4A7C-4379-4F60-8190-C6FFB81BE5F4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{087D4A7C-4379-4F60-8190-C6FFB81BE5F4}.Debug|Win32.Build.0 = Debug|Win32
+		{087D4A7C-4379-4F60-8190-C6FFB81BE5F4}.Release|Win32.ActiveCfg = Release|Win32
+		{087D4A7C-4379-4F60-8190-C6FFB81BE5F4}.Release|Win32.Build.0 = Release|Win32
+		{ACA0123A-FB53-41FE-A59A-7C0E03A88F7D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{ACA0123A-FB53-41FE-A59A-7C0E03A88F7D}.Debug|Win32.Build.0 = Debug|Win32
+		{ACA0123A-FB53-41FE-A59A-7C0E03A88F7D}.Release|Win32.ActiveCfg = Release|Win32
+		{ACA0123A-FB53-41FE-A59A-7C0E03A88F7D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

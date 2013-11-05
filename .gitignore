@@ -38,3 +38,16 @@ Thumbs.db
 *.out
 *.dat
 *.pgm
+
+# Visual Studio
+*.log
+*.pdb
+*.opensdf
+*.sdf
+*.obj
+*.filters
+*.lastbuildstate
+*.tlog
+*.ilk
+*.idb
+*.user
