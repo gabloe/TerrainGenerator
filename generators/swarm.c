@@ -8,33 +8,45 @@ void swarm(short*, int*, int, int);
 void display(short*, int);
 void smooth(short*, int);
 void normalize(short*, int);
+void out( const char* , short*, int );
 
-short min = 1e15 - 1;
-short max = 1e-15 - 1;
+short _min = 32000;
+short _max = -32000;
+
+#define max(x,y) (x)>(y)?(x):(y)
+#define min(x,y) (x)<(y)?(x):(y)
+
+#define set(d,p,v) { \
+	d[p] = v; \
+	if( v < _min ) _min = v; \
+	if( v > _max ) _max = v; \
+}
 
 typedef struct {
 	int mx;
 	int my;
 } Direction;
 
-void main(int argc, char** argv) {
+int main(int argc, char** argv) {
 	int MESH_SIZE = 8;
 	int NUM_PARTICLES = 64;
 	int ITERATIONS = 10;
 	int NUM_PEAKS = 3;
+
 	sscanf(argv[1], "%d", &MESH_SIZE);
 	sscanf(argv[2], "%d", &NUM_PARTICLES);
 	sscanf(argv[3], "%d", &ITERATIONS);
 	sscanf(argv[4], "%d", &NUM_PEAKS);
 
 	short* grid = (short*)calloc(sizeof(short), MESH_SIZE * MESH_SIZE);
-	srand(time(NULL));
+	//srand(time(NULL));
+	srand(512);
 
 	// Distribute the particles around the mesh
 	int j = 0;
 	while (j < NUM_PARTICLES) {
 		int loc = rand() % (MESH_SIZE*MESH_SIZE);
-		grid[loc] += 1;
+		set( grid , loc , grid[loc] + 1 );
 		++j;
 	}
 
@@ -46,7 +58,7 @@ void main(int argc, char** argv) {
 		++p;
 	}
 
-	display(grid, MESH_SIZE);
+	//display(grid, MESH_SIZE);
 
 	int i = 0;
 	while (i < ITERATIONS) {
@@ -54,29 +66,21 @@ void main(int argc, char** argv) {
 		++i;
 	}
 
+
+	printf("Min: %d Max:%d\n" , _min , _max );
 	normalize(grid, MESH_SIZE);
-	display(grid, MESH_SIZE);
+	out( "file.pgm" , grid, MESH_SIZE);
 
 	free(grid);
 	free(peaks);
-	return;
+	return 1;
 }
 
 void normalize(short* grid, int size) {
 	int i = 0;
 	while (i < size*size){
-		grid[i] = (short)(255*(grid[i] - min) / (max - min));
+		grid[i] = (short)max( 0 , min( 255 , 255 * (grid[i] - _min) / (_max - _min) ) );
 		++i;
-	}
-}
-
-void set(short* grid, int x, short val) {
-	grid[x] = val;
-	if (val < min) {
-		min = val;
-	}
-	if (val > max) {
-		max = val;
 	}
 }
 
@@ -142,6 +146,25 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 	}
 	free(dir_vec);
 	return;
+}
+
+void out( const char* filename , short *data , int size ) {
+	int i,j;
+	FILE *fp;
+	if( !(fp = fopen( filename , "w" ) ) ) {
+		printf( "Image File Failure\n" );
+		return;
+	}
+	printf( "%d\n" , size );
+	fprintf( fp , "P2 %d %d 255" , size , size );
+
+	for( i = 0 ; i < size ; i++ ) {
+		fprintf( fp , "\n" );
+		for( j = 0 ; j < size ; j++ ) {
+			fprintf( fp , "%d " , data[i * size + j] );
+		}
+	}
+	fclose( fp );
 }
 
 void display(short* grid, int size) {

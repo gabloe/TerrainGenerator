@@ -12,6 +12,10 @@
 #define MESH_FILE "mesh.dat"
 #define NORM_FILE "norm.dat"
 
+#ifndef max
+#define max(x,y) (x)>(y)?(x):(y)
+#define min(x,y) (x)<(y)?(x):(y)
+#endif
 
 void _write(float *data, short MESH_SIZE, float _min, float _max);
 void _validate(float *data, short MESH_SIZE , float _min , float _max );
