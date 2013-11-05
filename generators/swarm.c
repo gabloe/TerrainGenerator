@@ -27,12 +27,15 @@ void out( const char* , short*, int , short , short );
 
 #define sgn(x) (x)<0?-1:((x)==0?0:1);
 
-#define _MAX_RAND RAND_MAX
-
-// rand_cmwc()
+#if CMWC == 1
+#define MAX_RAND 0xEFFFFFFF
 #define my_rand() rand_cmwc()
+#else
+#define MAX_RAND RAND_MAX
+#define my_rand() rand()
+#endif
 
-#define uniform(low,high) (int)(low + high * (( my_rand() % (RAND_MAX + 1)) / (double)RAND_MAX ) )
+#define uniform(low,high) (int)(low + high * ( my_rand() / (double)MAX_RAND ) )
 
 int main(int argc, char** argv) {
 	srand( time( 0 ) );
