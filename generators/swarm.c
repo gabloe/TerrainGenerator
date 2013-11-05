@@ -27,15 +27,17 @@ void out( const char* , short*, int , short , short );
 
 #define sgn(x) (x)<0?-1:((x)==0?0:1);
 
+#define CMWC 1
+
 #if CMWC == 1
-#define MAX_RAND 0xEFFFFFFF
+#define MAX_RAND 0xFFFFFFFF
 #define my_rand() rand_cmwc()
 #else
 #define MAX_RAND RAND_MAX
 #define my_rand() rand()
 #endif
 
-#define uniform(low,high) (int)(low + high * ( my_rand() / (double)MAX_RAND ) )
+#define uniform(low,high) (unsigned int)((low) + (high) * ( my_rand() / (double)MAX_RAND ) )
 
 int main(int argc, char** argv) {
 	srand( time( 0 ) );
@@ -73,24 +75,17 @@ int main(int argc, char** argv) {
 		printf( "Peak Position : %d\n" , peaks[j] );
 	}
 	
-	int *count = (int*)calloc( sizeof(int) , NUM_PEAKS ); 
-	
 	// Generate particles
 	Point* particles = (Point*)calloc( sizeof( Point ) , NUM_PARTICLES );
 	for( j = 0 ; j < NUM_PARTICLES ; j++ ) {
-		int p = (int)uniform( 0 , NUM_PEAKS - 1 );
-		count[p]++;
+		int p = uniform( 0 , NUM_PEAKS );
 		int l = (int)uniform( 0 , MAX_INDEX );
-		particles[j].x = l % MESH_SIZE;
-		particles[j].y = l / MESH_SIZE;
+		particles[j].x = uniform( 0 , MESH_SIZE - 1);
+		particles[j].y = uniform( 0 , MESH_SIZE - 1 );
 		particles[j].dirt = uniform( 0 , 50 );
 		particles[j].dx = peaks[p] % MESH_SIZE;
 		particles[j].dy = peaks[p] / MESH_SIZE;
 	}
-	for( j = 0 ; j < NUM_PEAKS ; j++ ) {
-		printf( "%d : %d\n" , j , count[j] );
-	}
-	free( count );
 	
 	// Run!
 	for ( j = 0 ; j < ITERATIONS ; j++ ) {
