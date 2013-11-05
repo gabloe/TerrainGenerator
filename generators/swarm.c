@@ -7,6 +7,10 @@
 void swarm(short*, int*, int, int);
 void display(short*, int);
 void smooth(short*, int);
+void normalize(short*, int);
+
+short min = 1e15 - 1;
+short max = 1e-15 - 1;
 
 typedef struct {
 	int mx;
@@ -29,7 +33,7 @@ void main(int argc, char** argv) {
 	// Distribute the particles around the mesh
 	int j = 0;
 	while (j < NUM_PARTICLES) {
-		int loc = (MESH_SIZE*MESH_SIZE-1)*rand() / RAND_MAX;
+		int loc = rand() % (MESH_SIZE*MESH_SIZE);
 		grid[loc] += 1;
 		++j;
 	}
@@ -38,7 +42,7 @@ void main(int argc, char** argv) {
 	int p = 0;
 	int* peaks = (int*)calloc(sizeof(int), NUM_PEAKS);
 	while (p < NUM_PEAKS) {
-		peaks[p] = (MESH_SIZE*MESH_SIZE-1)*rand() / RAND_MAX;
+		peaks[p] = rand() % (MESH_SIZE*MESH_SIZE - 1);
 		++p;
 	}
 
@@ -49,9 +53,8 @@ void main(int argc, char** argv) {
 		swarm(grid,peaks,MESH_SIZE,NUM_PEAKS);
 		++i;
 	}
-	
-	smooth(grid, MESH_SIZE);
 
+	normalize(grid, MESH_SIZE);
 	display(grid, MESH_SIZE);
 
 	free(grid);
@@ -59,6 +62,23 @@ void main(int argc, char** argv) {
 	return;
 }
 
+void normalize(short* grid, int size) {
+	int i = 0;
+	while (i < size*size){
+		grid[i] = (short)(255*(grid[i] - min) / (max - min));
+		++i;
+	}
+}
+
+void set(short* grid, int x, short val) {
+	grid[x] = val;
+	if (val < min) {
+		min = val;
+	}
+	if (val > max) {
+		max = val;
+	}
+}
 
 // Perform 1 iteration of particle swarm
 void swarm(short* grid, int* peaks, int size, int numPeaks) {
@@ -67,23 +87,22 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 	while (i < size*size) {
 		// Translate grid location to 2d
 		int ix = i % size;
-		int iy = (int)(i / size);
+		int iy = (int)i / size;
 
 		// Find the closest peak position
 		int j = 0;
-		int closest_px = -1;
-		int closest_py = -1;
-		int closest_dist = INT_MAX-1;
+		int closest_px = 0;
+		int closest_py = 0;
+		float closest_dist = 1e16f;
 		while (j < numPeaks) {
 			int peak_pos = peaks[j];
 			int px = peak_pos % size;
-			int py = (int)(peak_pos / size);
-			float dist = sqrt(pow(ix - px, 2) + pow(iy - py,2));
-			// Update local optimal
+			int py = (int)peak_pos / size;
+			float dist = sqrt(pow(ix - px, 2.f) + pow(iy - py, 2.f));
 			if (dist < closest_dist) {
+				closest_px += px;
+				closest_py += py;
 				closest_dist = dist;
-				closest_px = px;
-				closest_py = py;
 			}
 			++j;
 		}
@@ -93,14 +112,19 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 		// Compute directional vector
 		if (closest_px > ix) { // Right
 			dir_vec[i].mx = 1;
-		} else if (closest_px < ix) { // Left
+		} else if (closest_px < ix) {
 			dir_vec[i].mx = -1;
 		}
-		if (closest_py > iy) { // Below
+		if (closest_py > iy) { // Right
 			dir_vec[i].my = 1;
 		}
-		else if (closest_py < iy) { // Above
+		else if (closest_py < iy) {
 			dir_vec[i].my = -1;
+		}
+		int r = rand();
+		if (r % 3 == 0) {
+			dir_vec[i].mx *= -1;
+			dir_vec[i].my *= -1;
 		}
 		++i;
 	}
@@ -110,8 +134,8 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 	while (j < size*size) {
 		if ((dir_vec[j].mx != 0 || dir_vec[j].my != 0) && grid[j] > 0) {
 			if (j + dir_vec[j].mx + dir_vec[j].my * size >= 0 && j + dir_vec[j].mx + dir_vec[j].my * size < size*size) {
-				grid[j]--;
-				grid[j + dir_vec[j].mx + (dir_vec[j].my * size)]++;
+				set(grid,j,grid[j]-1);
+				set(grid, j + dir_vec[j].mx + dir_vec[j].my * size, grid[j + dir_vec[j].mx + dir_vec[j].my * size] + 1);
 			}
 		}
 		++j;
@@ -120,32 +144,13 @@ void swarm(short* grid, int* peaks, int size, int numPeaks) {
 	return;
 }
 
-void smooth(short* grid, int size) {
-	int i=0;
-	while (i<size*size) {
-		short avg = 0;
-		int j = -1;
-		while (j<2) {
-			int k = -1;
-			while (k<2) {
-				avg += grid[i+(j+k)%size]
-				++k;
-			}
-			++j;
-		}
-		avg /= 9;
-		grid[i] = (short)avg;
-		++i;
-	}
-}
-
-void display(signed short* grid, int size) {
+void display(short* grid, int size) {
 	int i = 0;
 	while (i < size*size) {
 		if (i % size == 0) {
 			printf("\n");
 		}
-		printf("%d\t", grid[i]);
+		printf("%d ", grid[i]);
 		++i;
 	}
 	printf("\n");
