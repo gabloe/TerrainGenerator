@@ -128,7 +128,7 @@ void smooth(short* grid, int size) {
 		while (j<2) {
 			int k = -1;
 			while (k<2) {
-				avg += grid[(i+j+k)%size]
+				avg += grid[i+(j+k)%size]
 				++k;
 			}
 			++j;
