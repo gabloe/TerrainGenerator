@@ -54,10 +54,10 @@ int main(int argc, char** argv) {
 	int MESH_SIZE,NUM_PARTICLES,ITERATIONS,NUM_PEAKS,MAX_SIZE,MAX_INDEX;
 
 	// Read in the paramaters
-	sscanf(argv[1], "%d", &MESH_SIZE);
-	sscanf(argv[2], "%d", &NUM_PARTICLES);
-	sscanf(argv[3], "%d", &ITERATIONS);
-	sscanf(argv[4], "%d", &NUM_PEAKS);
+	sscanf_s(argv[1], "%d", &MESH_SIZE);
+	sscanf_s(argv[2], "%d", &NUM_PARTICLES);
+	sscanf_s(argv[3], "%d", &ITERATIONS);
+	sscanf_s(argv[4], "%d", &NUM_PEAKS);
 	
 	MAX_SIZE = MESH_SIZE * MESH_SIZE;
 	MAX_INDEX = MAX_SIZE - 1;
@@ -139,7 +139,7 @@ void swarm(Point* par, int points , int size ) {
 void out( const char* filename , short *data , int size , short _min , short _max  ) {
 	int i,j;
 	FILE *fp;
-	if( !(fp = fopen( filename , "w" ) ) ) {
+	if( !(fopen_s(&fp, filename , "w" ) ) ) {
 		printf( "Image File Failure\n" );
 		return;
 	}

@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -12,17 +14,22 @@
 
 typedef struct {
    double x, y, z;
-} Grad3;
+} Grad;
 
-typedef struct {
-   double x, y, z, w;
-} Grad4;
+double max = -32000;
+double min = 32000;
 
-double noise2D(double, double, short*, short*, Grad3*);
+#ifndef _max
+#define _max(x,y) (x)>(y)?(x):(y)
+#define _min(x,y) (x)<(y)?(x):(y)
+#endif
 
-void _write(char* fname, double *data, short MESH_SIZE) {
+double noise2D(double, double, short*, short*, Grad*);
+double noise3D(double, double, double, short*, short*, Grad*);
+
+void _write(const char* fname, double *data, short MESH_SIZE) {
    FILE* fp_img = NULL;
-   if (!(fp_img = fopen(fname, "wb"))) {
+   if (!(fp_img = fopen(fname, "wt"))) {
       printf("Error with mesh file.\n");
       return;
    }
@@ -30,14 +37,14 @@ void _write(char* fname, double *data, short MESH_SIZE) {
    for (int i = 0; i < MESH_SIZE; i++) {
       img_written += fprintf(fp_img, "\n");
       for (int j = 0; j < MESH_SIZE; j++) {
-         double t = data[i + (j*MESH_SIZE)];
-         img_written += fprintf(fp_img, "%3d ", (int)(t * 255));
+         double t = (data[i + (j*MESH_SIZE)] - min)/(max-min);
+         img_written += fprintf(fp_img, "%3d ", _max(0,_min(255,(int)(t * 255))));
       }
    }
    fclose(fp_img);
 }
 
-bool in(short* arr, short val, int size) {
+int in(short* arr, short val, int size) {
    int i=0;
    while(i<size) {
       if (arr[i] == val) {
@@ -49,7 +56,7 @@ bool in(short* arr, short val, int size) {
 }
 
 short* genPermutations(int low, int high) {
-   int range = high - low + 1;
+   int range = high - low;
    short* p = (short*) calloc(sizeof(short),range);
    int i = 1;
    srand(time(NULL));
@@ -71,21 +78,27 @@ int fastFloor(double x) {
    return x<xx ? xx-1 : xx;
 }
 
-double dot2(Grad3 g, double x, double y) { return g.x*x + g.y*y; }
-double dot3(Grad3 g, double x, double y, double z) { return g.x*x + g.y*y + g.z*z; }
-double dot4(Grad4 g, double x, double y, double z, double w) { return g.x*x + g.y*y + g.z*z + g.w*w; }
+double dot2(Grad g, double x, double y) { return g.x*x + g.y*y; }
+double dot3(Grad g, double x, double y, double z) { return g.x*x + g.y*y + g.z*z; }
+//double dot4(Grad g, double x, double y, double z, double w) { return g.x*x + g.y*y + g.z*z + g.w*w; }
 
-double noise(double x, double y, short* perm, short* permMod12, Grad3* gradients, int octaves, int persistence) {
+double noise(double x, double y, short* perm, short* permMod12, Grad* gradients, int octaves, float persistence) {
    double total = 0;
    for (int i=0;i<octaves-1;++i) {
       double freq = pow(2.0,i);
       double amp = pow(persistence,i);
       total += noise2D(x*freq,y*freq,perm,permMod12,gradients) * amp;
    }
+   if (total > max) {
+	   max = total;
+   }
+   else if (total < min) {
+	   min = total;
+   }
    return total;
 }
 
-double noise2D(double x, double y, short* perm, short* permMod12, Grad3* gradients) {
+double noise2D(double x, double y, short* perm, short* permMod12, Grad* gradients) {
    double n0,n1,n2;
    double s = (x+y)*F2;
    int i = fastFloor(x+s);
@@ -131,19 +144,19 @@ double noise2D(double x, double y, short* perm, short* permMod12, Grad3* gradien
 
 int main(int argc, char** argv) {
    int MESH_SIZE = 64;
-   int FREQ = 5;
-   float PERS = 0.5;
-   float POINT_DIST = 0.005;
+   int OCTAVES = 5;
+   float PERS = 0.5f;
+   float POINT_DIST = 0.005f;
    if( argc != 5 ) {
-      printf( "%s MESH_SIZE FREQ PERS PDIST\n", argv[0]);
+      printf( "%s MESH_SIZE OCTAVES PERS PDIST\n", argv[0]);
       return 0;
    }
-   sscanf(argv[1],"%d",&MESH_SIZE );
-   sscanf(argv[2],"%d",&FREQ );
-   sscanf(argv[3],"%f",&PERS );
-   sscanf(argv[4],"%f",&POINT_DIST );
+   sscanf_s(argv[1],"%d",&MESH_SIZE );
+   sscanf_s(argv[2],"%d",&OCTAVES);
+   sscanf_s(argv[3],"%f",&PERS );
+   sscanf_s(argv[4],"%f",&POINT_DIST );
 
-   short* p = genPermutations(0,255);
+   short* p = genPermutations(0,256);
    short* perm = (short*)calloc(sizeof(short),512);
    short* permMod12 = (short*)calloc(sizeof(short),512);
 
@@ -153,35 +166,35 @@ int main(int argc, char** argv) {
       permMod12[i] = (short)(perm[i] % 12);
    }
 
-   Grad3* gradients3D = (Grad3*)malloc(12 * sizeof(Grad3));
+   Grad* gradients3D = (Grad*)malloc(12 * sizeof(Grad));
    // Generate gradients
    int cnt = 0;
    for (int i=-1;i<2;i+=2) {
       for (int j=-1;j<2;j+=2) {
-         gradients3D[cnt].x=i;
-         gradients3D[cnt].y=j;
-         gradients3D[cnt++].z=0;
+		 gradients3D[cnt].x = (double)i;
+		 gradients3D[cnt].y = (double)j;
+         gradients3D[cnt++].z=0.0;
       }
    }
    for (int i=-1;i<2;i+=2) {
       for (int j=-1;j<2;j+=2) {
-         gradients3D[cnt].x=i;
-         gradients3D[cnt].z=j;
-         gradients3D[cnt++].y=0;
+		 gradients3D[cnt].x = (double)i;
+		 gradients3D[cnt].z = (double)j;
+         gradients3D[cnt++].y=0.0;
       }
    }
    for (int i=-1;i<2;i+=2) {
       for (int j=-1;j<2;j+=2) {
-         gradients3D[cnt].y=i;
-         gradients3D[cnt].z=j;
-         gradients3D[cnt++].x=0;
+         gradients3D[cnt].y=(double)i;
+		 gradients3D[cnt].z = (double)j;
+         gradients3D[cnt++].x=0.0;
       }
    }
 
    double* narr = (double*)malloc(MESH_SIZE*MESH_SIZE*sizeof(double));
    for (int i=0;i<MESH_SIZE;++i) {
       for (int j=0;j<MESH_SIZE;++j) {
-         narr[i+j*MESH_SIZE] = noise(i*POINT_DIST,j*POINT_DIST,perm,permMod12,gradients3D,FREQ,PERS);
+		  narr[i + j*MESH_SIZE] = noise(i*POINT_DIST, j*POINT_DIST, perm, permMod12, gradients3D,OCTAVES,PERS);
       }
    }
 
