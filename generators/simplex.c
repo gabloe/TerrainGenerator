@@ -31,7 +31,7 @@ void _write(char* fname, double *data, short MESH_SIZE) {
       img_written += fprintf(fp_img, "\n");
       for (int j = 0; j < MESH_SIZE; j++) {
          double t = data[i + (j*MESH_SIZE)];
-         img_written += fprintf(fp_img, "%3d ", 255-(int)(t * 255));
+         img_written += fprintf(fp_img, "%3d ", (int)(t * 255));
       }
    }
    fclose(fp_img);
