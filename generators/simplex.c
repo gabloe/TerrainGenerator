@@ -55,11 +55,11 @@ int in(short* arr, short val, int size) {
    return 0;
 }
 
-short* genPermutations(int low, int high) {
+short* genPermutations(int low, int high, int seed) {
    int range = high - low;
    short* p = (short*) calloc(sizeof(short),range);
    int i = 1;
-   srand(512);
+   srand(seed);
    short v = rand() % range;
    p[0] = v;
    while (i<range) {
@@ -146,26 +146,30 @@ int main(int argc, char** argv) {
    int OCTAVES = 5;
    float PERS = 0.5f;
    float POINT_DIST = 0.005f;
-   if( argc != 5 ) {
-      printf( "%s MESH_SIZE OCTAVES PERSISTENCE POINTDIST\n", argv[0]);
+   int SEED = time(NULL);
+   if( argc != 6 ) {
+      printf( "%s MESH_SIZE OCTAVES PERSISTENCE POINTDIST SEED\n", argv[0]);
       return 0;
    }
    sscanf_s(argv[1],"%d",&MESH_SIZE );
    sscanf_s(argv[2],"%d",&OCTAVES);
    sscanf_s(argv[3],"%f",&PERS );
    sscanf_s(argv[4],"%f",&POINT_DIST );
+   sscanf_s(argv[5], "%D", &SEED);
 
    printf("Description:\n");
    printf("OCTAVES - Scales the level of detail, 2 being worst detail and 7 being best detail.\n");
    printf("PERSISTENCE - Scales the amplitude of the wave function.\n");
-   printf("POINTDIST - Scales the distance between point samples, essentially zooms in or out.\n\n");
+   printf("POINTDIST - Scales the distance between point samples, essentially zooms in or out.\n");
+   printf("SEED - Seed for the random number generator.\n\n");
    printf("Configuration:\n");
    printf("OCTAVES - %d.\n",OCTAVES);
    printf("PERSISTENCE - %3f.\n",PERS);
-   printf("POINTDIST - %3f.\n\n",POINT_DIST);
+   printf("POINTDIST - %3f.\n",POINT_DIST);
+   printf("SEED - %d.\n\n", SEED);
 
    printf("Generating permutations.\n", POINT_DIST);
-   short* p = genPermutations(0,256);
+   short* p = genPermutations(0,256,SEED);
    short* perm = (short*)calloc(sizeof(short),512);
    short* permMod12 = (short*)calloc(sizeof(short),512);
 
