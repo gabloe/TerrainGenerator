@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <malloc.h>
 #include <stdlib.h>
@@ -39,7 +41,7 @@ void out( const char* , short*, int , short , short );
 
 #define uniform(low,high) (unsigned int)((low) + (high) * ( my_rand() / (double)MAX_RAND ) )
 
-int main(int argc, char** argv) {
+int sw_main(int argc, char** argv) {
 	srand( time( 0 ) );
 	init_rand( rand() );
 	
@@ -54,10 +56,10 @@ int main(int argc, char** argv) {
 	int MESH_SIZE,NUM_PARTICLES,ITERATIONS,NUM_PEAKS,MAX_SIZE,MAX_INDEX;
 
 	// Read in the paramaters
-	sscanf_s(argv[1], "%d", &MESH_SIZE);
-	sscanf_s(argv[2], "%d", &NUM_PARTICLES);
-	sscanf_s(argv[3], "%d", &ITERATIONS);
-	sscanf_s(argv[4], "%d", &NUM_PEAKS);
+	sscanf(argv[1], "%d", &MESH_SIZE);
+	sscanf(argv[2], "%d", &NUM_PARTICLES);
+	sscanf(argv[3], "%d", &ITERATIONS);
+	sscanf(argv[4], "%d", &NUM_PEAKS);
 	
 	MAX_SIZE = MESH_SIZE * MESH_SIZE;
 	MAX_INDEX = MAX_SIZE - 1;
@@ -139,7 +141,7 @@ void swarm(Point* par, int points , int size ) {
 void out( const char* filename , short *data , int size , short _min , short _max  ) {
 	int i,j;
 	FILE *fp;
-	if( !(fopen_s(&fp, filename , "w" ) ) ) {
+	if( !(fp = fopen( filename , "w" ) ) ) {
 		printf( "Image File Failure\n" );
 		return;
 	}

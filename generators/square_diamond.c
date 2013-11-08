@@ -55,7 +55,7 @@ void normal( float* vec1 , float* vec2 , float* vec3 , float* norm ) {
 	norm[2] = norm[2] / div;
 }
 
-void main(int argc , char** args) {
+void sq_main(int argc , char** args) {
 	// Loop Index
 	int i,j;
 
