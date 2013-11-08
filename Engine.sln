@@ -15,6 +15,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utils", "utils\utils.vcxproj", "{ACA0123A-FB53-41FE-A59A-7C0E03A88F7D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Main", "Main\Main.vcxproj", "{4D7F8840-AD64-4A4C-A537-657A0D263A54}"
+	ProjectSection(ProjectDependencies) = postProject
+		{73D9E675-3771-47EE-AD0F-11F5CBEB0B5D} = {73D9E675-3771-47EE-AD0F-11F5CBEB0B5D}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Renderer", "renderer\Renderer.vcxproj", "{73D9E675-3771-47EE-AD0F-11F5CBEB0B5D}"
 EndProject
