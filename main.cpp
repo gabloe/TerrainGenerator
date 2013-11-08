@@ -1,11 +1,11 @@
-#include <gl/glew.h>
+#include <GL/glew.h>
 
-#define GLFW_INCLUDE_GLU
 #include <GLFW/glfw3.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <cmath>
+
 
 #include "renderer\RenderObject.h"
 
@@ -23,7 +23,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
       glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-void display(RenderObject *obj) {
+void display(RenderObject obj) {
 
 	// Variables
 	GLuint vertexBuffer;
@@ -32,37 +32,45 @@ void display(RenderObject *obj) {
 	// Data
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)* obj->getNumVertices(), obj->getVertices(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)* obj.getNumVertices(), obj.getVertices(), GL_STATIC_DRAW);
 
 	// Indexes
 	glGenBuffers(1, &elementbuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj->getNumIndices() * sizeof(GLuint) , obj->getIndices() , GL_STATIC_DRAW );
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getNumIndices() * sizeof(GLuint) , obj.getIndices() , GL_STATIC_DRAW );
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 
 	// Things!
-	glDrawElements(obj->getDisplayMode(), obj->getNumIndices(), GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(obj.getDisplayMode(), obj.getNumIndices(), GL_UNSIGNED_INT, (void*)0);
 
 }
 
-int main(int argc , char** args)
+int main(int argc, char** args)
 {
-	glewExperimental = GL_TRUE;
-	if (!glewInit()) {
+	
+
+	GLFWwindow* window;
+	glfwSetErrorCallback(error_callback);
+	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
 	}
 
-   GLFWwindow* window;
-   glfwSetErrorCallback(error_callback);
-   if (!glfwInit())
-      exit(EXIT_FAILURE);
-   
-   
    window = glfwCreateWindow(640, 480, "Happy Time Fun Time ALPHA v10E-100", NULL, NULL);
    if (!window)
    {
       glfwTerminate();
       exit(EXIT_FAILURE);
    }
+
+   glfwMakeContextCurrent(window);
+
+   glewExperimental = GL_TRUE;
+   if (GLEW_OK != glewInit()) {
+	   glfwTerminate();
+	   fprintf(stderr, "Error: %s\n", glewGetErrorString(glewInit()));
+	   system("PAUSE");
+	   exit(EXIT_FAILURE);
+   }
+
    glfwMakeContextCurrent(window);
    glfwSetKeyCallback(window, key_callback);
 
@@ -77,13 +85,13 @@ int main(int argc , char** args)
    RenderObject obj;
 
    obj.setVertices(data, 9);
-   obj.setIndices( ind , 9);
+   obj.setIndices(ind, 3);
    
 
    while (!glfwWindowShouldClose(window))
    {
       // Main Loop.  Do the stuff!
-	   display(&obj);
+	  display(obj);
       glfwSwapBuffers(window);
       glfwPollEvents();
    }

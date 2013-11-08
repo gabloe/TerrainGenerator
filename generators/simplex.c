@@ -146,7 +146,7 @@ int main(int argc, char** argv) {
    int OCTAVES = 5;
    float PERS = 0.5f;
    float POINT_DIST = 0.005f;
-   int SEED = time(NULL);
+   int SEED = (int)time(NULL);
    if( argc != 6 ) {
       printf( "%s MESH_SIZE OCTAVES PERSISTENCE POINTDIST SEED\n", argv[0]);
       return 0;
