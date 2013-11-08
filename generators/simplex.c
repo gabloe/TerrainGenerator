@@ -59,7 +59,7 @@ short* genPermutations(int low, int high) {
    int range = high - low;
    short* p = (short*) calloc(sizeof(short),range);
    int i = 1;
-   srand(time(NULL));
+   srand(512);
    short v = rand() % range;
    p[0] = v;
    while (i<range) {
@@ -141,14 +141,13 @@ double noise2D(double x, double y, short* perm, short* permMod12, Grad* gradient
    return 70.0 * (n0 + n1 + n2);
 }
 
-
 int main(int argc, char** argv) {
    int MESH_SIZE = 64;
    int OCTAVES = 5;
    float PERS = 0.5f;
    float POINT_DIST = 0.005f;
    if( argc != 5 ) {
-      printf( "%s MESH_SIZE OCTAVES PERS PDIST\n", argv[0]);
+      printf( "%s MESH_SIZE OCTAVES PERSISTENCE POINTDIST\n", argv[0]);
       return 0;
    }
    sscanf_s(argv[1],"%d",&MESH_SIZE );
@@ -156,6 +155,16 @@ int main(int argc, char** argv) {
    sscanf_s(argv[3],"%f",&PERS );
    sscanf_s(argv[4],"%f",&POINT_DIST );
 
+   printf("Description:\n");
+   printf("OCTAVES - Scales the level of detail, 0 being worst detail and 10 being best detail.\n");
+   printf("PERSISTENCE - Scales the amplitude of the wave function.\n");
+   printf("POINTDIST - Scales the distance between point samples, essentially zooms in or out.\n\n");
+   printf("Configuration:\n");
+   printf("OCTAVES - %d.\n",OCTAVES);
+   printf("PERSISTENCE - %3f.\n",PERS);
+   printf("POINTDIST - %3f.\n\n",POINT_DIST);
+
+   printf("Generating permutations.\n", POINT_DIST);
    short* p = genPermutations(0,256);
    short* perm = (short*)calloc(sizeof(short),512);
    short* permMod12 = (short*)calloc(sizeof(short),512);
@@ -165,7 +174,8 @@ int main(int argc, char** argv) {
       perm[i]=p[i & 255];
       permMod12[i] = (short)(perm[i] % 12);
    }
-
+   printf("done.\n\n", POINT_DIST);
+   printf("Computing gradients.\n", POINT_DIST);
    Grad* gradients3D = (Grad*)malloc(12 * sizeof(Grad));
    // Generate gradients
    int cnt = 0;
@@ -190,15 +200,18 @@ int main(int argc, char** argv) {
          gradients3D[cnt++].x=0.0;
       }
    }
-
+   printf("done.\n\n", POINT_DIST);
+   printf("Generating simplex mesh.\n", POINT_DIST);
    double* narr = (double*)malloc(MESH_SIZE*MESH_SIZE*sizeof(double));
    for (int i=0;i<MESH_SIZE;++i) {
       for (int j=0;j<MESH_SIZE;++j) {
 		  narr[i + j*MESH_SIZE] = noise(i*POINT_DIST, j*POINT_DIST, perm, permMod12, gradients3D,OCTAVES,PERS);
       }
    }
-
+   printf("done.\n\n", POINT_DIST);
+   printf("Writing output file.\n", POINT_DIST);
    _write("out.pgm",narr,MESH_SIZE);
+   printf("done.\n", POINT_DIST);
 
    free(narr);
    free(p);
