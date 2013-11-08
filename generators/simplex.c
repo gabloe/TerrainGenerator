@@ -156,7 +156,7 @@ int main(int argc, char** argv) {
    sscanf_s(argv[4],"%f",&POINT_DIST );
 
    printf("Description:\n");
-   printf("OCTAVES - Scales the level of detail, 0 being worst detail and 10 being best detail.\n");
+   printf("OCTAVES - Scales the level of detail, 2 being worst detail and 7 being best detail.\n");
    printf("PERSISTENCE - Scales the amplitude of the wave function.\n");
    printf("POINTDIST - Scales the distance between point samples, essentially zooms in or out.\n\n");
    printf("Configuration:\n");
