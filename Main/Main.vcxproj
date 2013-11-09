@@ -21,6 +21,16 @@
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\renderer\Renderer.vcxproj">
+      <Project>{73d9e675-3771-47ee-ad0f-11f5cbeb0b5d}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4D7F8840-AD64-4A4C-A537-657A0D263A54}</ProjectGuid>
     <RootNamespace>math</RootNamespace>

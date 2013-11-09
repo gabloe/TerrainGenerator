@@ -89,6 +89,8 @@ int main(int argc, char** args)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getNumIndices() * sizeof(GLuint), obj.getIndices(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 
+	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
+
 
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window))

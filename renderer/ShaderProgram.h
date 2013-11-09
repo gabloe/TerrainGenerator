@@ -1,5 +1,7 @@
 #pragma once
 
+#define RENDERER_API __declspec(dllexport) 
+
 #include <GL/glew.h>
 
 enum SHADER_ERROR { FRAGMENT, VERTEX, PROGRAM };
@@ -16,13 +18,13 @@ private:
 	int error;
 	void cleanup();
 public:
-	ShaderProgram(const char* vert , const char* frag);
-	~ShaderProgram();
+	__declspec( dllexport) ShaderProgram(const char* vert , const char* frag);
+	__declspec(dllexport) ~ShaderProgram();
 
 	GLuint getVertexShader() { return v; }
 	GLuint getFragmentShader() { return f; }
 	GLuint getProgram(){ return program; }
-	SHADER_ERROR getError();
+	__declspec(dllexport) SHADER_ERROR getError();
 
 	
 };

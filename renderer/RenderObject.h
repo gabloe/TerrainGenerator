@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include "ShaderProgram.h"
 
 class RenderObject
 {
@@ -13,15 +14,23 @@ private:
 	GLfloat *norms;
 	GLuint *inds;
 
+	ShaderProgram* program;
+
 public:
 	RenderObject() {}
 	~RenderObject() {}
 
+	// Set
 	void setVertices(GLfloat *vert, int num) { this->vert = vert; this->num_vert = num; }
 	void setNormals(GLfloat *norms, int num) { this->norms = norms; this->num_norm = num; }
 	void setIndices(GLuint *inds, int num) { this->inds = inds; this->num_ind = num; }
+
 	void setMode(GLenum mode) { this->mode = mode; }
 
+	void setShaderProgram( ShaderProgram* p ) { this->program = p; }
+
+
+	// Get
 	GLuint* getIndices() { return this->inds; }
 	GLfloat* getVertices() { return this->vert; }
 	GLfloat* getNormals() { return this->norms; }
@@ -31,5 +40,7 @@ public:
 	GLuint getNumNormals() { return this->num_norm; }
 
 	GLenum getDisplayMode() { return this->mode; }
+
+	ShaderProgram* getShaderProgram() { return this->program; }
 };
 
