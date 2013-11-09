@@ -19,6 +19,13 @@
 #define GetCurrentDir getcwd
 #endif
 
+#define BUFFER_OFFSET(i) ((char*)NULL + (i))
+
+// Variables
+GLuint vertexBuffer;
+GLuint elementbuffer;
+
+
 
 GLFWwindow *window;
 
@@ -32,13 +39,32 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
+// used to display a RenderObject
 void display(RenderObject obj) {
 
-	// Things!
-	glDrawElements(obj.getDisplayMode(), obj.getNumIndices(), GL_UNSIGNED_INT, (void*)0);
+	ShaderProgram *p = obj.getShaderProgram();
+	if (p) {
+		p->load();
+	}
 
+	GLenum mode = obj.getDisplayMode();
+	GLuint num = obj.getNumIndices();
+	glBindBufferARB(GL_ARRAY_BUFFER, vertexBuffer);	
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat), BUFFER_OFFSET(0));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, elementbuffer);
+	glDrawElements( mode , num , GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+
+	glBindBufferARB(GL_ARRAY_BUFFER, 0 );
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+
+	if (p) {
+		p->unload();
+	}
 }
 
+// Initializes all the subsystems, create the window.
 void init() {
 
 	glfwSetErrorCallback(error_callback);
@@ -65,9 +91,15 @@ void init() {
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 
+	// Do some stuff
+	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_DEPTH_TEST);
+
+
 }
 
-
+// Just prints OpenGL information
 void print() {
 	char current[FILENAME_MAX];
 
@@ -102,36 +134,42 @@ int main(int argc, char** args)
 	obj.setIndices(ind, 3);
 	obj.setMode(GL_TRIANGLES);
 
-	// Variables
-	GLuint vertexBuffer;
-	GLuint elementbuffer;
-
 	// Data
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)* obj.getNumVertices(), obj.getVertices(), GL_STATIC_DRAW);
+	glGenBuffersARB(1, &vertexBuffer);
+	glBindBufferARB(GL_ARRAY_BUFFER, vertexBuffer);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(float)* obj.getNumVertices(), obj.getVertices(), GL_STATIC_DRAW_ARB);
 
 	// Indexes
-	glGenBuffers(1, &elementbuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getNumIndices() * sizeof(GLuint), obj.getIndices(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	glGenBuffersARB(1, &elementbuffer);
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, obj.getNumIndices() * sizeof(GLuint), obj.getIndices(), GL_STATIC_COPY_ARB);
+	
 
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
 
 	if (program.getError() != SHADER_ERROR::NO_SHADER_ERROR ) {
 		printf("No Error!\n");
 	}
 
+	obj.setShaderProgram(&program);
+
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window))
 	{	
-		glClearColor(1, 0, 0, 0 );
-		glClear(GL_COLOR_BUFFER_BIT);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		display(obj);
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	glDeleteBuffersARB(1, &vertexBuffer);
+	glDeleteBuffersARB(1, &elementbuffer);
 
 	glUseProgram(0);
 
