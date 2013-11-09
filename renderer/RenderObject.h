@@ -20,7 +20,7 @@ public:
 	void setVertices(GLfloat *vert, int num) { this->vert = vert; this->num_vert = num; }
 	void setNormals(GLfloat *norms, int num) { this->norms = norms; this->num_norm = num; }
 	void setIndices(GLuint *inds, int num) { this->inds = inds; this->num_ind = num; }
-	void setMode(GLenum mode);
+	void setMode(GLenum mode) { this->mode = mode; }
 
 	GLuint* getIndices() { return this->inds; }
 	GLfloat* getVertices() { return this->vert; }
