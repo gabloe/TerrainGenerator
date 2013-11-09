@@ -83,6 +83,13 @@ int main(int argc, char** args)
 	print();
 	init();
 
+
+	printf("OpenGL Vendor: %s\n", glGetString(GL_VENDOR));
+	printf("OpenGL Vendor: %s\n", glGetString(GL_RENDERER));
+	printf("OpenGL Vendor: %s\n", glGetString(GL_VERSION));
+
+
+
 	GLfloat data[] = {
 		-1.0f, -1.0f, 0.0f,
 		1.0f, -1.0f, 0.0f,
@@ -125,8 +132,6 @@ int main(int argc, char** args)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
-
 
 	glUseProgram(0);
 

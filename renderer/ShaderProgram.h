@@ -16,9 +16,9 @@ private:
 	GLint v_len, f_len;
 
 	SHADER_ERROR error;
-	void cleanup();
+
 public:
-	__declspec( dllexport) ShaderProgram(const char* vert , const char* frag);
+	__declspec(dllexport) ShaderProgram(const char* vert, const char* frag);
 	__declspec(dllexport) ~ShaderProgram();
 
 	GLuint getVertexShader() { return v; }
@@ -26,6 +26,8 @@ public:
 	GLuint getProgram(){ return program; }
 	SHADER_ERROR getError() { return this->error; }
 
-	
+	void load() { glUseProgram(this->program); };
+	void unload(){ glUseProgram(0); };
+
 };
 
