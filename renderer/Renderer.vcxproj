@@ -123,12 +123,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Def.h" />
+    <ClInclude Include="ObjectGenerator.h" />
     <ClInclude Include="RenderObject.h" />
     <ClInclude Include="ShaderProgram.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ObjectGenerator.cpp" />
     <ClCompile Include="RenderObject.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\math\math.vcxproj">
+      <Project>{087d4a7c-4379-4f60-8190-c6ffb81be5f4}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

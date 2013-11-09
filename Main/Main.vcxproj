@@ -22,6 +22,9 @@
     <ClCompile Include="..\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\math\math.vcxproj">
+      <Project>{087d4a7c-4379-4f60-8190-c6ffb81be5f4}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\renderer\Renderer.vcxproj">
       <Project>{73d9e675-3771-47ee-ad0f-11f5cbeb0b5d}</Project>
       <Private>true</Private>
