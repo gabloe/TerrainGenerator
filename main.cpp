@@ -8,6 +8,17 @@
 
 #include "renderer\RenderObject.h"
 
+#include <stdio.h>  /* defines FILENAME_MAX */
+
+
+#ifdef _WIN32
+	#include <direct.h>
+	#define GetCurrentDir _getcwd
+#else
+	#include <unistd.h>
+#define GetCurrentDir getcwd
+#endif
+
 
 GLFWwindow *window;
 
@@ -57,9 +68,19 @@ void init() {
 }
 
 
+void print() {
+	char current[FILENAME_MAX];
+
+	if (GetCurrentDir(current, sizeof(current))){
+		printf("%s\n" , current );
+	}
+}
+
 
 int main(int argc, char** args)
 {
+
+	print();
 	init();
 
 	GLfloat data[] = {
@@ -73,7 +94,6 @@ int main(int argc, char** args)
 	obj.setVertices(data, 9);
 	obj.setIndices(ind, 3);
 	obj.setMode(GL_TRIANGLES);
-
 
 	// Variables
 	GLuint vertexBuffer;
@@ -91,6 +111,9 @@ int main(int argc, char** args)
 
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
 
+	if (program.getError() != SHADER_ERROR::NO_SHADER_ERROR ) {
+		printf("No Error!\n");
+	}
 
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window))

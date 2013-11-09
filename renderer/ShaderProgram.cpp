@@ -5,6 +5,9 @@
 
 using namespace std;
 
+/*
+	Given a file stream returns the length of the file
+*/
 unsigned long long getFileLength(ifstream& file)
 {
 	if (!file.good()) return 0;
@@ -17,6 +20,10 @@ unsigned long long getFileLength(ifstream& file)
 	return (unsigned long)len;
 }
 
+/*
+	Loads the shader source code from a file in an array. The length 
+	of the source code is saved into len.
+*/
 int loadshader(const char* filename, GLchar** ShaderSource, GLint* len)
 {
 	ifstream file;
@@ -30,8 +37,6 @@ int loadshader(const char* filename, GLchar** ShaderSource, GLint* len)
 	GLchar *source = new GLchar[size + 1];
 	if (source == 0) return -3;   // can't reserve memory
 
-	// len isn't always strlen cause some characters are stripped in ascii read...
-	// it is important to 0-terminate the real length later, len is just max possible value... 
 	source[size] = 0;
 
 	unsigned int i = 0;
@@ -52,7 +57,9 @@ int loadshader(const char* filename, GLchar** ShaderSource, GLint* len)
 	return 0; // No Error
 }
 
-
+/*
+	Frees Shader Source Code information
+*/
 void unloadshader(GLchar** ShaderSource)
 {
 	if (*ShaderSource != 0)
@@ -60,6 +67,9 @@ void unloadshader(GLchar** ShaderSource)
 	*ShaderSource = 0;
 }
 
+/*
+	Prints any error from the object passed in
+*/
 void printError(GLint object ,int blen ) {
 	GLsizei slen = 0;
 	GLchar* compiler_log = (GLchar*)malloc(blen);
@@ -68,6 +78,9 @@ void printError(GLint object ,int blen ) {
 	free(compiler_log);
 }
 
+/*
+	Compiles a Shader Object (vertex/fragment)
+*/
 int compile(GLuint ShaderObject) {
 	GLint blen = 0;
 	GLint compiled;
@@ -76,14 +89,17 @@ int compile(GLuint ShaderObject) {
 	
 	glGetObjectParameterivARB(ShaderObject, GL_COMPILE_STATUS, &compiled);
 	if (compiled){
-		return 1;
-	}	
+		return 0;
+	}
+
 	glGetShaderiv(ShaderObject, GL_INFO_LOG_LENGTH, &blen);
 	printError(ShaderObject, blen);
 
-	return 0;
+	return 1;
 }
 
+/*
+*/
 int link(GLuint *program, GLuint f, GLuint v){
 	GLint blen;
 	GLint linked; 
@@ -109,16 +125,25 @@ ShaderProgram::ShaderProgram(const char* vert, const char* frag)
 	v = 0;
 	f = 0;
 
+	if (loadshader(vert, &this->v_src, &this->v_len) != 0) {
+		printf("Could not load the Vertex Shader file: %s" , vert );
+		return;
+	}
+	
+	if (loadshader(frag, &this->f_src, &this->f_len) != 0) {
+		printf("Could not load the Fragment Shader file: %s", frag);
+		return;
+	}
+
+	// Create palce for Shaders 
 	v = glCreateShader(GL_VERTEX_SHADER);
 	f = glCreateShader(GL_FRAGMENT_SHADER);
-
-	loadshader(vert, &this->v_src, &this->v_len);
-	loadshader(frag, &this->f_src, &this->f_len);
-
 	
+	// Copy over source code
 	glShaderSourceARB(v, 1, &vert, &this->v_len);
 	glShaderSourceARB(f, 1, &frag, &this->f_len);
 
+	// Try to compile!
 	if (!compile(v)) {
 		error = VERTEX;
 		return;
@@ -133,6 +158,8 @@ ShaderProgram::ShaderProgram(const char* vert, const char* frag)
 		// Cleanup
 	}
 
+
+	this->error = NO_SHADER_ERROR;
 }
 
 

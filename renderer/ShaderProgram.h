@@ -4,7 +4,7 @@
 
 #include <GL/glew.h>
 
-enum SHADER_ERROR { FRAGMENT, VERTEX, PROGRAM };
+enum SHADER_ERROR { NO_SHADER_ERROR, FRAGMENT, VERTEX, PROGRAM };
 
 class ShaderProgram
 {
@@ -15,7 +15,7 @@ private:
 	GLchar* f_src;
 	GLint v_len, f_len;
 
-	int error;
+	SHADER_ERROR error;
 	void cleanup();
 public:
 	__declspec( dllexport) ShaderProgram(const char* vert , const char* frag);
@@ -24,7 +24,7 @@ public:
 	GLuint getVertexShader() { return v; }
 	GLuint getFragmentShader() { return f; }
 	GLuint getProgram(){ return program; }
-	__declspec(dllexport) SHADER_ERROR getError();
+	SHADER_ERROR getError() { return this->error; }
 
 	
 };
