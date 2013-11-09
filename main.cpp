@@ -25,8 +25,6 @@
 GLuint vertexBuffer;
 GLuint elementbuffer;
 
-
-
 GLFWwindow *window;
 
 static void error_callback(int error, const char* description)
@@ -42,6 +40,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 // used to display a RenderObject
 void display(RenderObject obj) {
 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	ShaderProgram *p = obj.getShaderProgram();
 	if (p) {
 		p->load();
@@ -51,7 +51,7 @@ void display(RenderObject obj) {
 	GLuint num = obj.getNumIndices();
 	glBindBufferARB(GL_ARRAY_BUFFER, vertexBuffer);	
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat), BUFFER_OFFSET(0));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, elementbuffer);
 	glDrawElements( mode , num , GL_UNSIGNED_INT, BUFFER_OFFSET(0));
@@ -104,34 +104,35 @@ void print() {
 	char current[FILENAME_MAX];
 
 	if (GetCurrentDir(current, sizeof(current))){
-		printf("%s\n" , current );
+		printf("Current Working Directory : %s\n" , current );
 	}
-}
-
-
-int main(int argc, char** args)
-{
-
-	print();
-	init();
-
 
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VENDOR));
 	printf("OpenGL Vendor: %s\n", glGetString(GL_RENDERER));
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VERSION));
 
+}
 
 
+int main(int argc, char** args)
+{
+	init();
+	print();
+
+	// load data
+
+	
 	GLfloat data[] = {
-		-1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
+		-0.5f,	0.5f, 0.0f,	// 0
+		0.5f,	0.5f, 0.0f,	// 1
+		-0.5f,	-0.5f, 0.0f,	// 2
+		0.5f,	-0.5f, 0.0f	// 3
 	};
-	GLuint ind[] = { 0, 1, 2 };
+	GLuint ind[] = { 0, 1, 3 , 0 , 3 , 2 };
 	RenderObject obj;
 
-	obj.setVertices(data, 9);
-	obj.setIndices(ind, 3);
+	obj.setVertices(data, 12);
+	obj.setIndices(ind, 6);
 	obj.setMode(GL_TRIANGLES);
 
 	// Data
