@@ -7,11 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generators", "generators\ge
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math", "math\math.vcxproj", "{087D4A7C-4379-4F60-8190-C6FFB81BE5F4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{36AAD93D-6605-4F7D-A9BB-200414FB9FA1}"
-	ProjectSection(SolutionItems) = preProject
-		main.cpp = main.cpp
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utils", "utils\utils.vcxproj", "{ACA0123A-FB53-41FE-A59A-7C0E03A88F7D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Main", "Main\Main.vcxproj", "{4D7F8840-AD64-4A4C-A537-657A0D263A54}"
