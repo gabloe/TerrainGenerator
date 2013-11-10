@@ -18,6 +18,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Main", "Main\Main.vcxproj",
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Renderer", "renderer\Renderer.vcxproj", "{73D9E675-3771-47EE-AD0F-11F5CBEB0B5D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{087D4A7C-4379-4F60-8190-C6FFB81BE5F4} = {087D4A7C-4379-4F60-8190-C6FFB81BE5F4}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{CAC51969-C2C6-4CB5-9FE9-A01979FF19D6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{5269B0B0-DB5B-44E9-96F6-342AEF3AE208}"
+	ProjectSection(SolutionItems) = preProject
+		resources\shaders\shader.frag = resources\shaders\shader.frag
+		resources\shaders\shader.vert = resources\shaders\shader.vert
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,5 +81,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5269B0B0-DB5B-44E9-96F6-342AEF3AE208} = {CAC51969-C2C6-4CB5-9FE9-A01979FF19D6}
 	EndGlobalSection
 EndGlobal

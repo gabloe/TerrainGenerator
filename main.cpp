@@ -6,9 +6,19 @@
 #include <stdio.h>
 #include <cmath>
 
+#include "math\mat3.h"
+#include "math\mat4.h"
 #include "renderer\RenderObject.h"
 
 #include <stdio.h>  /* defines FILENAME_MAX */
+
+
+Mat4 t(
+	1, 0, 0, 0,
+	0, 1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1
+	);
 
 
 #ifdef _WIN32
@@ -39,12 +49,15 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 // used to display a RenderObject
 void display(RenderObject obj) {
-
+	GLuint rotationMatrix;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	ShaderProgram *p = obj.getShaderProgram();
 	if (p) {
 		p->load();
+		rotationMatrix = glGetAttribLocationARB(p->getProgram(), "rotation");
+		glEnableVertexAttribArray(rotationMatrix);
+		glVertexAttribPointerARB(rotationMatrix , 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 	}
 
 	GLenum mode = obj.getDisplayMode();
@@ -65,6 +78,7 @@ void display(RenderObject obj) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 
 	if (p) {
+		glDisableVertexAttribArray(rotationMatrix);
 		p->unload();
 	}
 }
@@ -117,7 +131,6 @@ void print() {
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VERSION));
 
 }
-
 
 int main(int argc, char** args)
 {

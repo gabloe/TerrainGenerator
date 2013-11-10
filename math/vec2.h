@@ -1,65 +1,24 @@
+#pragma once
 
-#ifndef _VEC2_
-
-#define _VEC2_
-
+#include "Def.h"
 #include <ostream>
 
-class vec2 {
+class MATH_API Vec2{
 
 private:
 	float v[2];
 public:
-	vec2( float x, float y ) {
-		v[0] = x;
-		v[1] = y;
-	}
-	
-	inline float getX() {
-		return this->v[0];
-	}
-	
-	inline float getY() {
-		return this->v[1];
-	}
+	Vec2();
+	Vec2(float x, float y);
 
-	vec2 operator+(vec2 rhs) {
-		return vec2( 
-			getX() + rhs.getX() , 
-			getY() + rhs.getY() 
-		);
-	}
+	float getX();
+	float getY();
 
-	float operator*(vec2& rhs) {
-		return 	( 
-			getX() * rhs.getX() + 
-			getY() * rhs.getY() 
-		);
-	
-	}
+	Vec2 operator+(Vec2 rhs);
+	float operator*(Vec2& rhs); // Dot Product
 
-	float sqrt_magintude() {
-		return 	(
-			( getX() * getX() ) + 
-			( getY() * getY() )
-		);
-	}
-
-	vec2 clone() {
-		return vec2( 
-			getX() , 
-			getY()
-		);
-	}
+	Vec2 clone();
 
 };
 
-std::ostream& operator<<( std::ostream& os , vec2 &obj) {
-		os << "(" << 
-		obj.getX() << "," << 
-		obj.getY() << ")";
-		return os;
-}
-
-
-#endif
+std::ostream& operator<<(std::ostream& os, Vec2 &obj);

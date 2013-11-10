@@ -1,12 +1,19 @@
 #pragma once
 
+#include "Def.h"
+
 #include <GL/glew.h>
 #include "ShaderProgram.h"
 
-class RenderObject
+#include "../math/vec3.h"
+
+class RENDERER_API RenderObject
 {
 
 private:
+
+	Vec3 position;
+
 	GLuint num_vert, num_norm, num_ind;
 	GLenum mode;
 
@@ -24,9 +31,10 @@ public:
 	void setVertices(GLfloat *vert, int num) { this->vert = vert; this->num_vert = num; }
 	void setNormals(GLfloat *norms, int num) { this->norms = norms; this->num_norm = num; }
 	void setIndices(GLuint *inds, int num) { this->inds = inds; this->num_ind = num; }
+	void setPositon(Vec3 p) { this->position = p; }
+
 
 	void setMode(GLenum mode) { this->mode = mode; }
-
 	void setShaderProgram( ShaderProgram* p ) { this->program = p; }
 
 
@@ -40,6 +48,8 @@ public:
 	GLuint getNumNormals() { return this->num_norm; }
 
 	GLenum getDisplayMode() { return this->mode; }
+
+	Vec3 getPosition() { return this->position;}
 
 	ShaderProgram* getShaderProgram() { return this->program; }
 };
