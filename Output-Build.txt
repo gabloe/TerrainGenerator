@@ -1,0 +1,16 @@
+﻿1>------ Rebuild All started: Project: math, Configuration: Debug x64 ------
+2>------ Rebuild All started: Project: generators, Configuration: Debug x64 ------
+2>  simplex.c
+2>simplex.c(210): warning C4029: declared formal parameter list different from definition
+2>simplex.c(229): warning C4029: declared formal parameter list different from definition
+2>  generators.vcxproj -> C:\Users\Gabriel\Documents\GitHub\TerrainGenerator\x64\Debug\generators.exe
+3>------ Rebuild All started: Project: utils, Configuration: Debug x64 ------
+1>  vec4.cpp
+1>  vec3.cpp
+1>  vec2.cpp
+1>  mat4.cpp
+1>  mat3.cpp
+1>  mat2.cpp
+1>  Generating Code...
+1>     Creating library C:\Users\Gabriel\Documents\GitHub\TerrainGenerator\x64\Debug\math.lib and object C:\Users\Gabriel\Documents\GitHub\TerrainGenerator\x64\Debug\math.exp
+1>  math.vcxproj -> C:\Users\Gabriel\Documents\GitHub\TerrainGenerator\x64\Debug\math.dll

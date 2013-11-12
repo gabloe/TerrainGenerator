@@ -281,6 +281,48 @@ double* select2D(double* first, double* second, double* control, int mesh_size) 
 	return out;
 }
 
+double* add2D(double* first, double* second, int mesh_size) {
+	double* out = (double*)calloc(sizeof(double), mesh_size * mesh_size);
+	for (int i = 0; i < mesh_size * mesh_size; ++i){
+		out[i] = first[i] + second[i];
+		if (out[i] > max) {
+			max = out[i];
+		}
+		else if (out[i] < min) {
+			min = out[i];
+		}
+	}
+	return out;
+}
+
+double* max2D(double* first, double* second, int mesh_size) {
+	double* out = (double*)calloc(sizeof(double), mesh_size * mesh_size);
+	for (int i = 0; i < mesh_size * mesh_size; ++i){
+		out[i] = _max(first[i], second[i]);
+		if (out[i] > max) {
+			max = out[i];
+		}
+		else if (out[i] < min) {
+			min = out[i];
+		}
+	}
+	return out;
+}
+
+double* mult2D(double* first, double* second, int mesh_size) {
+	double* out = (double*)calloc(sizeof(double), mesh_size * mesh_size);
+	for (int i = 0; i < mesh_size * mesh_size; ++i){
+		out[i] = first[i]*second[i];
+		if (out[i] > max) {
+			max = out[i];
+		}
+		else if (out[i] < min) {
+			min = out[i];
+		}
+	}
+	return out;
+}
+
 void generatePermutations(int seed) {
 	if (p) { free(p); }
 	if (perm) { free(perm); }
@@ -358,6 +400,8 @@ int main(int argc, char** argv) {
    printf("done.\n\n", POINT_DIST);
    printf("Generating simplex mesh.\n", POINT_DIST);
    double* narr = NULL;
+   double* narrOne = NULL;
+   double* narrTwo = NULL;
    if (DIMENSIONS == 2) {
 	  narr = gen2DNoise(MESH_SIZE, POINT_DIST, perm, permMod12, gradients3D, OCTAVES, PERS);
       printf("done.\n\n", POINT_DIST);
@@ -381,9 +425,6 @@ int main(int argc, char** argv) {
    }
    if (narrTwo) {
 	   free(narrTwo);
-   }
-   if (control) {
-	   free(control);
    }
    if (p) {
 	   free(p);
