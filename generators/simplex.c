@@ -27,6 +27,7 @@ double min = 32000;
 double noise2D(double, double, short*, short*, Grad*);
 double noise3D(double, double, double, short*, short*, Grad*);
 
+// Writes the data to a file.
 void _write(const char* fname, double *data, short MESH_SIZE) {
    FILE* fp_img = NULL;
    if (!(fp_img = fopen(fname, "wt"))) {
@@ -44,6 +45,7 @@ void _write(const char* fname, double *data, short MESH_SIZE) {
    fclose(fp_img);
 }
 
+// Returns 1 if a value is found within a particular array.  0 otherwise.
 int in(short* arr, short val, int size) {
    int i=0;
    while(i<size) {
@@ -55,6 +57,7 @@ int in(short* arr, short val, int size) {
    return 0;
 }
 
+// Generates all values between low and high randomly, given a particular seed value for srand.
 short* genPermutations(int low, int high, int seed) {
    int range = high - low;
    short* p = (short*) calloc(sizeof(short),range);
@@ -73,14 +76,17 @@ short* genPermutations(int low, int high, int seed) {
    return p;
 }
 
+// Floor function.  Faster than the standard math library.  Specified by Ken Perlin.
 int fastFloor(double x) {
    int xx = (int)x;
    return x<xx ? xx-1 : xx;
 }
 
+// Dot product functions for 2d and 3d, respectively.
 double dot2(Grad g, double x, double y) { return g.x*x + g.y*y; }
 double dot3(Grad g, double x, double y, double z) { return g.x*x + g.y*y + g.z*z; }
 
+// Generates a raw simplex noise value at a particular <x,y,z> coordinate.  Remember, this value is not scaled.
 double raw3D(double x, double y, double z, short* perm, short* permMod12, Grad* gradients) {
     double n0, n1, n2, n3;
     double s = (x+y+z)*F3;
@@ -150,6 +156,7 @@ double raw3D(double x, double y, double z, short* perm, short* permMod12, Grad* 
     return 32.0*(n0 + n1 + n2 + n3);
 }
 
+// Generates a raw simplex noise value at a particular <x,y> coordinate.  Remember, this value is not scaled.
 double raw2D(double x, double y, short* perm, short* permMod12, Grad* gradients) {
    double n0,n1,n2;
    double s = (x+y)*F2;
@@ -193,6 +200,9 @@ double raw2D(double x, double y, short* perm, short* permMod12, Grad* gradients)
    return 70.0 * (n0 + n1 + n2);
 }
 
+// Generates the 2d noise value at a particular <x,y> coordinate.
+// Each octave doubles the frequency of the previous octave.  Higher octaves increase the level of detail, but have worse performance.
+// Persistence scales the frequency of the wave function.
 double noise2D(double x, double y, short* perm, short* permMod12, Grad* gradients, int octaves, float persistence) {
    double total = 0;
    for (int i=0;i<octaves;++i) {
@@ -209,6 +219,9 @@ double noise2D(double x, double y, short* perm, short* permMod12, Grad* gradient
    return total;
 }
 
+// Generates the 3d noise value at a particular <x,y,z> coordinate.
+// Each octave doubles the frequency of the previous octave.  Higher octaves increase the level of detail, but have worse performance.
+// Persistence scales the frequency of the wave function.
 double noise3D(double x, double y, double z, short* perm, short* permMod12, Grad* gradients, int octaves, float persistence) {
    double total = 0;
    for (int i=0;i<octaves;++i) {
@@ -225,6 +238,7 @@ double noise3D(double x, double y, double z, short* perm, short* permMod12, Grad
    return total;
 }
 
+// Produces 2d simplex noise (square of noise)
 double* gen2DNoise(int mesh_size,float point_dist,short* perm,short* permMod12,Grad* gradients,int octaves,float pers) {
    double* narr = (double*)malloc(mesh_size*mesh_size*sizeof(double));
    for (int i=0;i<mesh_size;++i) {
@@ -235,12 +249,13 @@ double* gen2DNoise(int mesh_size,float point_dist,short* perm,short* permMod12,G
    return narr;
 }
 
+// Produces 3-dimensional simplex noise (cube of noise)
 double* gen3DNoise(int mesh_size,float point_dist,short* perm,short* permMod12,Grad* gradients,int octaves,float pers) {
    double* narr = (double*)malloc(mesh_size*mesh_size*mesh_size*sizeof(double));
    for (int i=0;i<mesh_size;++i) {
       for (int j=0;j<mesh_size;++j) {
          for (int k=0;k<mesh_size;++k) {
-	    narr[i + j*mesh_size + k*mesh_size] = noise3D(i*point_dist, j*point_dist, k*point_dist, perm, permMod12, gradients, octaves, pers);
+	        narr[i + mesh_size * (j + mesh_size * k)] = noise3D(i*point_dist, j*point_dist, k*point_dist, perm, permMod12, gradients, octaves, pers);
          }
       }
    }
@@ -283,7 +298,7 @@ int main(int argc, char** argv) {
    short* perm = (short*)calloc(sizeof(short),512);
    short* permMod12 = (short*)calloc(sizeof(short),512);
 
-   // Generate permutations from 0 to 255 inclusive.  Do this twice for wrapping.
+   // Generate permutations from 0 to 255 inclusive.  Copy them twice for wrapping.
    for (int i=0;i<512;++i) {
       perm[i]=p[i & 255];
       permMod12[i] = (short)(perm[i] % 12);
@@ -316,7 +331,7 @@ int main(int argc, char** argv) {
    }
    printf("done.\n\n", POINT_DIST);
    printf("Generating simplex mesh.\n", POINT_DIST);
-   double* narr;
+   double* narr = NULL;
    if (DIMENSIONS == 2) {
       narr = gen2DNoise(MESH_SIZE,POINT_DIST,perm,permMod12,gradients3D,OCTAVES,PERS);
       printf("done.\n\n", POINT_DIST);

@@ -91,7 +91,7 @@ void init() {
 		exit(EXIT_FAILURE);
 	}
 
-	window = glfwCreateWindow(640, 480, "Happy Time Fun Time ALPHA v10E-100", NULL, NULL);
+	window = glfwCreateWindow(640, 480, "Terrain Generator", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
