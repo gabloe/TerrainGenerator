@@ -27,6 +27,10 @@ double min = 32000;
 double noise2D(double, double, short*, short*, Grad*);
 double noise3D(double, double, double, short*, short*, Grad*);
 
+short* p;
+short* perm;
+short* permMod12;
+
 // Writes the data to a file.
 void _write(const char* fname, double *data, short MESH_SIZE) {
    FILE* fp_img = NULL;
@@ -262,6 +266,35 @@ double* gen3DNoise(int mesh_size,float point_dist,short* perm,short* permMod12,G
    return narr;
 }
 
+double* select2D(double* first, double* second, double* control, int mesh_size) {
+	double* out = (double*)calloc(sizeof(double),mesh_size * mesh_size);
+	for (int i = 0; i < mesh_size * mesh_size; ++i){
+		if (control[i] >= 0.5) out[i] = second[i];
+		else out[i] = first[i];
+		if (out[i] > max) {
+			max = out[i];
+		}
+		else if (out[i] < min) {
+			min = out[i];
+		}
+	}
+	return out;
+}
+
+void generatePermutations(int seed) {
+	if (p) { free(p); }
+	if (perm) { free(perm); }
+	if (permMod12) { free(permMod12); }
+	p = genPermutations(0, 256, seed);
+	perm = (short*)calloc(sizeof(short), 512);
+	permMod12 = (short*)calloc(sizeof(short), 512);
+	// Generate permutations from 0 to 255 inclusive.  Copy them twice for wrapping.
+	for (int i = 0; i<512; ++i) {
+		perm[i] = p[i & 255];
+		permMod12[i] = (short)(perm[i] % 12);
+	}
+}
+
 int main(int argc, char** argv) {
    int MESH_SIZE = 64;
    int OCTAVES = 5;
@@ -294,16 +327,9 @@ int main(int argc, char** argv) {
    printf("SEED - %d.\n\n", SEED);
 
    printf("Generating permutations.\n", POINT_DIST);
-   short* p = genPermutations(0,256,SEED);
-   short* perm = (short*)calloc(sizeof(short),512);
-   short* permMod12 = (short*)calloc(sizeof(short),512);
-
-   // Generate permutations from 0 to 255 inclusive.  Copy them twice for wrapping.
-   for (int i=0;i<512;++i) {
-      perm[i]=p[i & 255];
-      permMod12[i] = (short)(perm[i] % 12);
-   }
+   generatePermutations(SEED);
    printf("done.\n\n", POINT_DIST);
+
    printf("Computing gradients.\n", POINT_DIST);
    Grad* gradients3D = (Grad*)malloc(12 * sizeof(Grad));
    // Generate gradients
@@ -333,10 +359,10 @@ int main(int argc, char** argv) {
    printf("Generating simplex mesh.\n", POINT_DIST);
    double* narr = NULL;
    if (DIMENSIONS == 2) {
-      narr = gen2DNoise(MESH_SIZE,POINT_DIST,perm,permMod12,gradients3D,OCTAVES,PERS);
+	  narr = gen2DNoise(MESH_SIZE, POINT_DIST, perm, permMod12, gradients3D, OCTAVES, PERS);
       printf("done.\n\n", POINT_DIST);
       printf("Writing output file.\n");
-      _write("out.pgm",narr,MESH_SIZE);
+	  _write("out.pgm", narr, MESH_SIZE);
       printf("done.\n");
    } else if (DIMENSIONS == 3) {
       narr = gen3DNoise(MESH_SIZE,POINT_DIST,perm,permMod12,gradients3D,OCTAVES,PERS);
@@ -350,9 +376,26 @@ int main(int argc, char** argv) {
    if (narr) {
       free(narr);
    }
-   free(p);
-   free(gradients3D);
-   free(perm);
-   free(permMod12);
+   if (narrOne) {
+	   free(narrOne);
+   }
+   if (narrTwo) {
+	   free(narrTwo);
+   }
+   if (control) {
+	   free(control);
+   }
+   if (p) {
+	   free(p);
+   }
+   if (gradients3D) {
+	   free(gradients3D);
+   }
+   if (perm) {
+	   free(perm);
+   }
+   if (permMod12) {
+	   free(permMod12);
+   }
    return 0;
 }
