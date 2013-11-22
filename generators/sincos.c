@@ -6,7 +6,7 @@
 #define PI 3.14159265358979323846264338327 
 #define SCALE 255
 
-short f(short y, short x, short w, short h);
+short f(short y, short x);
 void write(const char* fname, short *data, short w, short h);
 
 int main(int argc, char** argv)
@@ -21,7 +21,7 @@ int main(int argc, char** argv)
    short j;
    for (i=0;i<h;++i) {
       for (j=0;j<w;++j) {
-         data[(i*w)+j] = f(i,j,w,h);
+         data[(i*w)+j] = f(i,j);
       }
    }
    /*for (i=0;i<h;++i) {
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
    return 0;
    }
 
-short f(short y, short x, short w, short h)
+short f(short y, short x)
    {
    double res = abs((sin(x*PI/180.0) + cos(y*PI/180.0))/2 * SCALE);
    return (short)(res);
