@@ -164,7 +164,7 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 		for (int j = 0 ; j < div; j++) { // x
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = min_x + j * delta_x;
-			data[pos + 1] = -0.5f;
+			data[pos + 1] = 0.f - rand() / float(RAND_MAX);
 			data[pos + 2] = z;
 		}
 	}
