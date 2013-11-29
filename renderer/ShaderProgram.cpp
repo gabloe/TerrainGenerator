@@ -5,6 +5,21 @@
 
 using namespace std;
 
+#define ERR printf("HERE\n");
+
+#define HANDLE_ERROR() if( glGetError() != GL_NO_ERROR ) std::cout<< glGetError() <<std::endl;
+
+#define CHECK_AND_RET(msg,ret,obj) \
+{ \
+	GLuint err = glGetError(); \
+	if (err != GL_NO_ERROR) { \
+		if (obj) printLog(obj); \
+		std::cout << msg << gluErrorString(err) << std::endl; \
+		error = ret;  \
+		return; \
+	} \
+} 
+
 /*
  * Given a file stream returns the length of the file
  */
@@ -33,13 +48,14 @@ int loadshader(const char* filename, GLchar** ShaderSource, GLint* len) {
 	if (size == 0) return -2;		// Error: Empty File 
 
 	// Create Memory
-	GLchar *source = new GLchar[size + 1];
+	GLchar *source = (GLchar*)calloc( size + 1, sizeof( GLchar ) );
 	if (source == 0) return -3;		// can't reserve memory
 
 	// Read
 	file.read(source, size);
 	source[size] = 0;
 	file.close();
+
 
 	// Set "Return" values
 	*ShaderSource = source;
@@ -55,87 +71,87 @@ int loadshader(const char* filename, GLchar** ShaderSource, GLint* len) {
 void unloadshader(GLchar** ShaderSource)
 {
 	if (*ShaderSource != 0)
-		delete[] * ShaderSource;
-	*ShaderSource = 0;
+		free( ShaderSource );
 }
 
 /*
 	Prints any error from the object passed in
 	*/
-void printError(GLint object, int blen) {
-	GLsizei slen = 0;
-	GLchar* compiler_log = (GLchar*)malloc(blen);
-	glGetInfoLogARB(object, blen, &slen, compiler_log);
-	cout << "compiler_log:\n" << compiler_log << endl;
-	free(compiler_log);
-}
-
-/*
-	Compiles a Shader Object (vertex/fragment)
-	*/
-int compile(GLuint ShaderObject) {
-	GLint blen = 0, compiled;
-	glCompileShaderARB(ShaderObject);
-	glGetObjectParameterivARB(ShaderObject, GL_COMPILE_STATUS, &compiled);
-	if (compiled)	return 0;
-	glGetShaderiv(ShaderObject, GL_INFO_LOG_LENGTH, &blen);
-	printError(ShaderObject, blen);
-	return 1;
-}
-
-/*
-*/
-int link(GLuint *program, GLuint f, GLuint v){
-	GLint blen, linked;
-	*program = glCreateProgram();
-	glAttachShader(*program, v);
-	glAttachShader(*program, f);
-	glLinkProgram(*program);
-	glGetProgramiv(*program, GL_LINK_STATUS, &linked);
-	if (!linked){
-		glGetProgramiv(*program, GL_INFO_LOG_LENGTH, &blen);
-		printError(*program, blen);
+void printLog(GLint object) {
+	int infoLogLength = 0;
+	char infoLog[1024];
+	if (glIsShader(object)) {
+		glGetShaderInfoLog(object, 1024, &infoLogLength, infoLog);
 	}
-	return linked;
+	else {
+		glGetProgramInfoLog(object, 1024, &infoLogLength, infoLog);
+	}
+	if (infoLogLength > 1) {
+		std::cout << infoLog << std::endl;
+	}
+	else {
+		std::cout << "Empty log" << std::endl;
+	}
+}
+
+int link(GLuint f, GLuint v){
+	GLuint program = glCreateProgram();
+
+	glAttachShader( program, v);
+	glAttachShader( program, f);
+	glLinkProgram( program );
+	
+	printLog(program);
+	return program;
 }
 
 ShaderProgram::ShaderProgram(const char* vert, const char* frag) : program(0), v(0), f(0)
 {
+
+	GLuint err = 0;
+
 	// No error yet
 	this->error = NO_SHADER_ERROR;
+	this->v_src = 0;
+	this->f_src = 0;
 
 	// Load Shader Source code
-	if (loadshader(vert, &this->v_src, &this->v_len) != 0) {
+	if (loadshader( vert , &this->v_src, &this->v_len) != 0) {
 		printf("Could not load the Vertex Shader file: %s", vert);
 		return;
-	}
-	else if (loadshader(frag, &this->f_src, &this->f_len) != 0) {
+	}else if (loadshader(frag, &this->f_src, &this->f_len) != 0) {
 		printf("Could not load the Fragment Shader file: %s", frag);
 		return;
 	}
 
-	// Create palce for Shaders 
+	// Create place for Shaders 
 	v = glCreateShader(GL_VERTEX_SHADER);
+	CHECK_AND_RET("glCreateShader(GL_VERTEX_SHADER) : ", VERTEX, 0);
 	f = glCreateShader(GL_FRAGMENT_SHADER);
+	CHECK_AND_RET("glCreateShader(GL_FRAGMENT_SHADER) : ", VERTEX, 0);
 
 	// Copy over source code
-	glShaderSourceARB(v, 1, &vert, &this->v_len);
-	glShaderSourceARB(f, 1, &frag, &this->f_len);
+	const char* vs = v_src,*fs = f_src;
+	glShaderSource(v, 1, &vs, NULL);
+	CHECK_AND_RET("glShaderSource(v,1,&vs,NULL) : ", VERTEX, 0);
+	glShaderSource(f, 1, &fs, NULL);
+	CHECK_AND_RET("glShaderSource(f,1,&fs,NULL) : ", FRAGMENT, 0);
+
+	free(f_src);
+	free(v_src);
 
 	// Try to compile!
-	if (!compile(v)) {
-		error = VERTEX;
-		return;
-	}
-	if (!compile(f)) {
-		error = FRAGMENT;
-		return;
-	}
+	glCompileShader(f);
+	CHECK_AND_RET("glCompileShader(f) : ", FRAGMENT, f);
+	glCompileShader(v);
+	CHECK_AND_RET("glCompileShader(v) : ", VERTEX, v);
 
-	if (!link(&program, f, v)) {
-		error = PROGRAM;
-	}
+	this->program = link(f, v);
+	CHECK_AND_RET("link(f,v) : ", PROGRAM, 0);
 
+	std::cout << "Is Program : " << (glIsProgram(this->program) == GL_TRUE) << std::endl;
+
+	printLog(this->program);
 }
 
 /* Cleanup */
@@ -160,9 +176,6 @@ ShaderProgram::~ShaderProgram()
 	program = 0;
 	f = 0;
 	v = 0;	
-
-	unloadshader(&this->v_src);
-	unloadshader(&this->f_src);
 
 }
 

@@ -2,9 +2,11 @@
 
 #include "Def.h"
 
+#include <iostream>
+
 #include <GL/glew.h>
 
-enum SHADER_ERROR { NO_SHADER_ERROR, FRAGMENT, VERTEX, PROGRAM };
+enum SHADER_ERROR { NO_SHADER_ERROR , FRAGMENT, VERTEX, PROGRAM };
 
 class RENDERER_API ShaderProgram
 {
@@ -23,10 +25,15 @@ public:
 
 	GLuint getVertexShader() { return v; }
 	GLuint getFragmentShader() { return f; }
-	GLuint getProgram(){ return program; }
+	GLuint getProgram(){ return this->program; }
 	SHADER_ERROR getError() { return this->error; }
 
-	void load() { glUseProgram(this->program); };
+	GLenum load() {
+		glUseProgram(this->program); 
+		return glGetError();
+	};
+	
+	GLuint isValid() { return glIsProgram(this->program) == GL_TRUE; }
 	void unload(){ glUseProgram(0); };
 
 };

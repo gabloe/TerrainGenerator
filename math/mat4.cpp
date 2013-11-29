@@ -51,6 +51,10 @@ Mat4::Mat4(
 
 }
 
+Mat4::Mat4(Mat4& other) {
+	memcpy(this->m, other.m, sizeof(float)* 16);
+}
+
 // Add two matricies
 Mat4 Mat4::operator+(Mat4 rhs) {
 	return Mat4(
@@ -98,24 +102,3 @@ Mat4 Mat4::operator*(Mat4 rhs) {
 		);
 }
 
-
-std::ostream& operator<<(std::ostream& os, Mat4 &obj) {
-	os << "(" <<
-		obj.m[0] << " " <<
-		obj.m[1] << " " <<
-		obj.m[2] << " " <<
-		obj.m[3] << "\n" <<
-		obj.m[4] << " " <<
-		obj.m[5] << " " <<
-		obj.m[6] << " " <<
-		obj.m[7] << "\n" <<
-		obj.m[8] << " " <<
-		obj.m[9] << " " <<
-		obj.m[10] << " " <<
-		obj.m[11] << "\n" <<
-		obj.m[12] << " " <<
-		obj.m[13] << " " <<
-		obj.m[14] << " " <<
-		obj.m[15] << ")";
-	return os;
-}

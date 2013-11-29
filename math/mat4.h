@@ -2,6 +2,8 @@
 
 #include "vec4.h"
 
+#include <iostream>
+
 class MATH_API Mat4 {
 private:
 	float m[16];
@@ -14,6 +16,7 @@ public:
 		float m20, float m21, float m22, float m23,
 		float m30, float m31, float m32, float m33
 		);
+	Mat4(Mat4& other);
 
 	// Add two matricies
 	Mat4 operator+(Mat4 rhs);
@@ -21,7 +24,28 @@ public:
 	// Multiply two matrices together
 	Mat4 operator*(Mat4 rhs);
 
-	friend std::ostream& operator<<(std::ostream& os, Mat4 &obj);
+	void rotateX(float del);
+	void rotateY(float del);
+	void rotateZ(float del);
+
+	void moveX(float dist) { m[12] += dist; }
+	void moveY(float dist) { m[13] += dist; }
+	void moveZ(float dist) { m[14] += dist; }
+
+	const float* getData() { return m; }
+
+
+	friend std::ostream& operator<<(std::ostream& os, Mat4& obj);
 };
 
-std::ostream& operator<<(std::ostream& os, Mat4 &obj);
+std::ostream& operator<<(std::ostream& os, Mat4& obj) {
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			os << obj.m[i * 4 + j] << " ";
+		}
+		os << std::endl;
+	}
+	return os;
+}
