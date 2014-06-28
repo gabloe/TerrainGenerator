@@ -89,11 +89,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			break;
 		case GLFW_KEY_UP:
 			vert += delta_x;
-			TransformMatrix.moveY(+0.1);
+			TransformMatrix.moveY(-0.5);
 			break;
 		case GLFW_KEY_DOWN:
 			vert -= delta_x;
-			TransformMatrix.moveY(-0.1);
+			TransformMatrix.moveY(+0.5);
 			break;
 		case GLFW_KEY_LEFT:
 			horiz += delta_y;
@@ -102,16 +102,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			horiz -= delta_y;
 			break;
 		case GLFW_KEY_W:
-			TransformMatrix.moveZ(0.1);
+			TransformMatrix.moveZ(0.5);
 			break;
 		case GLFW_KEY_S:
-			TransformMatrix.moveZ(-0.1);
+			TransformMatrix.moveZ(-0.5);
 			break;
 		case GLFW_KEY_A:
-			TransformMatrix.moveX(0.1);
+			TransformMatrix.moveX(0.5);
 			break;
 		case GLFW_KEY_D:
-			TransformMatrix.moveX(-0.1);
+			TransformMatrix.moveX(-0.5);
 			// move right
 			break;
 		case GLFW_KEY_P:
@@ -168,21 +168,10 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 		for (int j = 0 ; j < div; j++) { // x
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = min_x + j * delta_x;
-			data[pos + 1] = 0.f - rand() / float(RAND_MAX);
+			data[pos + 1] = -1.f + rand() / float(RAND_MAX);
 			data[pos + 2] = z;
 		}
 	}
-
-	/*
-	for (int i = 0; i < 3 * div * div; i++) {
-		if (i % 3 == 0 && i > 0) {
-			std::cout << std::endl;
-		}
-		std::cout << data[i] << " ";
-	}
-	std::cout << std::endl;
-	// */
-
 	return data;
 }
 
@@ -228,16 +217,6 @@ GLuint* generateIndices(int div) {
 
 
 	}
-
-	/*
-	for (int i = 0; i < max_i * max_j * 6; i++){
-		if (i > 0 && i % 3 == 0){
-			std::cout << std::endl;
-		}
-		std::cout << data[i] << " ";
-	}
-	std::cout << std::endl;
-	// */
 
 	return data;
 }
@@ -316,7 +295,7 @@ int main(int argc, char** args)
 	GLuint ind[] = { 0, 1, 3 , 0 , 3 , 2 };
 	RenderObject obj;
 
-	int ground_size = 50;
+	int ground_size = 100;
 
 	RenderObject ground;
 
@@ -344,14 +323,9 @@ int main(int argc, char** args)
 
 	ShaderProgram program("resources/shaders/shader.vert", "resources/shaders/shader.frag");
 
-	std::cout << program.isValid() << std::endl;
-
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
-	if (program.getError() == NO_SHADER_ERROR ) {
-		printf("No Error!\n");
-	}
-	else{
+	if (program.getError() != NO_SHADER_ERROR ) {
 		printf("Error!\n");
 	}
 

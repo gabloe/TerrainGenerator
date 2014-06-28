@@ -91,9 +91,6 @@ void printLog(GLint object) {
 	if (infoLogLength > 1) {
 		std::cout << infoLog << std::endl;
 	}
-	else {
-		std::cout << "Empty log" << std::endl;
-	}
 }
 
 int link(GLuint f, GLuint v){
@@ -102,7 +99,7 @@ int link(GLuint f, GLuint v){
 	glAttachShader( program, v);
 	glAttachShader( program, f);
 	glLinkProgram( program );
-	
+
 	printLog(program);
 	return program;
 }
@@ -151,7 +148,9 @@ ShaderProgram::ShaderProgram(const char* vert, const char* frag) : program(0), v
 	this->program = link(f, v);
 	CHECK_AND_RET("link(f,v) : ", PROGRAM, 0);
 
-	std::cout << "Is Program : " << (glIsProgram(this->program) == GL_TRUE) << std::endl;
+	if(glIsProgram(this->program) != GL_TRUE) {
+		std::cout << "Is not a Program!" << std::endl;
+	}
 
 	printLog(this->program);
 }
