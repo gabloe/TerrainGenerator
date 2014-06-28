@@ -13,7 +13,7 @@ EXECUTABLE = main
 all: init $(OBJECTS) $(EXECUTABLE)
 
 $(EXECUTABLE):
-	$(CXX) $(CXXFLAGS) $(LD_FLAGS) $(LIB_DIR) -o $@ $(OBJECTS) bin/math.a $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LD_FLAGS) $(LIB_DIR) -o $@ $(OBJECTS) bin/math.a bin/renderer.a $(LDLIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INC_DIR) -c $< -o $@

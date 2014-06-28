@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <stdlib.h>
+
 using namespace std;
 
 #define ERR printf("HERE\n");
