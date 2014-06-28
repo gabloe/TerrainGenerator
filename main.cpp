@@ -89,9 +89,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			break;
 		case GLFW_KEY_UP:
 			vert += delta_x;
+			printf("Up\n");
+			TransformMatrix.moveY(+0.1);
 			break;
 		case GLFW_KEY_DOWN:
 			vert -= delta_x;
+			TransformMatrix.moveY(-0.1);
 			break;
 		case GLFW_KEY_LEFT:
 			horiz += delta_y;
@@ -106,10 +109,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			TransformMatrix.moveZ(-0.1);
 			break;
 		case GLFW_KEY_A:
-			TransformMatrix.moveX(-0.01);
+			TransformMatrix.moveX(0.01);
 			break;
 		case GLFW_KEY_D:
-			TransformMatrix.moveX(0.01);
+			TransformMatrix.moveX(-0.01);
 			// move right
 			break;
 		case GLFW_KEY_P:
