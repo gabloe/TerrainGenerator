@@ -11,7 +11,7 @@ OBJECTS = ${SOURCE:%.cpp=$(OBJ_DIR)/%.o}
 EXECUTABLE = main
 
 
-all: math renderer init $(OBJECTS) $(EXECUTABLE)
+all: init math renderer $(OBJECTS) $(EXECUTABLE)
 
 $(EXECUTABLE):
 	$(CXX) $(CXXFLAGS) $(LD_FLAGS) $(LIB_DIR) -o $@ $(OBJECTS) bin/math.a bin/renderer.a $(LDLIBS)
@@ -24,6 +24,8 @@ init:
 
 clean:
 	@rm -rf $(OBJ_DIR) $(EXECUTABLE)
+	$(MAKE) -C math clean
+	$(MAKE) -C renderer clean
 
 test:
 	cd tests

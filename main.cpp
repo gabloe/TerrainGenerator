@@ -333,7 +333,7 @@ int main(int argc, char** args)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ground.getNumIndices() * sizeof(GLuint), ground.getIndices(), GL_STATIC_COPY);
 	
 
-	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
+	ShaderProgram program("resources/shaders/shader.vert", "resources/shaders/shader.frag");
 
 	std::cout << program.isValid() << std::endl;
 
