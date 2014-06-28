@@ -10,7 +10,8 @@ SOURCE = main.cpp
 OBJECTS = ${SOURCE:%.cpp=$(OBJ_DIR)/%.o}
 EXECUTABLE = main
 
-all: init $(OBJECTS) $(EXECUTABLE)
+
+all: math renderer init $(OBJECTS) $(EXECUTABLE)
 
 $(EXECUTABLE):
 	$(CXX) $(CXXFLAGS) $(LD_FLAGS) $(LIB_DIR) -o $@ $(OBJECTS) bin/math.a bin/renderer.a $(LDLIBS)
@@ -20,7 +21,7 @@ $(OBJ_DIR)/%.o: %.cpp
 
 init:
 	@mkdir -p "$(OBJ_DIR)"
-	make math
+
 clean:
 	@rm -rf $(OBJ_DIR) $(EXECUTABLE)
 
@@ -28,3 +29,16 @@ test:
 	cd tests
 	make
 	cd ..
+
+
+.PHONY:	math
+
+.PHONY: renderer
+
+
+renderer:
+	$(MAKE) -C renderer
+
+math:
+	$(MAKE) -C math
+

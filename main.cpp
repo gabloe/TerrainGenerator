@@ -242,7 +242,7 @@ GLuint* generateIndices(int div) {
 
 // Initializes all the subsystems, create the window.
 void init() {
-
+	srand(time(NULL));
 	ProjectionMatrix = buildProjectionMatrix( 15.f , 9.0f /16.0f , 0.001f , 100.f);
 
 	glfwSetErrorCallback(error_callback);
