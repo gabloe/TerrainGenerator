@@ -1,3 +1,5 @@
+#define GLEW_STATIC
+
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
@@ -11,7 +13,7 @@
 #include "math/mat3.h"
 #include "math/mat4.h"
 #include "renderer/RenderObject.h"
-
+#include "renderer/ShaderProgram.h"
 #include <stdio.h>  /* defines FILENAME_MAX */
 /*
 
@@ -337,7 +339,7 @@ int main(int argc, char** args)
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
-	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR ) {
+	if (program.getError() == NO_SHADER_ERROR ) {
 		printf("No Error!\n");
 	}
 	else{

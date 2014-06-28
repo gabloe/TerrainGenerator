@@ -50,10 +50,11 @@ Mat4::Mat4(
 	m[15] = m33;
 }
 
+/*
 Mat4::Mat4(Mat4& other) {
 	memcpy(this->m, other.m, sizeof(float)* 16);
 }
-
+*/
 // Add two matricies
 Mat4 Mat4::operator+(Mat4 rhs) {
 	return Mat4(m[0] + rhs.m[0], m[1] + rhs.m[1],

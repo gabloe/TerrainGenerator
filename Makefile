@@ -1,10 +1,10 @@
 CXX = g++ 
-CXXFLAGS = -Wall -std=c++11
-LDLIBS = -lglfw3 -lm -lGL -lGLU -lXrandr -lXi
+CXXFLAGS = -Wall
+LDLIBS =-lglfw -lm -lGLEW -lGL -lGLU -lXrandr -lXi
 
 OBJ_DIR = bin
-LIB_DIR = -L/usr/local/lib
-INC_DIR = -I/usr/local/include -I./Includes
+LIB_DIR = -L/usr/lib64:/usr/lib:/usr/local/lib
+INC_DIR = -I.:/usr/local/include:./Includes
 
 SOURCE = main.cpp
 OBJECTS = ${SOURCE:%.cpp=$(OBJ_DIR)/%.o}
@@ -13,14 +13,14 @@ EXECUTABLE = main
 all: init $(OBJECTS) $(EXECUTABLE)
 
 $(EXECUTABLE):
-	$(CXX) $(CXXFLAGS) $(LD_FLAGS) $(LIB_DIR) -o $@ $(OBJECTS) $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LD_FLAGS) $(LIB_DIR) -o $@ $(OBJECTS) bin/math.a $(LDLIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INC_DIR) -c $< -o $@
 
 init:
 	@mkdir -p "$(OBJ_DIR)"
-
+	make math
 clean:
 	@rm -rf $(OBJ_DIR) $(EXECUTABLE)
 
