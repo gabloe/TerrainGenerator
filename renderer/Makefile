@@ -1,5 +1,5 @@
 all:
-	g++ -c *.cpp
+	g++ -I../Includes -c *.cpp
 	ar cr renderer.a *.o
 	cp renderer.a ../bin
 
