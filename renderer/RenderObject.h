@@ -2,7 +2,7 @@
 
 #include "Def.h"
 
-#include <GL/glew.h>
+#include "GL/glew.h"
 #include "ShaderProgram.h"
 
 #include "../math/vec3.h"
