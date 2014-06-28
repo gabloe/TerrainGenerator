@@ -100,3 +100,17 @@ Mat4 Mat4::operator*(Mat4 rhs) {
 		);
 }
 
+
+
+std::ostream& operator<<(std::ostream& os, Mat4& obj) {
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			os << obj.m[i * 4 + j] << " ";
+		}
+		os << std::endl;
+	}
+	return os;
+}
+
