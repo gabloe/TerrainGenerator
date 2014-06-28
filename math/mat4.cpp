@@ -48,7 +48,6 @@ Mat4::Mat4(
 	m[13] = m31;
 	m[14] = m32;
 	m[15] = m33;
-
 }
 
 Mat4::Mat4(Mat4& other) {
@@ -57,9 +56,7 @@ Mat4::Mat4(Mat4& other) {
 
 // Add two matricies
 Mat4 Mat4::operator+(Mat4 rhs) {
-	return Mat4(
-		m[0] + rhs.m[0],
-		m[1] + rhs.m[1],
+	return Mat4(m[0] + rhs.m[0], m[1] + rhs.m[1],
 		m[2] + rhs.m[2],
 		m[3] + rhs.m[3],
 		m[4] + rhs.m[4],

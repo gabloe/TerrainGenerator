@@ -1,5 +1,5 @@
-CXX = g++
-CXXFLAGS = -Wall -std=c++0x
+CXX = g++ 
+CXXFLAGS = -Wall -std=c++11
 LDLIBS = -lglfw3 -lm -lGL -lGLU -lXrandr -lXi
 
 OBJ_DIR = bin
