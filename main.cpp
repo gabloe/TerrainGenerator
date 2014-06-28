@@ -242,6 +242,10 @@ GLuint* generateIndices(int div) {
 	return data;
 }
 
+void resized(GLFWwindow* window, int width, int height) {
+	glViewport(0,0,width,height);	
+}
+
 // Initializes all the subsystems, create the window.
 void init() {
 	srand(time(NULL));
@@ -252,6 +256,7 @@ void init() {
 		exit(EXIT_FAILURE);
 	}
 
+
 	window = glfwCreateWindow(640, 480, "Terrain Generator", NULL, NULL);
 	if (!window)
 	{
@@ -260,6 +265,7 @@ void init() {
 	}
 
 	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window,resized);
 
 	glewExperimental = GL_TRUE;
 	if (GLEW_OK != glewInit()) {
@@ -292,6 +298,7 @@ void print() {
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VERSION));
 
 }
+
 
 int main(int argc, char** args)
 {
