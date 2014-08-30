@@ -6,8 +6,8 @@
 
 #include <GLFW/glfw3.h>
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <cmath>
 
 #include <iostream>
@@ -361,7 +361,6 @@ int main(int argc, char** args)
 
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
 	
-	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	checkGL();
 
