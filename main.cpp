@@ -1,9 +1,4 @@
-
-#ifndef __APPLE__
 #include "GL/glew.h"
-#else
-#include "GL/gl3w.h"
-#endif
 
 #include <GLFW/glfw3.h>
 
@@ -273,7 +268,6 @@ void init() {
 
 	glfwMakeContextCurrent(window);
 
-#ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	if (GLEW_OK != glewInit()) {
 		glfwTerminate();
@@ -281,24 +275,13 @@ void init() {
 		system("PAUSE");
 		exit(EXIT_FAILURE);
 	}
-#else
-	if (gl3wInit()) {
-                fprintf(stderr, "failed to initialize OpenGL\n");
-                return -1;
-        }
-        if (!gl3wIsSupported(3, 2)) {
-                fprintf(stderr, "OpenGL 3.2 not supported\n");
-                return -1;
-        }
-        printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION),
-               glGetString(GL_SHADING_LANGUAGE_VERSION));
-#endif
+
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 
 	// Do some stuff
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
-	glShadeModel(GL_SMOOTH);
+	//glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
 
 
@@ -364,7 +347,7 @@ int main(int argc, char** args)
      
 	std::cout << (program.isValid()?"Valid":"Not Valid") << std::endl;
 
-	glEnableClientState(GL_VERTEX_ARRAY);
+	//glEnableClientState(GL_VERTEX_ARRAY);
 	
 	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR ) {
 		printf("No Error!\n");

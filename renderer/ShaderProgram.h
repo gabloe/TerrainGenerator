@@ -4,11 +4,7 @@
 
 #include <iostream>
 
-#ifndef __APPLE__
 #include "GL/glew.h"
-#else
-#include "GL/gl3w.h"
-#endif
 
 enum SHADER_ERROR { NO_SHADER_ERROR , FRAGMENT, VERTEX, PROGRAM };
 

@@ -148,6 +148,9 @@ ShaderProgram::ShaderProgram(const char* vert, const char* frag) : program(0), v
 
 	glCompileShader(v);
 	CHECK_AND_RET("glCompileShader(v) : ", VERTEX, v);
+        glGetShaderInfoLog( v, sizeof(logBuf), NULL, (GLchar*)logBuf );
+        std::cout << logBuf << std::endl;
+
 
 	this->program = link(f, v);
 	CHECK_AND_RET("link(f,v) : ", PROGRAM, 0);
