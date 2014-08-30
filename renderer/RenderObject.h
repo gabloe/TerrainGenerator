@@ -2,11 +2,7 @@
 
 #include "Def.h"
 
-#ifndef __APPLE__
 #include "GL/glew.h"
-#else
-#include <GL/gl3w.h>
-#endif
 
 #include "ShaderProgram.h"
 
