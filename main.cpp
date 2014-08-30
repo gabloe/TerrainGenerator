@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 #define GLFW_DLL
-
-#ifndef __APPLE__
-=======
->>>>>>> 9b0351765371e920bea63b356b2a7872f26f4974
 #include "GL/glew.h"
 
 
@@ -175,17 +170,6 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			data[pos + 2] = z;
 		}
 	}
-
-	/*
-	for (int i = 0; i < 3 * div * div; i++) {
-		if (i % 3 == 0 && i > 0) {
-			std::cout << std::endl;
-		}
-		std::cout << data[i] << " ";
-	}
-	std::cout << std::endl;
-	// */
-
 	return data;
 }
 
@@ -256,11 +240,9 @@ void init() {
 		exit(EXIT_FAILURE);
 	}
 
-
-
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	int major, minor, rev;
 
@@ -289,32 +271,14 @@ void init() {
 		std::exit(-1);
 	}
 
-<<<<<<< HEAD
 	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-
-
-#else
-	if (gl3wInit()) {
-                fprintf(stderr, "failed to initialize OpenGL\n");
-                return -1;
-        }
-        if (!gl3wIsSupported(3, 2)) {
-                fprintf(stderr, "OpenGL 3.2 not supported\n");
-                return -1;
-        }
-        printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION),
-               glGetString(GL_SHADING_LANGUAGE_VERSION));
-#endif
-=======
->>>>>>> 9b0351765371e920bea63b356b2a7872f26f4974
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 
-
 	// Do some stuff
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
-	//glShadeModel(GL_SMOOTH);
+	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -331,6 +295,17 @@ void print() {
 	printf("OpenGL Vendor: %s\n", glGetString(GL_RENDERER));
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VERSION));
 
+}
+
+static void copyToGPU(RenderObject &obj) {
+	glGenBuffers(1, &vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)* obj.getNumVertices(), obj.getVertices(), GL_STATIC_DRAW);
+
+	// Indexes
+	glGenBuffers(1, &elementbuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getNumIndices() * sizeof(GLuint), obj.getIndices(), GL_STATIC_COPY);
 }
 
 int main(int argc, char** args)
@@ -365,45 +340,31 @@ int main(int argc, char** args)
 	obj.setIndices(ind, 6);
 	obj.setMode(GL_TRIANGLES);
 
-	// Data
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)* ground.getNumVertices(), ground.getVertices(), GL_STATIC_DRAW);
-
-	// Indexes
-	glGenBuffers(1, &elementbuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ground.getNumIndices() * sizeof(GLuint), ground.getIndices(), GL_STATIC_COPY);
-	
+	copyToGPU(obj);
 
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
 	
-	std::cout << (program.isValid()?"Valid":"Not Valid") << std::endl;
-
-	//glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR ) {
-		printf("No Error!\n");
-	}
-	else{
-		printf("Error!\n");
+		printf("No error loading shader\n");
+	} else {
+		printf("Error with shader\n");
 	}
 
 	obj.setShaderProgram(&program);
 	ground.setShaderProgram(&program);
 
-	int i = 0;
 	// Main Loop.  Do the stuff!
 	std::cout << "Starting main loop" << std::endl;
 	while (!glfwWindowShouldClose(window))
 	{	
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		display(ground);
+		display(obj);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		i++;
 	}
 
 	free(ground.getVertices());
