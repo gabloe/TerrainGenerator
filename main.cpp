@@ -248,6 +248,7 @@ GLuint* generateIndices(int div) {
 // Initializes all the subsystems, create the window.
 void init() {
 
+
 	ProjectionMatrix = buildProjectionMatrix( 15.f , 9.0f /16.0f , 0.001f , 100.f);
 
 	glfwSetErrorCallback(error_callback);
@@ -255,10 +256,11 @@ void init() {
 		exit(EXIT_FAILURE);
 	}
 
+
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	int major, minor, rev;
 
@@ -280,12 +282,18 @@ void init() {
 		fprintf(stderr, "Error: %s\n", glewGetErrorString(glewInit()));
 		system("PAUSE");
 		exit(EXIT_FAILURE);
-	}
+	}glGetError();
+	
+
 	if (!GLEW_VERSION_2_1){
 		std::cout << "GLew Version not supported?" << std::endl;
 		std::exit(-1);
 	}
+
 	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+
+
+
 #else
 	if (gl3wInit()) {
                 fprintf(stderr, "failed to initialize OpenGL\n");
@@ -301,11 +309,11 @@ void init() {
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 
+
 	// Do some stuff
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
-
 
 }
 
@@ -329,6 +337,7 @@ int main(int argc, char** args)
 	print();
 
 	// load data
+
 
 	GLfloat data[] = {
 		-0.5f,	-0.1f,	0.5f,	// 0
@@ -364,6 +373,7 @@ int main(int argc, char** args)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ground.getNumIndices() * sizeof(GLuint), ground.getIndices(), GL_STATIC_COPY);
 	
+
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
 	
 	std::cout << (program.isValid()?"Valid":"Not Valid") << std::endl;

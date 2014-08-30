@@ -122,11 +122,6 @@ ShaderProgram::ShaderProgram(const char* vert, const char* frag) : program(0), v
 		return;
 	}
 
-	
-	if (glCreateShader == 0) {
-		std::cout << "Create shader is null" << std::endl;
-		std::exit(-1);
-	}
 	// Create place for Shaders 
 	v = glCreateShader(GL_VERTEX_SHADER);
 	CHECK_AND_RET("glCreateShader(GL_VERTEX_SHADER) : ", VERTEX, 0);
