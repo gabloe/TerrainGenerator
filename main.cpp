@@ -1,5 +1,7 @@
 #define GLFW_DLL
 
+
+
 #include "GL/glew.h"
 
 #include <GLFW/glfw3.h>
@@ -61,6 +63,16 @@ GLuint vertexBuffer;
 GLuint elementbuffer;
 
 GLFWwindow *window;
+
+
+
+void checkGL() {
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR) {
+		std::cout << err << ": " << glewGetErrorString(err) << "at line " << __LINE__ << " in file " << __FILE__ << std::endl;
+		std::exit(-1);
+	}
+}
 
 static void error_callback(int error, const char* description)
 {
