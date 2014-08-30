@@ -70,7 +70,7 @@ GLFWwindow *window;
 	GLenum err = glGetError();				\
 	if (err != GL_NO_ERROR) {				\
 		std::cout << err << ": " <<			\
-			glewGetErrorString(err) <<		\
+			gluErrorString(err) <<			\
 			" at line " << __LINE__ <<		\
 			" in file " << __FILE__ <<		\
 			std::endl;						\
@@ -137,7 +137,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 // used to display a RenderObject
 void display(RenderObject renderObj) {
+
 	GLuint transformMatrix = 0, projectionMatrix = 0;
+
+	// If there is a Shader program we should use it
 	ShaderProgram *p = renderObj.getShaderProgram();
 	if (p) {
 		p->load();
@@ -145,6 +148,8 @@ void display(RenderObject renderObj) {
 		projectionMatrix = glGetUniformLocation(p->getProgram(), "projection");
 		glUniformMatrix4fv(transformMatrix, 1, false, TransformMatrix.getData());
 		glUniformMatrix4fv(projectionMatrix, 1, false, ProjectionMatrix.getData());
+	} else {
+		std::cout << "No shader program" << std::endl;
 	}
 
 	GLenum mode = renderObj.getDisplayMode();
@@ -274,9 +279,10 @@ void init() {
 	glfwMakeContextCurrent(window);
 
 	glewExperimental = GL_TRUE;
-	if (GLEW_OK != glewInit()) {
+	GLenum err = glewInit();
+	if (GLEW_OK != err) {
 		glfwTerminate();
-		fprintf(stderr, "Error: %s\n", glewGetErrorString(glewInit()));
+		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 		system("PAUSE");
 		exit(EXIT_FAILURE);
 	}glGetError();
@@ -353,30 +359,20 @@ int main(int argc, char** args)
 	obj.setIndices(ind, 6);
 	obj.setMode(GL_TRIANGLES);
 
-	checkGL();
-
 	copyToGPU(obj);
-
-	checkGL();
 
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
 	
-	
-	checkGL();
-
 	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR ) {
 		printf("No error loading shader\n");
 	} else {
 		printf("Error with shader\n");
 	}
 
-	checkGL();
-
 	obj.setShaderProgram(&program);
 	ground.setShaderProgram(&program);
 
 	// Main Loop.  Do the stuff!
-	checkGL();
 
 	while (!glfwWindowShouldClose(window))
 	{	
