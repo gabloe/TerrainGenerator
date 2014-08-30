@@ -2,7 +2,10 @@
 
 #include "Def.h"
 
+#ifndef __APPLE__
 #include "GL/glew.h"
+#endif
+
 #include "ShaderProgram.h"
 
 #include "../math/vec3.h"

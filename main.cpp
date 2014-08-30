@@ -1,6 +1,7 @@
-#define GLEW_STATIC
 
+#ifndef __APPLE__
 #include <GL/glew.h>
+#endif
 
 #include <GLFW/glfw3.h>
 
@@ -270,6 +271,7 @@ void init() {
 
 	glfwMakeContextCurrent(window);
 
+#ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	if (GLEW_OK != glewInit()) {
 		glfwTerminate();
@@ -277,6 +279,7 @@ void init() {
 		system("PAUSE");
 		exit(EXIT_FAILURE);
 	}
+#endif
 
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
