@@ -1,11 +1,6 @@
-<<<<<<< HEAD
 #define GLFW_DLL
 
-#ifndef __APPLE__
-=======
->>>>>>> 9b0351765371e920bea63b356b2a7872f26f4974
 #include "GL/glew.h"
-
 
 #include <GLFW/glfw3.h>
 
@@ -260,7 +255,8 @@ void init() {
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	int major, minor, rev;
 
@@ -289,32 +285,14 @@ void init() {
 		std::exit(-1);
 	}
 
-<<<<<<< HEAD
-	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-
-
-#else
-	if (gl3wInit()) {
-                fprintf(stderr, "failed to initialize OpenGL\n");
-                return -1;
-        }
-        if (!gl3wIsSupported(3, 2)) {
-                fprintf(stderr, "OpenGL 3.2 not supported\n");
-                return -1;
-        }
-        printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION),
-               glGetString(GL_SHADING_LANGUAGE_VERSION));
-#endif
-=======
->>>>>>> 9b0351765371e920bea63b356b2a7872f26f4974
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 
 
 	// Do some stuff
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
-	//glShadeModel(GL_SMOOTH);
+	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
 
 }
