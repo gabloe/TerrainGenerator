@@ -108,7 +108,6 @@ ShaderProgram::ShaderProgram(const char* vert, const char* frag) : program(0), v
 {
 
 	GLuint err = 0;
-
 	// No error yet
 	this->error = NO_SHADER_ERROR;
 	this->v_src = 0;
@@ -123,11 +122,19 @@ ShaderProgram::ShaderProgram(const char* vert, const char* frag) : program(0), v
 		return;
 	}
 
+	
+	if (glCreateShader == 0) {
+		std::cout << "Create shader is null" << std::endl;
+		std::exit(-1);
+	}
 	// Create place for Shaders 
 	v = glCreateShader(GL_VERTEX_SHADER);
 	CHECK_AND_RET("glCreateShader(GL_VERTEX_SHADER) : ", VERTEX, 0);
+
 	f = glCreateShader(GL_FRAGMENT_SHADER);
 	CHECK_AND_RET("glCreateShader(GL_FRAGMENT_SHADER) : ", VERTEX, 0);
+
+
 
 	// Copy over source code
 	const char* vs = v_src,*fs = f_src;
@@ -138,6 +145,7 @@ ShaderProgram::ShaderProgram(const char* vert, const char* frag) : program(0), v
 
 	free(f_src);
 	free(v_src);
+
 
 	// Try to compile!
 	glCompileShader(f);

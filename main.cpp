@@ -1,9 +1,11 @@
+#define GLFW_DLL
 
 #ifndef __APPLE__
 #include "GL/glew.h"
 #else
 #include "GL/gl3w.h"
 #endif
+
 
 #include <GLFW/glfw3.h>
 
@@ -255,22 +257,20 @@ void init() {
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	int major, minor, rev;
 
 	glfwGetVersion(&major, &minor, &rev);
 
-	fprintf(stderr, "OpenGL version recieved: %d.%d.%d\n", major, minor, rev);
-
+	fprintf(stderr, "GLFW sversion recieved: %d.%d.%d\n", major, minor, rev);
 	window = glfwCreateWindow(640, 480, "Terrain Generator", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
-
 	glfwMakeContextCurrent(window);
 
 #ifndef __APPLE__
@@ -281,6 +281,11 @@ void init() {
 		system("PAUSE");
 		exit(EXIT_FAILURE);
 	}
+	if (!GLEW_VERSION_2_1){
+		std::cout << "GLew Version not supported?" << std::endl;
+		std::exit(-1);
+	}
+	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 #else
 	if (gl3wInit()) {
                 fprintf(stderr, "failed to initialize OpenGL\n");
@@ -359,9 +364,8 @@ int main(int argc, char** args)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ground.getNumIndices() * sizeof(GLuint), ground.getIndices(), GL_STATIC_COPY);
 	
-
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
-     
+	
 	std::cout << (program.isValid()?"Valid":"Not Valid") << std::endl;
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -378,6 +382,7 @@ int main(int argc, char** args)
 
 	int i = 0;
 	// Main Loop.  Do the stuff!
+	std::cout << "Starting main loop" << std::endl;
 	while (!glfwWindowShouldClose(window))
 	{	
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

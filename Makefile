@@ -17,12 +17,14 @@ INC_DIR=-I/usr/local/include:includes:.
 LDLIBS = -lglfw -lm -lGLEW -lGL -lGLU -lXrandr -lXi 
 EXECUTABLE=main
 else
+
 CXX = g++ -m32
 CXXFLAGS = -Wall --std=c++0x -DGLFW_BUILD_DLL -DGLEW_STATIC
 LIB_DIR=-Llib/Win32
 INC_DIR=-Iincludes
-LDLIBS =-lm -lglew32s -lopengl32 -lglu32
+LDLIBS =-lm -lglew32 -lopengl32 -lglu32 -lgdi32 -lglfw3
 EXECUTABLE=main.exe
+
 endif
 
 SOURCE=main.cpp
