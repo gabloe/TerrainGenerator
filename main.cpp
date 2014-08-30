@@ -1,6 +1,6 @@
 #define GLFW_DLL
-#include "GL/glew.h"
 
+#include "GL/glew.h"
 
 #include <GLFW/glfw3.h>
 
@@ -232,7 +232,6 @@ GLuint* generateIndices(int div) {
 // Initializes all the subsystems, create the window.
 void init() {
 
-
 	ProjectionMatrix = buildProjectionMatrix( 15.f , 9.0f /16.0f , 0.001f , 100.f);
 
 	glfwSetErrorCallback(error_callback);
@@ -243,6 +242,7 @@ void init() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	int major, minor, rev;
 
@@ -270,9 +270,6 @@ void init() {
 		std::cout << "GLew Version not supported?" << std::endl;
 		std::exit(-1);
 	}
-
-	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
-
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 

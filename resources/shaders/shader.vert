@@ -1,4 +1,4 @@
-#version 410
+#version 150
 in vec3 in_Position;
 out vec4 gl_Position;
 uniform mat4 transform,projection;
