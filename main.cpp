@@ -243,15 +243,12 @@ GLuint* generateIndices(int div) {
 // Initializes all the subsystems, create the window.
 void init() {
 
-
 	ProjectionMatrix = buildProjectionMatrix( 15.f , 9.0f /16.0f , 0.001f , 100.f);
 
 	glfwSetErrorCallback(error_callback);
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
 	}
-
-
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -358,7 +355,7 @@ int main(int argc, char** args)
 	
 	std::cout << (program.isValid()?"Valid":"Not Valid") << std::endl;
 
-	//glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR ) {
 		printf("No Error!\n");
