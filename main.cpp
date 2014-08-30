@@ -1,6 +1,8 @@
 
 #ifndef __APPLE__
-#include <GL/glew.h>
+#include "GL/glew.h"
+#else
+#include "GL/gl3w.h"
 #endif
 
 #include <GLFW/glfw3.h>
@@ -279,8 +281,18 @@ void init() {
 		system("PAUSE");
 		exit(EXIT_FAILURE);
 	}
+#else
+	if (gl3wInit()) {
+                fprintf(stderr, "failed to initialize OpenGL\n");
+                return -1;
+        }
+        if (!gl3wIsSupported(3, 2)) {
+                fprintf(stderr, "OpenGL 3.2 not supported\n");
+                return -1;
+        }
+        printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION),
+               glGetString(GL_SHADING_LANGUAGE_VERSION));
 #endif
-
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 
