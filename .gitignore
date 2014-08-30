@@ -50,3 +50,6 @@ Thumbs.db
 *.ilk
 *.idb
 *.user
+*.a
+
+bin/main

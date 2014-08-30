@@ -1,9 +1,6 @@
-#version 150 // Specify which version of GLSL we are using.
-// in_Position was bound to attribute index 0("shaderAttribute")
-in  vec3 in_Position;
-
+#version 150
+in vec3 in_Position;
 out vec4 v_Position;
-
 uniform mat4 transform,projection;
 void main(void)
 {
