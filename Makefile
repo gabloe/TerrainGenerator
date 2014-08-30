@@ -2,19 +2,29 @@ CXX = g++
 CXXFLAGS = -DGLEW_STATIC -Wall --std=c++0x
 
 OBJ_DIR=bin
-ifeq ($(OS),Windows_NT)
+OBJ_BIN=bin
+
+UNAME := $(shell uname)
+
+ifeq ($(UNAME),Darwin)
+LIB_DIR=-L/usr/local/lib -L./lib/osx
+INC_DIR=-I/usr/local/include -Iincludes -I.
+LDLIBS =-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -lglfw3 -lglew
+EXECUTABLE=main
+else ifeq ($UNAME), Linux)
+LIB_DIR=-L/usr/local/lib -L./lib/linux
+INC_DIR=-I/usr/local/include:includes:.
+LDLIBS = -lglfw -lm -lGLEW -lGL -lGLU -lXrandr -lXi 
+EXECUTABLE=main
+else
 LIB_DIR=-Llib/Win32/
 INC_DIR=-Iincludes
 LDLIBS =-lglfw3 -lm -lglew32 -lopengl32 -lglu32
-else
-LIB_DIR=-L/usr/local/lib
-INC_DIR=-I/usr/local/include
-LDLIBS =-lglfw -lm -lGLEW -lGL -lGLU -lXrandr -lXi
+EXECUTABLE=main.exe
 endif
 
 SOURCE=main.cpp
 OBJECTS=${SOURCE:%.cpp=$(OBJ_DIR)/%.o}
-EXECUTABLE=main.exe
 
 all: math renderer $(OBJECTS) $(OBJ_BIN)/$(EXECUTABLE)
 
@@ -34,15 +44,12 @@ test:
 	make
 	cd ..
 
-
 .PHONY:	math
 
 .PHONY: renderer
-
 
 renderer:
 	$(MAKE) -C renderer
 
 math:
 	$(MAKE) -C math
-

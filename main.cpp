@@ -9,9 +9,9 @@
 
 #include <iostream>
 
-#include "math\mat3.h"
-#include "math\mat4.h"
-#include "renderer\RenderObject.h"
+#include "math/mat3.h"
+#include "math/mat4.h"
+#include "renderer/RenderObject.h"
 
 #include <stdio.h>  /* defines FILENAME_MAX */
 /*

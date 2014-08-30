@@ -4,4 +4,5 @@ all:
 	cp renderer.a ../bin
 
 clean:
-	rm -f *.[oa]
+	rm -f *.o
+	rm -f *.a
