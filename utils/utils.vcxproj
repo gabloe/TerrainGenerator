@@ -115,9 +115,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="def.h" />
     <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="ObjectIO.h" />
     <ClInclude Include="PMGExporter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MemoryManager.cpp" />
+    <ClCompile Include="ObjectO.cpp" />
+    <ClCompile Include="PMGExporter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

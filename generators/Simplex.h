@@ -1,6 +1,6 @@
 #pragma once
 
-#define NOISE_API _declspec( dllexport )
+#include "def.h"
 
 NOISE_API float simplex(float x);
 NOISE_API float simplex2d(float x, float y);

@@ -2,7 +2,7 @@
 
 	#define _RENDERER_DEF_
 
-#ifdef WIN32
+#ifdef _WIN32
 	#define RENDERER_API __declspec(dllexport) 
 #else
 	#define RENDERER_API

@@ -1,6 +1,6 @@
 #pragma once
 
-#define NOISE_API _declspec( dllexport )
+#include "def.h"
 
 NOISE_API float perlin(float x);
 NOISE_API float perlin2d(float x, float y);

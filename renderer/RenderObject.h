@@ -24,33 +24,32 @@ private:
 	ShaderProgram* program;
 
 public:
-	RenderObject() {}
-	~RenderObject() {}
+	RenderObject();
+	~RenderObject();
 
 	// Set
-	void setVertices(GLfloat *vert, int num) { this->vert = vert; this->num_vert = num; }
-	void setNormals(GLfloat *norms, int num) { this->norms = norms; this->num_norm = num; }
-	void setIndices(GLuint *inds, int num) { this->inds = inds; this->num_ind = num; }
-	void setPosition(Vec3 p) { this->position = p; }
+	void setVertices(GLfloat *vert, int num);
+	void setNormals(GLfloat *norms, int num);
+	void setIndices(GLuint *inds, int num);
+	void setPosition(Vec3 p);
 
-
-	void setMode(GLenum mode) { this->mode = mode; }
-	void setShaderProgram( ShaderProgram* p ) { this->program = p; }
+	void setMode(GLenum mode);
+	void setShaderProgram(ShaderProgram* p);
 
 
 	// Get
-	GLuint* getIndices() { return this->inds; }
-	GLfloat* getVertices() { return this->vert; }
-	GLfloat* getNormals() { return this->norms; }
+	GLuint* getIndices();
+	GLfloat* getVertices();
+	GLfloat* getNormals();
 
-	GLuint getNumIndices() { return this->num_ind; }
-	GLuint getNumVertices() { return this->num_vert; }
-	GLuint getNumNormals() { return this->num_norm; }
+	GLuint getNumIndices();
+	GLuint getNumVertices();
+	GLuint getNumNormals();
 
-	GLenum getDisplayMode() { return this->mode; }
+	GLenum getDisplayMode();
 
-	Vec3 getPosition() { return this->position;}
+	Vec3 getPosition();
 
-	ShaderProgram* getShaderProgram() { return this->program; }
+	ShaderProgram* getShaderProgram();
 };
 

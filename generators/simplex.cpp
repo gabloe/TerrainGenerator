@@ -1,5 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#include "def.h"
+
 #include <cstdio>
 #include <cmath>
 #include <cstdlib>
@@ -207,7 +209,7 @@ double raw2D(double x, double y, short* perm, short* permMod12, Grad* gradients)
 // Generates the 2d noise value at a particular <x,y> coordinate.
 // Each octave doubles the frequency of the previous octave.  Higher octaves increase the level of detail, but have worse performance.
 // Persistence scales the frequency of the wave function.
-double noise2D(double x, double y, short* perm, short* permMod12, Grad* gradients, int octaves, float persistence) {
+NOISE_API double simplex2d(double x, double y, short* perm, short* permMod12, Grad* gradients, int octaves, float persistence) {
    double total = 0;
    for (int i=0;i<octaves;++i) {
 	  double freq = pow(2.0,i);
@@ -226,7 +228,7 @@ double noise2D(double x, double y, short* perm, short* permMod12, Grad* gradient
 // Generates the 3d noise value at a particular <x,y,z> coordinate.
 // Each octave doubles the frequency of the previous octave.  Higher octaves increase the level of detail, but have worse performance.
 // Persistence scales the frequency of the wave function.
-double noise3D(double x, double y, double z, short* perm, short* permMod12, Grad* gradients, int octaves, float persistence) {
+NOISE_API double simplex3d(double x, double y, double z, short* perm, short* permMod12, Grad* gradients, int octaves, float persistence) {
    double total = 0;
    for (int i=0;i<octaves;++i) {
 	  double freq = pow(2.0,i);
@@ -247,7 +249,7 @@ double* gen2DNoise(int mesh_size,float point_dist,short* perm,short* permMod12,G
    double* narr = (double*)malloc(mesh_size*mesh_size*sizeof(double));
    for (int i=0;i<mesh_size;++i) {
 	  for (int j=0;j<mesh_size;++j) {
-	  narr[i + j*mesh_size] = noise2D(i*point_dist, j*point_dist, perm, permMod12, gradients,octaves,pers);
+		  narr[i + j*mesh_size] = simplex2d(i*point_dist, j*point_dist, perm, permMod12, gradients, octaves, pers);
 	  }
    }
    return narr;
@@ -259,7 +261,7 @@ double* gen3DNoise(int mesh_size,float point_dist,short* perm,short* permMod12,G
    for (int i=0;i<mesh_size;++i) {
 	  for (int j=0;j<mesh_size;++j) {
 		 for (int k=0;k<mesh_size;++k) {
-			narr[i + mesh_size * (j + mesh_size * k)] = noise3D(i*point_dist, j*point_dist, k*point_dist, perm, permMod12, gradients, octaves, pers);
+			 narr[i + mesh_size * (j + mesh_size * k)] = simplex3d(i*point_dist, j*point_dist, k*point_dist, perm, permMod12, gradients, octaves, pers);
 		 }
 	  }
    }
@@ -337,7 +339,7 @@ void generatePermutations(int seed) {
 	}
 }
 
-int main(int argc, char** argv) {
+int __main(int argc, char** argv) {
    int MESH_SIZE = 64;
    int OCTAVES = 5;
    float PERS = 0.5f;
