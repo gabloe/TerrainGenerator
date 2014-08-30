@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 enum SHADER_ERROR { NO_SHADER_ERROR , FRAGMENT, VERTEX, PROGRAM };
 

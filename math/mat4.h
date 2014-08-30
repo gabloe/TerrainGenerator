@@ -8,15 +8,15 @@ class MATH_API Mat4 {
 private:
 	float m[16];
 public:
+	//Mat4(Mat4& other);
+
 	Mat4(Vec4 r1, Vec4 r2, Vec4 r3, Vec4 r4);
 	
-	Mat4(
-		float m00, float m01, float m02, float m03,
-		float m10, float m11, float m12, float m13,
-		float m20, float m21, float m22, float m23,
-		float m30, float m31, float m32, float m33
-		);
-	Mat4(Mat4& other);
+	Mat4(float m00, float m01, float m02, float m03,
+	     float m10, float m11, float m12, float m13,
+	     float m20, float m21, float m22, float m23,
+	     float m30, float m31, float m32, float m33
+	     );
 
 	// Add two matricies
 	Mat4 operator+(Mat4 rhs);
@@ -34,18 +34,6 @@ public:
 
 	const float* getData() { return m; }
 
-
 	friend std::ostream& operator<<(std::ostream& os, Mat4& obj);
 };
 
-std::ostream& operator<<(std::ostream& os, Mat4& obj) {
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			os << obj.m[i * 4 + j] << " ";
-		}
-		os << std::endl;
-	}
-	return os;
-}

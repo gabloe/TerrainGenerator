@@ -1,25 +1,7 @@
-CXX = g++
-CXXFLAGS = -Wall
-LDLIBS = -lglfw3 -lm -lGL -lGLU -lXrandr -lXi
-
-OBJ_DIR = ../bin
-LIB_DIR = -L/usr/local/lib
-INC_DIR = -I/usr/local/include
-TEST_DIR= tests
-SOURCE = math.cpp
-OBJECTS = ${SOURCE:%.cpp=$(OBJ_DIR)/%.o}
-EXECUTABLE = main
-
-all: init $(OBJECTS) $(EXECUTABLE)
-
-$(EXECUTABLE):
-	$(CXX) $(LD_FLAGS) $(LIB_DIR) -o $@ $(OBJECTS) $(LDLIBS)
-
-$(OBJ_DIR)/%.o: %.cpp
-	$(CXX) $(INC_DIR) -c $< -o $@
-
-init:
-	@mkdir -p "$(OBJ_DIR)"
+all:
+	g++ -I../Includes -c *.cpp
+	ar cr renderer.a *.o
+	cp renderer.a ../bin
 
 clean:
-	@rm -rf $(OBJ_DIR) $(EXECUTABLE)
+	rm -f *.[oa]
