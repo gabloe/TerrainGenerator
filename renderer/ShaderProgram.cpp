@@ -142,6 +142,10 @@ ShaderProgram::ShaderProgram(const char* vert, const char* frag) : program(0), v
 	// Try to compile!
 	glCompileShader(f);
 	CHECK_AND_RET("glCompileShader(f) : ", FRAGMENT, f);
+        char logBuf[1024];
+        glGetShaderInfoLog( f, sizeof(logBuf), NULL, (GLchar*)logBuf );
+        std::cout << logBuf << std::endl;
+
 	glCompileShader(v);
 	CHECK_AND_RET("glCompileShader(v) : ", VERTEX, v);
 

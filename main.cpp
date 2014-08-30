@@ -1,4 +1,5 @@
 #define GLEW_STATIC
+
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
@@ -249,6 +250,17 @@ void init() {
 		exit(EXIT_FAILURE);
 	}
 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+	int major, minor, rev;
+
+	glfwGetVersion(&major, &minor, &rev);
+
+	fprintf(stderr, "OpenGL version recieved: %d.%d.%d\n", major, minor, rev);
+
 	window = glfwCreateWindow(640, 480, "Terrain Generator", NULL, NULL);
 	if (!window)
 	{
@@ -265,6 +277,7 @@ void init() {
 		system("PAUSE");
 		exit(EXIT_FAILURE);
 	}
+
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 
@@ -333,7 +346,7 @@ int main(int argc, char** args)
 	
 
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
-
+     
 	std::cout << (program.isValid()?"Valid":"Not Valid") << std::endl;
 
 	glEnableClientState(GL_VERTEX_ARRAY);

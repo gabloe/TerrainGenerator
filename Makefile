@@ -9,7 +9,7 @@ UNAME := $(shell uname)
 ifeq ($(UNAME),Darwin)
 LIB_DIR=-L/usr/local/lib -L./lib/osx
 INC_DIR=-I/usr/local/include -Iincludes -I.
-LDLIBS =-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -lglfw3 -lglew
+LDLIBS =-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -lglfw3 -lGLEW
 EXECUTABLE=main
 else ifeq ($UNAME), Linux)
 LIB_DIR=-L/usr/local/lib -L./lib/linux
