@@ -1,7 +1,9 @@
 #pragma once
 
+#include <cstdio>
+
 unsigned long long write( const char* filename , int width , int height , float* data , float min , float max ) {
-	written = 0;
+	int written = 0;
 	FILE *fp;
 	if( !(fp = fopen( filename , "w" ) ) ) {
 		printf("Error, could not open the file.\n");

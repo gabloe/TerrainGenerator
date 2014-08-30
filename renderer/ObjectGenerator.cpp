@@ -25,9 +25,9 @@ RenderObject* ObjectGenerator::createSquare(Vec3 position) {
 	int pos = 0;
 	for(int y = 0; y < 2;++y) {
 		for(int x = 0; x < 2; ++x) {
-			verts[pos + 0] = x - 1; // x
-			verts[pos + 1] = y - 1; // y
-			verts[pos + 2] = 0; // z
+			verts[pos + 0] = (GLfloat)(x - 1);	// x
+			verts[pos + 1] = (GLfloat)(y - 1);	// y
+			verts[pos + 2] = (GLfloat)(0);		// z
 			pos += 3;
 		}
 	}

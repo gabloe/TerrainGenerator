@@ -42,8 +42,8 @@ Mat4 TransformMatrix (
 float vert;
 float horiz;
 
-float delta_x = 0.01;
-float delta_y = 0.01;
+float delta_x = 0.01f;
+float delta_y = 0.01f;
 
 #ifdef _WIN32
 	#include <direct.h>
@@ -68,7 +68,7 @@ static void error_callback(int error, const char* description)
 
 Mat4 buildProjectionMatrix(float fov, float ratio, float nearP, float farP) {
 
-	float f = 1.0f / tan(fov * (3.14159265359f / 360.0));
+	float f = (float)(1.0f / tan(fov * (3.14159265359f / 360.0)));
 
 	return Mat4(f / ratio, 0, 0, 0,
 		0, f, 0, 0,
@@ -99,16 +99,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			horiz -= delta_y;
 			break;
 		case GLFW_KEY_W:
-			TransformMatrix.moveZ(0.1);
+			TransformMatrix.moveZ(0.1f);
 			break;
 		case GLFW_KEY_S:
-			TransformMatrix.moveZ(-0.1);
+			TransformMatrix.moveZ(-0.1f);
 			break;
 		case GLFW_KEY_D:
-			TransformMatrix.moveX(-0.01);
+			TransformMatrix.moveX(-0.01f);
 			break;
 		case GLFW_KEY_A:
-			TransformMatrix.moveX(0.01);
+			TransformMatrix.moveX(0.01f);
 			// move right
 			break;
 		case GLFW_KEY_P:
@@ -334,7 +334,7 @@ int main(int argc, char** args)
 
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
 
-	std::cout << program.isValid() << std::endl;
+	std::cout << (program.isValid()?"Valid":"Not Valid") << std::endl;
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	

@@ -1,4 +1,4 @@
-CXX = g++ 
+CXX = g++ -m32
 CXXFLAGS = -DGLEW_STATIC -Wall --std=c++0x
 
 OBJ_DIR=bin
@@ -17,9 +17,10 @@ INC_DIR=-I/usr/local/include:includes:.
 LDLIBS = -lglfw -lm -lGLEW -lGL -lGLU -lXrandr -lXi 
 EXECUTABLE=main
 else
-LIB_DIR=-Llib/Win32/
+CXXFLAGS = -Wall --std=c++0x -DGLFW_BUILD_DLL -DGLEW_STATIC
+LIB_DIR=-Llib/Win32
 INC_DIR=-Iincludes
-LDLIBS =-lglfw3 -lm -lglew32 -lopengl32 -lglu32
+LDLIBS =-lm -lglew32s -lopengl32 -lglu32
 EXECUTABLE=main.exe
 endif
 
