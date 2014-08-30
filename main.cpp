@@ -103,10 +103,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_S:
 			TransformMatrix.moveZ(-0.1);
 			break;
-		case GLFW_KEY_A:
+		case GLFW_KEY_D:
 			TransformMatrix.moveX(-0.01);
 			break;
-		case GLFW_KEY_D:
+		case GLFW_KEY_A:
 			TransformMatrix.moveX(0.01);
 			// move right
 			break;
