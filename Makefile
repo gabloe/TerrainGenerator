@@ -1,41 +1,31 @@
 CXX = g++ 
-CXXFLAGS = -Wall
-LDLIBS =-lglfw -lm -lGLEW -lGL -lGLU -lXrandr -lXi
+CXXFLAGS = -DGLEW_STATIC -Wall --std=c++0x
 
-<<<<<<< HEAD
 OBJ_DIR=bin
 ifeq ($(OS),Windows_NT)
-LIB_DIR=-L./lib
-INC_DIR=-I./includes
+LIB_DIR=-Llib/Win32/
+INC_DIR=-Iincludes
+LDLIBS =-lglfw3 -lm -lglew32 -lopengl32 -lglu32
 else
 LIB_DIR=-L/usr/local/lib
 INC_DIR=-I/usr/local/include
+LDLIBS =-lglfw -lm -lGLEW -lGL -lGLU -lXrandr -lXi
 endif
-=======
-OBJ_DIR = bin
-LIB_DIR = -L/usr/lib64:/usr/lib:/usr/local/lib
-INC_DIR = -I.:/usr/local/include:./Includes
->>>>>>> cbf25dac8f6d7d9bddfa3e0d5539d6d0a4986255
 
 SOURCE=main.cpp
 OBJECTS=${SOURCE:%.cpp=$(OBJ_DIR)/%.o}
-EXECUTABLE=main
+EXECUTABLE=main.exe
 
-<<<<<<< HEAD
-all: $(OBJECTS) $(EXECUTABLE)
-=======
+all: math renderer $(OBJECTS) $(OBJ_BIN)/$(EXECUTABLE)
 
-all: init math renderer $(OBJECTS) $(EXECUTABLE)
->>>>>>> cbf25dac8f6d7d9bddfa3e0d5539d6d0a4986255
-
-$(EXECUTABLE):
+$(OBJ_BIN)/$(EXECUTABLE):
 	$(CXX) $(CXXFLAGS) $(LD_FLAGS) $(LIB_DIR) -o $@ $(OBJECTS) bin/math.a bin/renderer.a $(LDLIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INC_DIR) -c $< -o $@
 
 clean:
-	@rm -rf $(OBJ_DIR) $(EXECUTABLE)
+	@rm -rf $(OBJ_DIR) $(EXECUTABLE)/*.o main
 	$(MAKE) -C math clean
 	$(MAKE) -C renderer clean
 

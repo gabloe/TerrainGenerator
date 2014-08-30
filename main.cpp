@@ -1,8 +1,7 @@
 #define GLEW_STATIC
+#include <GL/glew.h>
 
-#include "GL/glew.h"
-
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -10,10 +9,10 @@
 
 #include <iostream>
 
-#include "math/mat3.h"
-#include "math/mat4.h"
-#include "renderer/RenderObject.h"
-#include "renderer/ShaderProgram.h"
+#include "math\mat3.h"
+#include "math\mat4.h"
+#include "renderer\RenderObject.h"
+
 #include <stdio.h>  /* defines FILENAME_MAX */
 /*
 
@@ -89,11 +88,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			break;
 		case GLFW_KEY_UP:
 			vert += delta_x;
-			TransformMatrix.moveY(-0.5);
 			break;
 		case GLFW_KEY_DOWN:
 			vert -= delta_x;
-			TransformMatrix.moveY(+0.5);
 			break;
 		case GLFW_KEY_LEFT:
 			horiz += delta_y;
@@ -102,24 +99,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			horiz -= delta_y;
 			break;
 		case GLFW_KEY_W:
-			TransformMatrix.moveZ(0.5);
+			TransformMatrix.moveZ(0.1);
 			break;
 		case GLFW_KEY_S:
-			TransformMatrix.moveZ(-0.5);
+			TransformMatrix.moveZ(-0.1);
 			break;
-<<<<<<< HEAD
 		case GLFW_KEY_D:
 			TransformMatrix.moveX(-0.01);
 			break;
 		case GLFW_KEY_A:
 			TransformMatrix.moveX(0.01);
-=======
-		case GLFW_KEY_A:
-			TransformMatrix.moveX(0.5);
-			break;
-		case GLFW_KEY_D:
-			TransformMatrix.moveX(-0.5);
->>>>>>> cbf25dac8f6d7d9bddfa3e0d5539d6d0a4986255
 			// move right
 			break;
 		case GLFW_KEY_P:
@@ -176,10 +165,21 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 		for (int j = 0 ; j < div; j++) { // x
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = min_x + j * delta_x;
-			data[pos + 1] = -1.f + rand() / float(RAND_MAX);
+			data[pos + 1] = 0.f - rand() / float(RAND_MAX);
 			data[pos + 2] = z;
 		}
 	}
+
+	/*
+	for (int i = 0; i < 3 * div * div; i++) {
+		if (i % 3 == 0 && i > 0) {
+			std::cout << std::endl;
+		}
+		std::cout << data[i] << " ";
+	}
+	std::cout << std::endl;
+	// */
+
 	return data;
 }
 
@@ -226,23 +226,28 @@ GLuint* generateIndices(int div) {
 
 	}
 
-	return data;
-}
+	/*
+	for (int i = 0; i < max_i * max_j * 6; i++){
+		if (i > 0 && i % 3 == 0){
+			std::cout << std::endl;
+		}
+		std::cout << data[i] << " ";
+	}
+	std::cout << std::endl;
+	// */
 
-void resized(GLFWwindow* window, int width, int height) {
-	glViewport(0,0,width,height);	
+	return data;
 }
 
 // Initializes all the subsystems, create the window.
 void init() {
-	srand(time(NULL));
+
 	ProjectionMatrix = buildProjectionMatrix( 15.f , 9.0f /16.0f , 0.001f , 100.f);
 
 	glfwSetErrorCallback(error_callback);
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
 	}
-
 
 	window = glfwCreateWindow(640, 480, "Terrain Generator", NULL, NULL);
 	if (!window)
@@ -252,7 +257,6 @@ void init() {
 	}
 
 	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window,resized);
 
 	glewExperimental = GL_TRUE;
 	if (GLEW_OK != glewInit()) {
@@ -286,7 +290,6 @@ void print() {
 
 }
 
-
 int main(int argc, char** args)
 {
 	init();
@@ -303,7 +306,7 @@ int main(int argc, char** args)
 	GLuint ind[] = { 0, 1, 3 , 0 , 3 , 2 };
 	RenderObject obj;
 
-	int ground_size = 100;
+	int ground_size = 50;
 
 	RenderObject ground;
 
@@ -329,11 +332,16 @@ int main(int argc, char** args)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ground.getNumIndices() * sizeof(GLuint), ground.getIndices(), GL_STATIC_COPY);
 	
 
-	ShaderProgram program("resources/shaders/shader.vert", "resources/shaders/shader.frag");
+	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
+
+	std::cout << program.isValid() << std::endl;
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
-	if (program.getError() != NO_SHADER_ERROR ) {
+	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR ) {
+		printf("No Error!\n");
+	}
+	else{
 		printf("Error!\n");
 	}
 
