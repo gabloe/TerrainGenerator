@@ -66,12 +66,16 @@ GLFWwindow *window;
 
 
 
-void checkGL() {
-	GLenum err = glGetError();
-	if (err != GL_NO_ERROR) {
-		std::cout << err << ": " << glewGetErrorString(err) << "at line " << __LINE__ << " in file " << __FILE__ << std::endl;
-		std::exit(-1);
-	}
+#define checkGL() {							\
+	GLenum err = glGetError();				\
+	if (err != GL_NO_ERROR) {				\
+		std::cout << err << ": " <<			\
+			glewGetErrorString(err) <<		\
+			" at line " << __LINE__ <<		\
+			" in file " << __FILE__ <<		\
+			std::endl;						\
+		std::exit(-1);						\
+	}										\
 }
 
 static void error_callback(int error, const char* description)
@@ -349,23 +353,32 @@ int main(int argc, char** args)
 	obj.setIndices(ind, 6);
 	obj.setMode(GL_TRIANGLES);
 
+	checkGL();
+
 	copyToGPU(obj);
+
+	checkGL();
 
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
+	checkGL();
+
 	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR ) {
 		printf("No error loading shader\n");
 	} else {
 		printf("Error with shader\n");
 	}
 
+	checkGL();
+
 	obj.setShaderProgram(&program);
 	ground.setShaderProgram(&program);
 
 	// Main Loop.  Do the stuff!
-	std::cout << "Starting main loop" << std::endl;
+	checkGL();
+
 	while (!glfwWindowShouldClose(window))
 	{	
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
