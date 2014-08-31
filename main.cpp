@@ -24,7 +24,7 @@ float horiz;
 float delta_x = 0.1f;
 float delta_y = 0.1f;
 
-Mat4 TranslateMatrix = Mat4::LookAt(Vec3( 0, 1, 1), Vec3(0, 0, 0), Vec3(0, 1, 0));
+Mat4 TranslateMatrix = Mat4::LookAt(Vec3( 0, 1, 1), Vec3(0, 0, 0), Vec3(0, -1, 0));
 
 #ifdef _WIN32
 	#include <direct.h>
@@ -77,10 +77,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			horiz -= delta_y;
 			break;
 		case GLFW_KEY_W:
-			TranslateMatrix.moveZ(0.5f);
+			TranslateMatrix.moveZ(5.0f);
 			break;
 		case GLFW_KEY_S:
-			TranslateMatrix.moveZ(-0.5f);
+			TranslateMatrix.moveZ(-5.0f);
 			break;
 		case GLFW_KEY_D:
 			TranslateMatrix.moveX(-0.5f);
@@ -156,6 +156,9 @@ GLuint* generateIndices(int div) {
 	return data;
 }
 
+void resized(GLFWwindow *window, int height, int width) {
+	glViewport(0, 0, height, width);
+}
 
 // Initializes all the subsystems, create the window.
 void init() {
@@ -176,6 +179,7 @@ void init() {
 	}glfwMakeContextCurrent(window);
 
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetWindowSizeCallback(window, resized);
 
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
