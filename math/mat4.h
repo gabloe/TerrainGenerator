@@ -20,10 +20,10 @@ public:
 	     );
 
 	// Add two matricies
-	Mat4 operator+(Mat4 rhs);
+	Mat4 operator+(Mat4 &rhs);
 	
 	// Multiply two matrices together
-	Mat4 operator*(Mat4 rhs);
+	Mat4 operator*(Mat4 &rhs);
 
 	void rotateX(float del);
 	void rotateY(float del);
