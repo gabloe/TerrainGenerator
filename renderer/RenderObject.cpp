@@ -1,6 +1,7 @@
 #include "RenderObject.h"
 
 #include <string>
+#include <cmath>
 
 Vec3 helper(Vec3 &a, Vec3 &b, Vec3 &c) {
 	Vec3 t1 = b - a;
@@ -37,7 +38,6 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		Vec3 p2(vertices + i2);
 		Vec3 p3(vertices + i3);
 
-
 		Vec3 t1 = helper(p1, p2, p3);
 		Vec3 t2 = helper(p2, p1, p3);
 		Vec3 t3 = helper(p3, p1, p2);
@@ -65,6 +65,9 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		normals[i+0] = t.getX();
 		normals[i+1] = t.getY();
 		normals[i+2] = t.getZ();
+                std::cout << normals[i] << std::endl;
+                std::cout << normals[i+1] << std::endl;
+                std::cout << normals[i+2] << std::endl;
 	}
 
 	glGenBuffers(1, &_vertex_buffer);
