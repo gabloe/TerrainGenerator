@@ -12,7 +12,7 @@ public:
 	Mat4();
 	Mat4(const Mat4& other);
 
-	Mat4(Vec4 r1, Vec4 r2, Vec4 r3, Vec4 r4);
+	Mat4(const Vec4 &r1, const Vec4 &r2, const Vec4 &r3, const Vec4 &r4);
 	
 	Mat4(float m00, float m01, float m02, float m03,
 	     float m10, float m11, float m12, float m13,

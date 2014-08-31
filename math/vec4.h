@@ -11,15 +11,15 @@ public:
 	Vec4();
 	Vec4(float x, float y, float z, float w);
 
-	float getX();
-	float getY();
-	float getZ();
-	float getW();
+	float getX() const;
+	float getY() const;
+	float getZ() const;
+	float getW() const;
 
-	Vec4 operator+(Vec4 rhs);
-	float operator*(Vec4 rhs);
+	Vec4 operator+(Vec4 rhs) const;
+	float operator*(Vec4 rhs) const;
 
-	Vec4 clone();
+	Vec4 clone() const;
 
 	MATH_API friend std::ostream& operator<<(std::ostream& os, Vec4 &obj);
 };

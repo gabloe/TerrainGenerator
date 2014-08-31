@@ -11,10 +11,10 @@ Mat4::Mat4() {
 }
 
 Mat4::Mat4(const Mat4 &other) {
-	for (int i = 0; i < 16; ++i) m[i] = other.m[i];
+	std::memcpy(m, other.m, sizeof(float)* 16);
 }
 
-Mat4::Mat4(Vec4 r1, Vec4 r2, Vec4 r3, Vec4 r4) {
+Mat4::Mat4(const Vec4 &r1, const Vec4 &r2, const Vec4 &r3, const Vec4 &r4) {
 	m[0] = r1.getX();
 	m[1] = r1.getY();
 	m[2] = r1.getZ();
@@ -64,11 +64,6 @@ Mat4::Mat4(
 	m[15] = m33;
 }
 
-/*
-Mat4::Mat4(Mat4& other) {
-	memcpy(this->m, other.m, sizeof(float)* 16);
-}
-*/
 // Add two matricies
 Mat4 Mat4::operator+(const Mat4 &rhs) {
 	Mat4 ret;
@@ -103,24 +98,6 @@ Mat4 Mat4::operator*(const Mat4 &rhs) {
 		);
 }
 
-Mat4 Mat4::Perspective(float fov, float aspect, float near, float far) {
-	Mat4 ret;
-	float range = tan((fov * 0.0174532925f * 0.5f)) * near;
-	float left = -range * aspect;
-	float right = range * aspect;
-	float bottom = -range;
-	float top = range;
-
-	ret.m[0] = (2 * near) / (right - left);
-	ret.m[5] = (2 * near) / (top - bottom);
-	ret.m[10] = -(far + near) / (far - near);
-	ret.m[11] = -1;
-	ret.m[14] = -(2 * far * near) / (far - near);
-	ret.m[15] = 0;
-
-	return ret;
-}
-
 void Mat4::rotateX(float angle) {
 	Mat4 t = Mat4::RotateX(angle);
 	*this = *this * t;
@@ -139,6 +116,25 @@ void Mat4::rotateZ(float angle) {
 Vec3 normalize(const Vec3& other) {
 	float div = other * other;
 	return Vec3(other.getX() / div, other.getY() / div, other.getZ() / div);
+}
+
+// Static Class Functions
+Mat4 Mat4::Perspective(float fov, float aspect, float near, float far) {
+	Mat4 ret;
+	float range = tan((fov * 0.0174532925f * 0.5f)) * near;
+	float left = -range * aspect;
+	float right = range * aspect;
+	float bottom = -range;
+	float top = range;
+
+	ret.m[0] = (2 * near) / (right - left);
+	ret.m[5] = (2 * near) / (top - bottom);
+	ret.m[10] = -(far + near) / (far - near);
+	ret.m[11] = -1;
+	ret.m[14] = -(2 * far * near) / (far - near);
+	ret.m[15] = 0;
+
+	return ret;
 }
 
 Mat4 Mat4::LookAt(const Vec3 &eye, const Vec3 &center, const Vec3 &up) {
@@ -178,6 +174,7 @@ Mat4 Mat4::RotateX(float x) {
 	ret.m[10] = cos(x);
 	return ret;
 }
+
 Mat4 Mat4::RotateY(float x) {
 	Mat4 ret;
 	ret.m[0] = cos(x);
@@ -186,6 +183,7 @@ Mat4 Mat4::RotateY(float x) {
 	ret.m[10] = cos(x);
 	return ret;
 }
+
 Mat4 Mat4::RotateZ(float x) {
 	Mat4 ret;
 	ret.m[0] = cos(x);
@@ -195,6 +193,7 @@ Mat4 Mat4::RotateZ(float x) {
 	return ret;
 }
 
+// Print
 std::ostream& operator<<(std::ostream& os, Mat4& obj) {
 	for (int i = 0; i < 4; i++)
 	{

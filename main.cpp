@@ -1,6 +1,5 @@
 #define GLFW_DLL
 
-
 // OpenGL
 #include "GL/glew.h"
 #include <GLFW/glfw3.h>
@@ -167,9 +166,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 static void mousepos_callback(GLFWwindow *window, double x, double y) {
-
 	TranslateMatrix.rotateX(-10.0f * 0.0174532925f * (float)y / height);
 	TranslateMatrix.rotateY(-10.0f * 0.0174532925f * (float)x / width);
+	// Reset to the center
 	glfwSetCursorPos(window, 0, 0);
 }
 
