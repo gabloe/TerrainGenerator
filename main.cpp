@@ -65,6 +65,10 @@ static void error_callback(int error, const char* description)
 	fputs(description, stderr);
 }
 
+void resized(GLFWwindow* window, int width, int height) {
+	glViewport(0, 0, width, height);
+}
+
 Mat4 buildProjectionMatrix(float fov, float ratio, float nearP, float farP) {
 
 	float f = (float)(1.0f / tan(fov * (3.14159265359f / 360.0)));
@@ -218,6 +222,7 @@ void init() {
 	}
 	glfwMakeContextCurrent(window);
 
+
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (GLEW_OK != err) {
@@ -226,7 +231,7 @@ void init() {
 		exit(EXIT_FAILURE);
 	}glGetError();
 	
-	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window, resized);
 	glfwSetKeyCallback(window, key_callback);
 
 	// Do some stuff
@@ -274,12 +279,15 @@ int main(int argc, char** args)
 		printf("Error with shader\n");
 	}
 
+	ProjectionMatrix = buildProjectionMatrix(15.f, 9.0f / 16.0f, 0.001f, 100.f);
+
 	// Create our object
 	RenderObject obj;
 	obj.setVertices(data, 12);
 	obj.setIndices(ind, 6);
 	obj.setMode(GL_TRIANGLES);
 	obj.setShaderProgram(&program);
+	obj.setProjectionMatrix(&ProjectionMatrix);
 	obj.moveToGPU();
 
 	// Main Loop.  Do the stuff!

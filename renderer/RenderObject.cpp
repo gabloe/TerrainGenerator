@@ -17,14 +17,15 @@ void RenderObject::moveToGPU() {
 
 	glGenBuffers(1, &v_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, v_buffer);
-	glBufferData(GL_ARRAY_BUFFER, num_vert, vert, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, num_vert * sizeof(float), vert, GL_DYNAMIC_DRAW);
 	
 
 	glGenBuffers(1, &i_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, i_buffer);
-	glBufferData(GL_ARRAY_BUFFER, num_ind, inds, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, i_buffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_ind * sizeof(GLuint), inds, GL_STATIC_COPY);
 	
 	v_position = glGetAttribLocation(program->getProgram(), "v_Position");
+	p_mat = glGetUniformLocation(program->getProgram(), "projection");
 	
 	program->unload();
 	
@@ -49,19 +50,26 @@ Vec3 RenderObject::getPosition() { return this->position; }
 
 ShaderProgram* RenderObject::getShaderProgram() { return this->program; }
 
+void RenderObject::setProjectionMatrix(Mat4* mat) {
+	this->proj = mat;
+}
+
 void RenderObject::render() {
 	// Load the shader program
 	program->load();
-	
+
+	// Turn on variables
+	glEnableVertexAttribArray(v_position);
+
 	// Select the data
 	glBindBuffer(GL_ARRAY_BUFFER, v_buffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, i_buffer);
 
-	// Turn on variables
-	glVertexAttribPointer(v_position, 3, GL_FLOAT, false, 0, 0);
+	glVertexAttribPointer(v_position, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glUniformMatrix4fv(p_mat, 1, false, proj->getData());
 
 	// Draw
-	glDrawElements(GL_TRIANGLES, num_vert / 3, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, num_ind, GL_UNSIGNED_INT, 0);
 
 	// Unload the shader program
 	program->unload();

@@ -7,6 +7,7 @@
 #include "ShaderProgram.h"
 
 #include "../math/vec3.h"
+#include "../math/mat4.h"
 
 class RENDERER_API RenderObject
 {
@@ -14,6 +15,7 @@ class RENDERER_API RenderObject
 private:
 
 	Vec3 position;
+	Mat4 *proj;
 
 	GLuint num_vert, num_norm, num_ind;
 	GLenum mode;
@@ -25,6 +27,7 @@ private:
 	GLuint v_buffer;
 	GLuint i_buffer;
 	GLuint v_position;
+	GLuint p_mat;
 
 	ShaderProgram* program;
 
@@ -40,7 +43,7 @@ public:
 
 	void setMode(GLenum mode);
 	void setShaderProgram(ShaderProgram* p);
-
+	void setProjectionMatrix(Mat4* m);
 	void moveToGPU();
 
 	// Get
@@ -57,7 +60,7 @@ public:
 	GLuint getShaderPosition();
 
 	GLenum getDisplayMode();
-
+	
 	void render();
 	Vec3 getPosition();
 
