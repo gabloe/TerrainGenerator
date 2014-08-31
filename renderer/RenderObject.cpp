@@ -16,9 +16,17 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, number_indices * sizeof(GLuint), indices, GL_STATIC_COPY);
 
-	_position_index = shader.getVariable(std::string("v_Position"));
-	_projection_index = shader.getUniform(std::string("projection"));
-	_projection_index = shader.getUniform(std::string("translate"));
+	std::string *a = new std::string("v_Position");
+	std::string *b = new std::string("projection");
+	std::string *c = new std::string("translate");
+
+	_position_index = shader.getVariable(*a);
+	_projection_index = shader.getUniform(*b);
+	_projection_index = shader.getUniform(*c);
+
+	delete a;
+	delete b;
+	delete c;
 
 	shader.unload();
 
