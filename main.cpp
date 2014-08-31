@@ -228,7 +228,7 @@ int main(int argc, char** args)
 	glfwGetFramebufferSize(window, &width, &height);
 	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)height / (float)width, -0.1f, 100.0f);
 	
-	const int divisions = 20;
+	const int divisions = 200;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions-1) * (divisions - 1);
 	const float size = 100.0f;

@@ -3,6 +3,14 @@
 #include <string>
 #include <cmath>
 
+bool close(Vec3 &a, Vec3 &b){
+	float x = a.getX() - b.getX();
+	float y = a.getY() - b.getY();
+	float z = a.getZ() - b.getZ();
+
+	return abs(x) < 0.0001 && abs(y) < 0.0001 && abs(z) < 0.0001;
+
+}
 Vec3 helper(Vec3 &a, Vec3 &b, Vec3 &c) {
 	Vec3 t1 = b - a;
 	Vec3 t2 = c - a;
@@ -35,8 +43,8 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		Vec3 p3(vertices + i3);
 
 		Vec3 t1 = helper(p1, p2, p3);
-		Vec3 t2 = helper(p2, p1, p3);
-		Vec3 t3 = helper(p3, p1, p2);
+		//Vec3 t2 = helper(p2, p3, p1);
+		//Vec3 t3 = helper(p3, p1, p2);
 
 		/*
 		std::cout << t1 << std::endl;
@@ -48,23 +56,15 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		normals[i1 + 1] += t1.getY();
 		normals[i1 + 2] += t1.getZ();
 
-		normals[i2 + 0] += t2.getX();
-		normals[i2 + 1] += t2.getY();
-		normals[i2 + 2] += t2.getZ();
+		normals[i2 + 0] += t1.getX();
+		normals[i2 + 1] += t1.getY();
+		normals[i2 + 2] += t1.getZ();
 
-		normals[i3 + 0] += t3.getX();
-		normals[i3 + 1] += t3.getY();
-		normals[i3 + 2] += t3.getZ();
+		normals[i3 + 0] += t1.getX();
+		normals[i3 + 1] += t1.getY();
+		normals[i3 + 2] += t1.getZ();
 
 	}
-	for (int i = 0; i < number_vertices; i += 3) {
-		Vec3 t(normals + i);
-		t.normalize();
-		normals[i+0] = t.getX();
-		normals[i+1] = t.getY();
-		normals[i+2] = t.getZ();
-	}
-
 
 	// Copy over the position data
 	glGenBuffers(1, &_vertex_buffer);
@@ -89,29 +89,27 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 	std::string *y = new std::string("projection");
 	std::string *z = new std::string("translate");
 	
-	std::cout << "hi! " << glewGetErrorString(glGetError()) << std::endl;
-
 	if ((_position_index = shader.getVariable(*a)) < 0) {
 		std::cout << "Error: Could not load v_Position" << std::endl;
-	}std::cout << "a" << glewGetErrorString(glGetError()) << std::endl;
+	}
 
-	
 	if ((_normal_index = shader.getVariable(*b)) < 0) {
 		std::cout << "Error: Could not load v_Normal" << std::endl;
-	}std::cout << "b" << glewGetErrorString(glGetError()) << std::endl;
+	}
 	
 	if ((_projection_index = shader.getUniform(*y)) < 0) {
 		std::cout << "Error: Could not load projection" << std::endl;
-	}std::cout << "y" << glewGetErrorString(glGetError()) << std::endl;
+	}
 
 	if ((_translation_index = shader.getUniform(*z)) < 0) {
 		std::cout << "Error: Could not load translate" << std::endl;
-	}std::cout << "z" << glewGetErrorString(glGetError()) << std::endl;
+	}
+
 	if (GLenum err = glGetError()) {
 		std::cout << "Error creating render object" << std::endl;
 		std::cout << glewGetErrorString(err) << std::endl;
 	}
-	std::cout << glewGetErrorString(glGetError()) << std::endl;
+
 	delete normals;
 
 	delete a;
