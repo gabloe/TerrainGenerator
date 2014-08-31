@@ -65,10 +65,6 @@ static void error_callback(int error, const char* description)
 	fputs(description, stderr);
 }
 
-void resized(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
-}
-
 Mat4 buildProjectionMatrix(float fov, float ratio, float nearP, float farP) {
 
 	float f = (float)(1.0f / tan(fov * (3.14159265359f / 360.0)));
@@ -231,7 +227,6 @@ void init() {
 		exit(EXIT_FAILURE);
 	}glGetError();
 	
-	glfwSetFramebufferSizeCallback(window, resized);
 	glfwSetKeyCallback(window, key_callback);
 
 	// Do some stuff
@@ -287,7 +282,7 @@ int main(int argc, char** args)
 	glfwGetFramebufferSize(window, &width, &height);
 
 	float ratio = (float)width / (float)height;
-	//ProjectionMatrix = buildProjectionMatrix(45.0f ,ratio, -1.0f, 10.0f);
+	ProjectionMatrix = buildProjectionMatrix(45.0f ,ratio, -1.0f, 100.0f);
 
 	// Create our object
 	RenderObject obj;
@@ -301,7 +296,7 @@ int main(int argc, char** args)
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window))
 	{	
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
 		obj.render();
 
