@@ -29,23 +29,15 @@
 #define GetCurrentDir getcwd
 #endif
 
-static int height = 480, width = 640;
-
 // Position Data
 const Vec3 Camera(0, 1, 1);
 const Vec3 Origin(0, 0, 0);
 const Vec3 Up(0, 1, 0);
 Mat4 TranslateMatrix = Mat4::LookAt(Camera, Origin, Up);
 
-float vert;
-float horiz;
-
-float delta_x = 0.1f;
-float delta_y = 0.1f;
-
-
-// The current window
-GLFWwindow *window;
+// The window and related data
+static GLFWwindow *window;
+static int height = 480, width = 640;
 
 #define checkGL() {							\
 	GLenum err = glGetError();				\
@@ -58,65 +50,12 @@ GLFWwindow *window;
 		std::exit(-1);						\
 	}										\
 }
-
-static void error_callback(int error, const char* description)
-{
-	fputs(description, stderr);
-}
-
 GLenum MODES[2] = {GL_FILL , GL_LINE };
 int mode = 0;
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	float scale = 1.0;
-	if (mods == GLFW_MOD_SHIFT) {
-		scale = 10.0;
-	}
-	if (action == GLFW_REPEAT || action== GLFW_PRESS){
-		switch (key) {
-		case GLFW_KEY_ESCAPE:
-			glfwSetWindowShouldClose(window, GL_TRUE);
-			break;
-		case GLFW_KEY_UP:
-			TranslateMatrix.rotateX(0.0174532925f * (scale * 0.2f));
-			break;
-		case GLFW_KEY_DOWN:
-			TranslateMatrix.rotateX(0.0174532925f * (scale * -0.2f));
-			break;
-		case GLFW_KEY_LEFT:
-			TranslateMatrix.rotateY(0.0174532925f * (scale * 0.2f));
-			break;
-		case GLFW_KEY_RIGHT:
-			TranslateMatrix.rotateY(0.0174532925f * (scale * -0.2f));
-			break;
-		case GLFW_KEY_W:
-			TranslateMatrix.moveZ(scale * 5.0f);
-			break;
-		case GLFW_KEY_S:
-			TranslateMatrix.moveZ(scale * -5.0f);
-			break;
-		case GLFW_KEY_D:
-			TranslateMatrix.moveX(scale * -0.5f);
-			break;
-		case GLFW_KEY_A:
-			TranslateMatrix.moveX(scale * 0.5f);
-			// move right
-			break;
-		case GLFW_KEY_P:
-			mode = (mode + 1) % 2;
-			glPolygonMode(GL_FRONT_AND_BACK, MODES[mode]);
-		}
-	}
-}
-
-static void mousepos_callback(GLFWwindow *window, double x, double y) {
-	
-	TranslateMatrix.rotateX(-10.0f * 0.0174532925f * (y) / height);
-	TranslateMatrix.rotateY(-10.0f * 0.0174532925f * (x) / width);
-	glfwSetCursorPos(window, 0, 0);
-}
-
+//////////////////////////////////////////////
+//			Simple Random Data				//
+//////////////////////////////////////////////
 float* generateGround(float min_x, float max_x, float min_z, float max_z, int div) {
 	
 	init_simplex(242342);
@@ -181,35 +120,107 @@ GLuint* generateIndices(int div) {
 	return data;
 }
 
-void resized(GLFWwindow *window, int w, int h) {
+//////////////////////////////////////////////
+//				Callbacks					//
+//////////////////////////////////////////////
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	float scale = 1.0;
+	if (mods == GLFW_MOD_SHIFT) {
+		scale = 10.0;
+	}
+	if (action == GLFW_REPEAT || action == GLFW_PRESS){
+		switch (key) {
+		case GLFW_KEY_ESCAPE:
+			glfwSetWindowShouldClose(window, GL_TRUE);
+			break;
+		case GLFW_KEY_UP:
+			TranslateMatrix.rotateX(0.0174532925f * (scale * 0.2f));
+			break;
+		case GLFW_KEY_DOWN:
+			TranslateMatrix.rotateX(0.0174532925f * (scale * -0.2f));
+			break;
+		case GLFW_KEY_LEFT:
+			TranslateMatrix.rotateY(0.0174532925f * (scale * 0.2f));
+			break;
+		case GLFW_KEY_RIGHT:
+			TranslateMatrix.rotateY(0.0174532925f * (scale * -0.2f));
+			break;
+		case GLFW_KEY_W:
+			TranslateMatrix.moveZ(scale * 5.0f);
+			break;
+		case GLFW_KEY_S:
+			TranslateMatrix.moveZ(scale * -5.0f);
+			break;
+		case GLFW_KEY_D:
+			TranslateMatrix.moveX(scale * -0.5f);
+			break;
+		case GLFW_KEY_A:
+			TranslateMatrix.moveX(scale * 0.5f);
+			// move right
+			break;
+		case GLFW_KEY_P:
+			mode = (mode + 1) % 2;
+			glPolygonMode(GL_FRONT_AND_BACK, MODES[mode]);
+		}
+	}
+}
+
+static void mousepos_callback(GLFWwindow *window, double x, double y) {
+
+	TranslateMatrix.rotateX(-10.0f * 0.0174532925f * (float)y / height);
+	TranslateMatrix.rotateY(-10.0f * 0.0174532925f * (float)x / width);
+	glfwSetCursorPos(window, 0, 0);
+}
+
+void resized_callback(GLFWwindow *window, int w, int h) {
 	width = w;
 	height = h;
 	glViewport(0, 0, w, h);
 }
 
+static void error_callback(int error, const char* description)
+{
+	fputs(description, stderr);
+}
+
+//////////////////////////////////////////////
+//				Helper Functions			//
+//////////////////////////////////////////////
 // Initializes all the subsystems, create the window.
 void init() {
 
+	// Set up the error callback for GLFW
 	glfwSetErrorCallback(error_callback);
+
+	// Initialize the GLFW system, if failure jump ship
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
 	}
+
+	// Set the hints on how to render to the 
+	// screen, which OpenGL version we have, etc
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	
-	window = glfwCreateWindow(640, 480, "Terrain Generator", NULL, NULL);
+	// Create our window using the hints given above
+	window = glfwCreateWindow(width, height, "Terrain Generator", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}glfwMakeContextCurrent(window);
 
+	// Set callbacks for GLFW, window, keyboard, and mouse
 	glfwSetKeyCallback(window, key_callback);
-	glfwSetWindowSizeCallback(window, resized);
+	glfwSetWindowSizeCallback(window, resized_callback);
 	glfwSetCursorPosCallback(window, mousepos_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);	// Disable the cursor
+	
+	// Disable the mouse so that we can lookaround
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+	// Setup GLEW, enable newer OpenGL functions
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (GLEW_OK != err) {
@@ -218,7 +229,8 @@ void init() {
 		exit(EXIT_FAILURE);
 	}glGetError();
 	
-	// Do some stuff
+	// The background color should be a 
+	// nice light blue color
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
 }
 
@@ -233,7 +245,9 @@ void print() {
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VERSION));
 }
 
-
+//////////////////////////////////////////////
+//					Main					//
+//////////////////////////////////////////////
 int main(int argc, char** args)
 {
 	init();print();
