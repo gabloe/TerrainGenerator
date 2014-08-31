@@ -1,7 +1,13 @@
 #include "mat4.h"
 
+#include <cmath>
+
 Mat4::Mat4() {
 	for (int i = 0; i < 16; ++i) m[i] = 0;
+	m[0] = 1.0f;
+	m[5] = 1.0f;
+	m[10] = 1.0f;
+	m[15] = 1.0f;
 }
 
 Mat4::Mat4(const Mat4 &other) {
@@ -97,7 +103,67 @@ Mat4 Mat4::operator*(const Mat4 &rhs) {
 		);
 }
 
+Mat4 Mat4::Perspective(float fov, float aspect, float near, float far) {
+	Mat4 ret;
+	float range = tan((fov * 0.0174532925f * 0.5f)) * near;
+	float left = -range * aspect;
+	float right = range * aspect;
+	float bottom = -range;
+	float top = range;
 
+	ret.m[0] = (2 * near) / (right - left);
+	ret.m[5] = (2 * near) / (top - bottom);
+	ret.m[10] = -(far + near) / (far - near);
+	ret.m[11] = -1;
+	ret.m[14] = -(2 * far * near) / (far - near);
+	ret.m[15] = 0;
+
+	return ret;
+}
+
+
+Vec3 normalize(const Vec3& other) {
+	float div = other * other;
+	return Vec3(other.getX() / div, other.getY() / div, other.getZ() / div);
+}
+
+Vec3 cross(const Vec3 &a, const Vec3 &b) {
+	return Vec3(
+		a.getY() * b.getZ() - a.getZ()*b.getY(),
+		a.getZ() * b.getX() - a.getX()*b.getZ(),
+		a.getX() * b.getY() - a.getY()*b.getX()
+		);
+}
+
+
+Mat4 Mat4::LookAt(const Vec3 &eye, const Vec3 &center, const Vec3 &up) {
+	Mat4 ret;
+
+	Vec3 f = normalize(center - eye);
+	Vec3 u = normalize(up);
+	Vec3 s = normalize(cross(f,u));
+	u = cross(s, f);
+
+	ret.m[0] = s.getX();
+	ret.m[4] = s.getY();
+	ret.m[8] = s.getZ();
+
+	ret.m[1] = u.getX();
+	ret.m[5] = u.getY();
+	ret.m[9] = u.getZ();
+
+	ret.m[2] = -f.getX();
+	ret.m[6] = -f.getY();
+	ret.m[10] = -f.getZ();
+
+	ret.m[12] = -(s * eye);
+	ret.m[13] = -(u * eye);
+	ret.m[14] = -(f * eye);
+
+	ret.m[15] = 0;
+
+	return ret;
+}
 
 std::ostream& operator<<(std::ostream& os, Mat4& obj) {
 	for (int i = 0; i < 4; i++)

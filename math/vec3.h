@@ -11,14 +11,15 @@ public:
 	Vec3(void);
 	Vec3(float x, float y, float z);
 
-	float getX();
-	float getY();
-	float getZ();
+	float getX() const;
+	float getY() const;
+	float getZ() const;
 
-	Vec3 operator+(Vec3 rhs);
-	float operator*(Vec3 rhs);
+	Vec3 operator+(const Vec3 &rhs) const;
+	Vec3 operator-(const Vec3 &rhs) const;
+	float operator*(const Vec3 &rhs) const;
 
-	Vec3 clone();
+	Vec3 clone() const;
 
 };
 

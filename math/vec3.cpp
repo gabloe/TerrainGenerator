@@ -10,19 +10,19 @@ Vec3::Vec3(float x, float y, float z) {
 	v[2] = z;
 }
 
-float Vec3::getX() {
+float Vec3::getX() const {
 	return this->v[0];
 }
 
-float Vec3::getY() {
+float Vec3::getY() const {
 	return this->v[1];
 }
 
-float Vec3::getZ() {
+float Vec3::getZ() const {
 	return this->v[2];
 }
 
-Vec3 Vec3::operator+(Vec3 rhs) {
+Vec3 Vec3::operator+(const Vec3 &rhs) const {
 	return Vec3(
 		getX() + rhs.getX(),
 		getY() + rhs.getY(),
@@ -30,13 +30,21 @@ Vec3 Vec3::operator+(Vec3 rhs) {
 		);
 }
 
-float Vec3::operator*(Vec3 rhs) {
+Vec3 Vec3::operator-(const Vec3 &rhs) const {
+	return Vec3(
+		getX() - rhs.getX(),
+		getY() - rhs.getY(),
+		getZ() - rhs.getZ()
+		);
+}
+
+float Vec3::operator*(const Vec3 &rhs) const {
 	return (
 		getX() * rhs.getX() + getY() * rhs.getY() + getZ() * rhs.getZ()
 		);
 }
 
-Vec3 Vec3::clone() {
+Vec3 Vec3::clone() const {
 	return Vec3(getX(), getY(), getZ());
 }
 

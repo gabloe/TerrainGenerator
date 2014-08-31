@@ -59,16 +59,6 @@ static void error_callback(int error, const char* description)
 	fputs(description, stderr);
 }
 
-Mat4 buildProjectionMatrix(float fov, float ratio, float nearP, float farP) {
-
-	float f = (float)(1.0f / tan(fov * (3.14159265359f / 360.0)));
-
-	return Mat4(f / ratio, 0, 0, 0,
-		0, f, 0, 0,
-		0, 0, (farP + nearP) / (nearP - farP), -1.0f,
-		0, 0, (2.0f * farP * nearP) / (nearP - farP), 0);
-}
-
 GLenum MODES[2] = {GL_FILL , GL_LINE };
 int mode = 0;
 
@@ -171,9 +161,6 @@ GLuint* generateIndices(int div) {
 	return data;
 }
 
-void resized(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
-}
 
 // Initializes all the subsystems, create the window.
 void init() {
@@ -194,7 +181,6 @@ void init() {
 	}glfwMakeContextCurrent(window);
 
 	glfwSetKeyCallback(window, key_callback);
-	glfwSetFramebufferSizeCallback(window, resized);
 
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
@@ -222,14 +208,29 @@ void print() {
 int main(int argc, char** args)
 {
 	init();print();
-	
+
+
+	GLuint VertexArrayID;
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+
+	///*
 	GLfloat data[] = {
-		-0.5f, -0.1f, 0.5f,	// 0
-		0.5f, -0.1f, 0.5f,	// 1
-		-0.5f, 0.1f, -0.5f,	// 2
-		0.5f, 0.1f, -0.5f// 3
+		-0.5f, 0.5f, 0.0f,		// Top Left
+		0.5f, 0.5f, 0.0f,		// Top Right
+		-0.5f, -0.5f, 0.0f,		// Bottom Left
+		0.5f, -0.5f, 0.0f		// Bottom Right
 	};
-	GLuint ind[] = { 0, 1, 3, 0, 3, 2 };
+	// */
+	/*
+	GLfloat data[] {
+		-1.0f, -1.0f, 0.0f,
+			1.0f, -1.0f, 0.0f,
+			0.0f, 1.0f, 0.0f,
+	};
+	// */
+	//GLuint ind[] = { 0, 1, 2, 1, 4, 2 };
+	GLuint ind[] = { 0, 1, 2, 1, 4, 2 };
 
 	// Load the shader and compile it
 	const std::string BaseShaderDir = std::string("../resources/shaders/");
@@ -240,8 +241,10 @@ int main(int argc, char** args)
 	}else {
 		printf("Error with shader\n");
 	}
-
-	const Mat4 ProjectionMatrix = buildProjectionMatrix(15.f, 9.0/16.0, -0.001f, 100.f);
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)height / (float)width, 0.1f, 100.0f);
+	const Mat4 TranslateMatrix = Mat4::LookAt(Vec3(4, 3, 3), Vec3(0, 0, 0), Vec3(0, 1, 0));
 
 	std::list<RenderObject> objs;
 	objs.insert(objs.end(), RenderObject(shader, data, 12, ind, 6));
@@ -253,7 +256,7 @@ int main(int argc, char** args)
 		
 		// for objects to be rendered
 		for (RenderObject obj : objs) {
-			obj.render(ProjectionMatrix, TransformMatrix);
+			obj.render(Mat4(), Mat4());
 		}
 
 		glfwSwapBuffers(window);

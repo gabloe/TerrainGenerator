@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vec4.h"
+#include "vec3.h"
 
 #include <iostream>
 
@@ -34,6 +35,9 @@ public:
 	void moveZ(float dist) { m[14] += dist; }
 
 	const float* getData() const { return m; };
+
+	static Mat4 Perspective(float fov, float aspect, float near, float far);
+	static Mat4 LookAt(const Vec3&, const Vec3&, const Vec3&);
 
 	MATH_API friend std::ostream& operator << (std::ostream& os, Mat4& obj);
 };
