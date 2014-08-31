@@ -14,7 +14,7 @@ void main(void) {
 
 	gl_Position = projection * V;
 
-	vec4 L = normalize(camera - V);
+	vec4 L = normalize(vec4(camera,1.0) - V);
 	vec4 E = normalize(-V);
 	vec4 R = normalize(reflect(-L,N));
 
