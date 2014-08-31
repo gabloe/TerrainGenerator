@@ -20,25 +20,28 @@
 #include "renderer/RenderObject.h"
 #include "generators/Simplex.h"
 
+
+#ifdef _WIN32
+#include <direct.h>
+#define GetCurrentDir _getcwd
+#else
+#include <unistd.h>
+#define GetCurrentDir getcwd
+#endif
+
+
+// Position Data
+const Vec3 Camera(0, 1, 1);
+const Vec3 Origin(0, 0, 0);
+const Vec3 Up(0, 1, 0);
+Mat4 TranslateMatrix = Mat4::LookAt(Camera, Origin, Up);
+
 float vert;
 float horiz;
 
 float delta_x = 0.1f;
 float delta_y = 0.1f;
 
-const Vec3 Camera(0, 1, 1);
-const Vec3 Origin(0, 0, 0);
-const Vec3 Up(0, 1, 0);
-
-Mat4 TranslateMatrix = Mat4::LookAt(Camera, Origin, Up);
-
-#ifdef _WIN32
-	#include <direct.h>
-	#define GetCurrentDir _getcwd
-#else
-	#include <unistd.h>
-#define GetCurrentDir getcwd
-#endif
 
 // The current window
 GLFWwindow *window;
@@ -123,7 +126,7 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
 			//data[pos + 1] = (float)simplex2d( x , z ,7,2.323f);
-			data[pos + 1] = -50 * (rand() / float(RAND_MAX));
+			data[pos + 1] = 50 * (rand() / float(RAND_MAX));
 			data[pos + 2] = z;
 		}
 	}
