@@ -22,6 +22,10 @@ private:
 	GLfloat *norms;
 	GLuint *inds;
 
+	GLuint v_buffer;
+	GLuint i_buffer;
+	GLuint v_position;
+
 	ShaderProgram* program;
 
 public:
@@ -37,6 +41,7 @@ public:
 	void setMode(GLenum mode);
 	void setShaderProgram(ShaderProgram* p);
 
+	void moveToGPU();
 
 	// Get
 	GLuint* getIndices();
@@ -47,8 +52,13 @@ public:
 	GLuint getNumVertices();
 	GLuint getNumNormals();
 
+	GLuint getVertexBufferIndex();
+	GLuint getIndexBufferIndex();
+	GLuint getShaderPosition();
+
 	GLenum getDisplayMode();
 
+	void render();
 	Vec3 getPosition();
 
 	ShaderProgram* getShaderProgram();

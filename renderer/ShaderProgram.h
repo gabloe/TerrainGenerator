@@ -23,18 +23,14 @@ public:
 	ShaderProgram(const char* vert, const char* frag);
 	~ShaderProgram();
 
-	GLuint getVertexShader() { return v; }
-	GLuint getFragmentShader() { return f; }
-	GLuint getProgram(){ return this->program; }
-	SHADER_ERROR getError() { return this->error; }
+	GLuint getVertexShader();
+	GLuint getFragmentShader();
+	GLuint getProgram();
+	SHADER_ERROR getError();
 
-	GLenum load() {
-		glUseProgram(this->program); 
-		return glGetError();
-	};
-	
-	GLuint isValid() { return glIsProgram(this->program) == GL_TRUE; }
-	void unload(){ glUseProgram(0); };
+	GLenum load();
+	GLboolean isValid();
+	GLenum unload();
 
 };
 

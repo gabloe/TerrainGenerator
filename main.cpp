@@ -136,42 +136,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 // used to display a RenderObject
-void display(RenderObject renderObj) {
-
-	GLuint transformMatrix = 0, projectionMatrix = 0;
-
-	// If there is a Shader program we should use it
-	ShaderProgram *p = renderObj.getShaderProgram();
-	if (p) {
-		p->load();
-		transformMatrix = glGetUniformLocation(p->getProgram(), "transform");
-		projectionMatrix = glGetUniformLocation(p->getProgram(), "projection");
-		glUniformMatrix4fv(transformMatrix, 1, false, TransformMatrix.getData());
-		glUniformMatrix4fv(projectionMatrix, 1, false, ProjectionMatrix.getData());
-	} else {
-		std::cout << "No shader program" << std::endl;
-	}
-
-	GLenum mode = renderObj.getDisplayMode();
-	GLuint num = renderObj.getNumIndices();
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);	
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-
-	// Indexed Arrays
-	if( num ) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-		glDrawElements( mode , num , GL_UNSIGNED_INT, BUFFER_OFFSET(0));
-	}else {// No index
-		glDrawArrays(mode, 0, renderObj.getNumVertices() / 3);
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0 );
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	if (p) {
-		p->unload();
-	}
+void display(RenderObject &renderObj) {
+	renderObj.render();
 }
 
 float* generateGround(float min_x, float max_x, float min_z, float max_z, int div) {
@@ -297,8 +263,7 @@ void init() {
 
 	// Do some stuff
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 
 }
 
@@ -342,38 +307,34 @@ int main(int argc, char** args)
 		0.5f,	0.1f,	-0.5f// 3
 	};
 	GLuint ind[] = { 0, 1, 3 , 0 , 3 , 2 };
-	RenderObject obj;
-
 	int ground_size = 50;
 
-	RenderObject ground;
 
+	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
+
+	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR) {
+		printf("No error loading shader\n");
+	}else {
+		printf("Error with shader\n");
+	}
+
+	RenderObject ground,obj;
+
+	/*
 	int vertex_size = ground_size * ground_size * 3;
 	int ind_size = (ground_size - 1) * (ground_size - 1) * 6;
 
 	ground.setVertices( generateGround(-30, 30, -30, 30 , ground_size ) , vertex_size );
 	ground.setIndices( generateIndices(ground_size) , ind_size );
 	ground.setMode(GL_TRIANGLES);
-
+	// */
 	obj.setVertices(data, 12);
 	obj.setIndices(ind, 6);
 	obj.setMode(GL_TRIANGLES);
-
-	copyToGPU(obj);
-
-	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
-	
-	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR ) {
-		printf("No error loading shader\n");
-	} else {
-		printf("Error with shader\n");
-	}
-
 	obj.setShaderProgram(&program);
-	ground.setShaderProgram(&program);
 
+	obj.moveToGPU();
 	// Main Loop.  Do the stuff!
-
 	while (!glfwWindowShouldClose(window))
 	{	
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

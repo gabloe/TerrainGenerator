@@ -190,3 +190,20 @@ ShaderProgram::~ShaderProgram()
 
 }
 
+GLuint ShaderProgram::load() {
+		glUseProgram(this->program);
+		return glGetError();
+}
+
+GLenum ShaderProgram::unload() {
+	glUseProgram(0);
+	return glGetError();
+}
+
+GLboolean ShaderProgram::isValid()  { 
+	return glIsProgram(this->program);
+}
+GLuint ShaderProgram::getVertexShader() { return v; }
+GLuint ShaderProgram::getFragmentShader() { return f; }
+GLuint ShaderProgram::getProgram(){ return this->program; }
+SHADER_ERROR ShaderProgram::getError() { return this->error; }
