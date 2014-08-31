@@ -1,5 +1,7 @@
 #include "RenderObject.h"
 
+#include <string>
+
 RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertices, GLuint* indices, int number_indices) {
 	_shader = &shader;
 

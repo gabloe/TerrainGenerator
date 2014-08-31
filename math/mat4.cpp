@@ -65,22 +65,11 @@ Mat4::Mat4(Mat4& other) {
 */
 // Add two matricies
 Mat4 Mat4::operator+(const Mat4 &rhs) {
-	return Mat4(m[0] + rhs.m[0], m[1] + rhs.m[1],
-		m[2] + rhs.m[2],
-		m[3] + rhs.m[3],
-		m[4] + rhs.m[4],
-		m[5] + rhs.m[5],
-		m[6] + rhs.m[6],
-		m[7] + rhs.m[7],
-		m[8] + rhs.m[8],
-		m[9] + rhs.m[9],
-		m[10] + rhs.m[10],
-		m[11] + rhs.m[11],
-		m[12] + rhs.m[12],
-		m[13] + rhs.m[13],
-		m[14] + rhs.m[14],
-		m[15] + rhs.m[15]
-		);
+	Mat4 ret;
+	for (int i = 0; i < 16; ++i) {
+		ret.m[i] = m[i] + rhs.m[i];
+	}
+	return ret;
 }
 
 // Multiply two matrices together

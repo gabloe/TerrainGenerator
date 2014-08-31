@@ -9,6 +9,7 @@
 #include "../math/vec3.h"
 #include "../math/mat4.h"
 
+
 class RENDERER_API RenderObject
 {
 
