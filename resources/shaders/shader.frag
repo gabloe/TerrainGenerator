@@ -1,10 +1,10 @@
 #version 150
 
-in vec3 norm;
-in vec3 vect;
-
 out vec4 colorOut;
 
+in vec3 norm;
+
 void main(void) {
-    colorOut=  max(0.0, dot(norm,vect)) * vec4(1.0,0.0,0.0, 1.0);
+	vec3 n = normalize(norm);
+    colorOut = vec4(n,1.0); // vec4(1.0, 0.0, 0.0, 1.0); // max(intensity * diffuse + spec, ambient);
 }
