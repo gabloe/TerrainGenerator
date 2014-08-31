@@ -1,8 +1,9 @@
 #version 150
 in vec3 v_Position;
 
+out vec4 pos;
 uniform mat4 projection;
 void main(void)
 {
-    gl_Position = projection * vec4(v_Position, 1.0);
+    pos = projection * vec4(v_Position, 1.0);
 }

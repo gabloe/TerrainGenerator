@@ -34,6 +34,6 @@ public:
 
 	const float* getData() { return m; }
 
-	friend std::ostream& operator<<(std::ostream& os, Mat4& obj);
+	MATH_API friend std::ostream& operator << (std::ostream& os, Mat4& obj);
 };
 

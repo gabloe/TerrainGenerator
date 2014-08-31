@@ -236,7 +236,10 @@ void init() {
 
 	// Do some stuff
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
-	glEnable(GL_DEPTH_TEST);
+
+	GLuint VertexArrayID;
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
 }
 
 // Just prints OpenGL information
@@ -260,10 +263,10 @@ int main(int argc, char** args)
 
 	// Square Data
 	GLfloat data[] = {
-		-0.5f,	-0.1f,	0.5f,	// 0
-		0.5f,	-0.1f,	0.5f,	// 1
-		-0.5f,	0.1f,	-0.5f,	// 2
-		0.5f,	0.1f,	-0.5f	// 3
+		-0.5f,	0.5f,	0.01f,	// 0
+		0.5f,	0.5f,	0.01f,	// 1
+		0.5f,	-0.5f,	0.01f,	// 2
+		-0.5f,	-0.5f,	0.01f	// 3
 	};
 	GLuint ind[] = {
 		0, 1, 3,	// T1
@@ -279,7 +282,12 @@ int main(int argc, char** args)
 		printf("Error with shader\n");
 	}
 
-	ProjectionMatrix = buildProjectionMatrix(15.f, 9.0f / 16.0f, 0.001f, 100.f);
+	int width, height;
+
+	glfwGetFramebufferSize(window, &width, &height);
+
+	float ratio = (float)width / (float)height;
+	//ProjectionMatrix = buildProjectionMatrix(45.0f ,ratio, -1.0f, 10.0f);
 
 	// Create our object
 	RenderObject obj;
