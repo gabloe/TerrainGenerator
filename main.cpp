@@ -113,7 +113,7 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			float x = min_x + j * delta_x;
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
-			data[pos + 1] = simplex2d(x, z ,12,5.323); //1.f - 50 * (rand() / float(RAND_MAX));
+			data[pos + 1] = simplex2d( x , z ,7,2.323); //1.f - 50 * (rand() / float(RAND_MAX));
 			data[pos + 2] = z;
 		}
 	}

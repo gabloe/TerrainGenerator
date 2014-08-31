@@ -1,11 +1,11 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#include "Simplex.h"
+
 #include <cstdio>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-
-#include "Simplex.h"
 
 #define F2 0.5*(sqrt(3.0)-1.0)
 #define G2 (3.0-sqrt(3.0))/6.0
@@ -22,13 +22,13 @@ double min = 32000;
 #define _min(x,y) (x)<(y)?(x):(y)
 #endif
 
-double noise2D(double, double, short*, short*, Grad*);
-double noise3D(double, double, double, short*, short*, Grad*);
+static double noise2D(double, double, short*, short*, Grad*);
+static double noise3D(double, double, double, short*, short*, Grad*);
 
-short* p;
-short* perm;
-short* permMod12;
-Grad* gradients3D;
+static short* p;
+static short* perm;
+static short* permMod12;
+static Grad* gradients3D;
 
 // Writes the data to a file.
 void _write(const char* fname, double *data, short MESH_SIZE) {
@@ -203,44 +203,6 @@ double raw2D(double x, double y, short* perm, short* permMod12, Grad* gradients)
    return 70.0 * (n0 + n1 + n2);
 }
 
-// Generates the 2d noise value at a particular <x,y> coordinate.
-// Each octave doubles the frequency of the previous octave.  Higher octaves increase the level of detail, but have worse performance.
-// Persistence scales the frequency of the wave function.
-NOISE_API float simplex2d(float x,float y, int octaves, float persistence) {
-   double total = 0;
-   for (int i=0;i<octaves;++i) {
-	  double freq = pow(2.0,i);
-	  double amp = pow(persistence,i);
-	  total += raw2D(x*freq,y*freq,perm,permMod12,gradients3D) * amp;
-   }
-   if (total > max) {
-	   max = total;
-   }
-   else if (total < min) {
-	   min = total;
-   }
-   return (float)total;
-}
-
-// Generates the 3d noise value at a particular <x,y,z> coordinate.
-// Each octave doubles the frequency of the previous octave.  Higher octaves increase the level of detail, but have worse performance.
-// Persistence scales the frequency of the wave function.
-NOISE_API float simplex3d(float x, float y, float z, int octaves, float persistence) {
-   double total = 0;
-   for (int i=0;i<octaves;++i) {
-	  double freq = pow(2.0,i);
-	  double amp = pow(persistence,i);
-	  total += raw3D(x*freq, y*freq, z*freq, perm, permMod12, gradients3D) * amp;
-   }
-   if (total > max) {
-	   max = total;
-   }
-   else if (total < min) {
-	   min = total;
-   }
-   return (float)total;
-}
-
 // Produces 2d simplex noise (square of noise)
 double* gen2DNoise(int mesh_size,float point_dist,Grad* gradients,int octaves,float pers) {
    double* narr = (double*)malloc(mesh_size*mesh_size*sizeof(double));
@@ -336,6 +298,44 @@ void generatePermutations(int seed) {
 	}
 }
 
+// Generates the 2d noise value at a particular <x,y> coordinate.
+// Each octave doubles the frequency of the previous octave.  Higher octaves increase the level of detail, but have worse performance.
+// Persistence scales the frequency of the wave function.
+NOISE_API float simplex2d(float x, float y, int octaves, float persistence) {
+	double total = 0;
+	for (int i = 0; i<octaves; ++i) {
+		double freq = pow(2.0, i);
+		double amp = pow(persistence, i);
+		total += raw2D(x*freq, y*freq, perm, permMod12, gradients3D) * amp;
+	}
+	if (total > max) {
+		max = total;
+	}
+	else if (total < min) {
+		min = total;
+	}
+	return (float)total;
+}
+
+// Generates the 3d noise value at a particular <x,y,z> coordinate.
+// Each octave doubles the frequency of the previous octave.  Higher octaves increase the level of detail, but have worse performance.
+// Persistence scales the frequency of the wave function.
+NOISE_API float simplex3d(float x, float y, float z, int octaves, float persistence) {
+	double total = 0;
+	for (int i = 0; i<octaves; ++i) {
+		double freq = pow(2.0, i);
+		double amp = pow(persistence, i);
+		total += raw3D(x*freq, y*freq, z*freq, perm, permMod12, gradients3D) * amp;
+	}
+	if (total > max) {
+		max = total;
+	}
+	else if (total < min) {
+		min = total;
+	}
+	return (float)total;
+}
+
 NOISE_API void init_simplex(int seed) {
 	generatePermutations(seed);
 	gradients3D = (Grad*)malloc(12 * sizeof(Grad));
@@ -362,6 +362,13 @@ NOISE_API void init_simplex(int seed) {
 			gradients3D[cnt++].x = 0.0;
 		}
 	}
+}
+
+NOISE_API void cleanup_simplex() {
+	delete p;
+	delete perm;
+	delete permMod12;
+	delete gradients3D;
 }
 
 int __main(int argc, char** argv) {
