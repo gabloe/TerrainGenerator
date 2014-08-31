@@ -30,10 +30,10 @@ endif
 SOURCE=main.cpp
 OBJECTS=${SOURCE:%.cpp=$(OBJ_DIR)/%.o}
 
-all: math renderer $(OBJECTS) $(OBJ_BIN)/$(EXECUTABLE)
+all: math renderer generators $(OBJECTS) $(OBJ_BIN)/$(EXECUTABLE)
 
 $(OBJ_BIN)/$(EXECUTABLE):
-	$(CXX) $(CXXFLAGS) $(LD_FLAGS) $(LIB_DIR) -o $@ $(OBJECTS) bin/math.a bin/renderer.a $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LD_FLAGS) $(LIB_DIR) -o $@ $(OBJECTS) bin/generators.a bin/math.a bin/renderer.a $(LDLIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INC_DIR) -c $< -o $@
@@ -42,6 +42,7 @@ clean:
 	@rm -rf $(OBJ_DIR) $(EXECUTABLE)/*.o main
 	$(MAKE) -C math clean
 	$(MAKE) -C renderer clean
+	$(MAKE) -C generators clean
 
 test:
 	cd tests

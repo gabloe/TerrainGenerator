@@ -6,7 +6,6 @@ typedef struct {
 	double x, y, z;
 } Grad;
 
-
 NOISE_API void cleanup_simplex();
 NOISE_API void init_simplex(int);
 NOISE_API float simplex(float x);
