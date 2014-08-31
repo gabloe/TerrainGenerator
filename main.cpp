@@ -118,9 +118,43 @@ GLuint* generateIndices(int div) {
 	return data;
 }
 
+bool shift_down = false;
+
 bool handleKey(int key, int check_key) {
 	if (key == check_key) return true;
 	return glfwGetKey(window, check_key) != GLFW_RELEASE;
+}
+
+void checkKeys() {
+	float scale = 0.1;
+	if (shift_down) {
+		scale = 1.0;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_UP) != GLFW_RELEASE) {
+		TranslateMatrix.rotateX(0.0174532925f * (scale * 0.2f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) != GLFW_RELEASE) {
+		TranslateMatrix.rotateX(0.0174532925f * (scale * -0.2f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT) != GLFW_RELEASE) {
+		TranslateMatrix.rotateY(0.0174532925f * (scale * 0.2f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) != GLFW_RELEASE) {
+		TranslateMatrix.rotateY(0.0174532925f * (scale * -0.2f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_W) != GLFW_RELEASE) {
+		TranslateMatrix.moveZ(scale * 5.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) != GLFW_RELEASE) {
+		TranslateMatrix.moveZ(scale * -5.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) != GLFW_RELEASE) {
+		TranslateMatrix.moveX(scale * -0.5f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) != GLFW_RELEASE) {
+		TranslateMatrix.moveX(scale * 0.5f);
+	}
 }
 
 //////////////////////////////////////////////
@@ -128,41 +162,18 @@ bool handleKey(int key, int check_key) {
 //////////////////////////////////////////////
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	float scale = 1.0;
-	if (mods == GLFW_MOD_SHIFT) {
-		scale = 10.0;
-	}
+	shift_down = mods == GLFW_MOD_SHIFT;
 
-	if (handleKey(key,GLFW_KEY_ESCAPE)) {
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	}
-	if (handleKey(key,GLFW_KEY_UP)) {
-		TranslateMatrix.rotateX(0.0174532925f * (scale * 0.2f));
-	}
-	if (handleKey(key,GLFW_KEY_DOWN)){
-		TranslateMatrix.rotateX(0.0174532925f * (scale * -0.2f));
-	}
-	if (handleKey(key,GLFW_KEY_LEFT)){
-		TranslateMatrix.rotateY(0.0174532925f * (scale * 0.2f));
-	}
-	if (handleKey(key,GLFW_KEY_RIGHT)){
-		TranslateMatrix.rotateY(0.0174532925f * (scale * -0.2f));
-	}
-	if (handleKey(key, GLFW_KEY_W)){
-		TranslateMatrix.moveZ(scale * 5.0f);
-	}
-	if (handleKey(key, GLFW_KEY_S)){
-		TranslateMatrix.moveZ(scale * -5.0f);
-	}
-	if (handleKey(key, GLFW_KEY_D)){
-		TranslateMatrix.moveX(scale * -0.5f);
-	}
-	if (handleKey(key, GLFW_KEY_A)){
-		TranslateMatrix.moveX(scale * 0.5f);
-	}
-	if (handleKey(key, GLFW_KEY_P)){
-		mode = (mode + 1) % 2;
-		glPolygonMode(GL_FRONT_AND_BACK, MODES[mode]);
+	if (action == GLFW_REPEAT || action == GLFW_PRESS){
+
+		if (key == GLFW_KEY_ESCAPE) {
+			glfwSetWindowShouldClose(window, GL_TRUE);
+		}
+
+		if (key == GLFW_KEY_P) {
+			mode = (mode + 1) % 2;
+			glPolygonMode(GL_FRONT_AND_BACK, MODES[mode]);
+		}
 	}
 }
 
@@ -290,6 +301,8 @@ int main(int argc, char** args)
 	delete ground_data;
 	delete indices;
 
+	double duration = 0;
+
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
 		// Clear everything on the screen
@@ -299,9 +312,16 @@ int main(int argc, char** args)
 		for (RenderObject obj : objs) {
 			obj.render(ProjectionMatrix, TranslateMatrix, Camera);
 		}
-
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		duration += glfwGetTime();
+		if (duration > 0.5) {
+			checkKeys();
+			duration = 0;
+		}
+
 	}
 
 	glfwDestroyWindow(window);
