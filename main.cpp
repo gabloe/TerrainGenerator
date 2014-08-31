@@ -48,14 +48,14 @@ static int height = 480, width = 640;
 		std::exit(-1);						\
 	}										\
 }
-GLenum MODES[2] = {GL_FILL , GL_LINE };
+GLenum MODES[2] = { GL_FILL, GL_LINE };
 int mode = 0;
 
 //////////////////////////////////////////////
 //			Simple Random Data				//
 //////////////////////////////////////////////
 float* generateGround(float min_x, float max_x, float min_z, float max_z, int div) {
-	
+
 	init_simplex(242342);
 
 	float x_len = max_x - min_x;
@@ -63,10 +63,10 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 	float delta_x = x_len / (div - 1);
 	float delta_z = z_len / (div - 1);
 	float* data = (float*)calloc(3 * div * div, sizeof(float));
-	
-	for ( int i = 0; i < div; i++) { // z
+
+	for (int i = 0; i < div; i++) { // z
 		float z = max_z - i * delta_z;
-		for (int j = 0 ; j < div; j++) { // x
+		for (int j = 0; j < div; j++) { // x
 			float x = min_x + j * delta_x;
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
@@ -79,7 +79,7 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 }
 
 GLuint* generateIndices(int div) {
-	GLuint* data = (GLuint*)calloc( (div - 1) * (div - 1) * 6, sizeof(GLuint));
+	GLuint* data = (GLuint*)calloc((div - 1) * (div - 1) * 6, sizeof(GLuint));
 	int max_i, max_j;
 	max_i = max_j = div - 1;
 
@@ -89,10 +89,10 @@ GLuint* generateIndices(int div) {
 	int D = div + 1;
 
 	int i = 0;
-	for ( ; i < max_i; i++){
+	for (; i < max_i; i++){
 		int j = 0;
-		for ( ; j < max_j; j++) {
-			int pos = 6 * ( i * (div - 1) + j);
+		for (; j < max_j; j++) {
+			int pos = 6 * (i * (div - 1) + j);
 
 			// Create indices
 			// Triangle One
@@ -104,7 +104,7 @@ GLuint* generateIndices(int div) {
 			data[pos + 3] = A;		// 0
 			data[pos + 4] = D;		// 3
 			data[pos + 5] = C;		// 2
-		
+
 			A++;
 			B++;
 			C++;
@@ -118,6 +118,11 @@ GLuint* generateIndices(int div) {
 	return data;
 }
 
+bool handleKey(int key, int check_key) {
+	if (key == check_key) return true;
+	return glfwGetKey(window, check_key) != GLFW_RELEASE;
+}
+
 //////////////////////////////////////////////
 //				Callbacks					//
 //////////////////////////////////////////////
@@ -127,40 +132,37 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (mods == GLFW_MOD_SHIFT) {
 		scale = 10.0;
 	}
-	if (action == GLFW_REPEAT || action == GLFW_PRESS){
-		switch (key) {
-		case GLFW_KEY_ESCAPE:
-			glfwSetWindowShouldClose(window, GL_TRUE);
-			break;
-		case GLFW_KEY_UP:
-			TranslateMatrix.rotateX(0.0174532925f * (scale * 0.2f));
-			break;
-		case GLFW_KEY_DOWN:
-			TranslateMatrix.rotateX(0.0174532925f * (scale * -0.2f));
-			break;
-		case GLFW_KEY_LEFT:
-			TranslateMatrix.rotateY(0.0174532925f * (scale * 0.2f));
-			break;
-		case GLFW_KEY_RIGHT:
-			TranslateMatrix.rotateY(0.0174532925f * (scale * -0.2f));
-			break;
-		case GLFW_KEY_W:
-			TranslateMatrix.moveZ(scale * 5.0f);
-			break;
-		case GLFW_KEY_S:
-			TranslateMatrix.moveZ(scale * -5.0f);
-			break;
-		case GLFW_KEY_D:
-			TranslateMatrix.moveX(scale * -0.5f);
-			break;
-		case GLFW_KEY_A:
-			TranslateMatrix.moveX(scale * 0.5f);
-			// move right
-			break;
-		case GLFW_KEY_P:
-			mode = (mode + 1) % 2;
-			glPolygonMode(GL_FRONT_AND_BACK, MODES[mode]);
-		}
+
+	if (handleKey(key,GLFW_KEY_ESCAPE)) {
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+	if (handleKey(key,GLFW_KEY_UP)) {
+		TranslateMatrix.rotateX(0.0174532925f * (scale * 0.2f));
+	}
+	if (handleKey(key,GLFW_KEY_DOWN)){
+		TranslateMatrix.rotateX(0.0174532925f * (scale * -0.2f));
+	}
+	if (handleKey(key,GLFW_KEY_LEFT)){
+		TranslateMatrix.rotateY(0.0174532925f * (scale * 0.2f));
+	}
+	if (handleKey(key,GLFW_KEY_RIGHT)){
+		TranslateMatrix.rotateY(0.0174532925f * (scale * -0.2f));
+	}
+	if (handleKey(key, GLFW_KEY_W)){
+		TranslateMatrix.moveZ(scale * 5.0f);
+	}
+	if (handleKey(key, GLFW_KEY_S)){
+		TranslateMatrix.moveZ(scale * -5.0f);
+	}
+	if (handleKey(key, GLFW_KEY_D)){
+		TranslateMatrix.moveX(scale * -0.5f);
+	}
+	if (handleKey(key, GLFW_KEY_A)){
+		TranslateMatrix.moveX(scale * 0.5f);
+	}
+	if (handleKey(key, GLFW_KEY_P)){
+		mode = (mode + 1) % 2;
+		glPolygonMode(GL_FRONT_AND_BACK, MODES[mode]);
 	}
 }
 
@@ -202,7 +204,7 @@ void init() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	
+
 	// Create our window using the hints given above
 	window = glfwCreateWindow(width, height, "Terrain Generator", NULL, NULL);
 	if (!window) {
@@ -214,7 +216,7 @@ void init() {
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetWindowSizeCallback(window, resized_callback);
 	glfwSetCursorPosCallback(window, mousepos_callback);
-	
+
 	// Disable the mouse so that we can lookaround
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -226,7 +228,7 @@ void init() {
 		std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
 		exit(EXIT_FAILURE);
 	}glGetError();
-	
+
 	// The background color should be a 
 	// nice light blue color
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
@@ -236,7 +238,7 @@ void init() {
 void print() {
 	char current[FILENAME_MAX];
 	if (GetCurrentDir(current, sizeof(current))){
-		printf("Current Working Directory : %s\n" , current );
+		printf("Current Working Directory : %s\n", current);
 	}
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VENDOR));
 	printf("OpenGL Vendor: %s\n", glGetString(GL_RENDERER));
@@ -248,9 +250,9 @@ void print() {
 //////////////////////////////////////////////
 int main(int argc, char** args)
 {
-	init();print();
+	init(); print();
 	// Backup a lot
-    TranslateMatrix.moveZ(-1000.0f);
+	TranslateMatrix.moveZ(-1000.0f);
 
 
 	GLuint VertexArrayID;
@@ -259,21 +261,22 @@ int main(int argc, char** args)
 
 	// Load the shader and compile it
 	const std::string BaseShaderDir = std::string("../resources/shaders/");
-	Shader shader(BaseShaderDir,std::string("shader"));
+	Shader shader(BaseShaderDir, std::string("shader"));
 
 	if (shader.getError() == SHADER_ERROR::NO_SHADER_ERROR) {
 		printf("No error loading shader\n");
-	}else {
+	}
+	else {
 		printf("Error with shader\n");
 	}
-	
+
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)height / (float)width, -0.1f, 100.0f);
-	
+
 	const int divisions = 50;
 	const int number_vertices = 3 * divisions * divisions;
-	const int number_indicies = 6 * (divisions-1) * (divisions - 1);
+	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
 	const float size = 100.0f;
 	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions);
 	GLuint *indices = generateIndices(divisions);
@@ -282,13 +285,16 @@ int main(int argc, char** args)
 	objs.insert(
 		objs.end(),
 		RenderObject(shader, ground_data, number_vertices, indices, number_indicies)
-	);
+		);
+
+	delete ground_data;
+	delete indices;
 
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
 		// Clear everything on the screen
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-		
+
 		// for objects to be rendered
 		for (RenderObject obj : objs) {
 			obj.render(ProjectionMatrix, TranslateMatrix, Camera);
@@ -297,7 +303,7 @@ int main(int argc, char** args)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-	
+
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
