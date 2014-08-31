@@ -24,7 +24,7 @@ float horiz;
 float delta_x = 0.1f;
 float delta_y = 0.1f;
 
-Mat4 TranslateMatrix = Mat4::LookAt(Vec3(0, 0.1, -30), Vec3(0, 0, 0), Vec3(0, 1, 0));
+Mat4 TranslateMatrix = Mat4::LookAt(Vec3( 0, 1, 1), Vec3(0, 0, 0), Vec3(0, 1, 0));
 
 #ifdef _WIN32
 	#include <direct.h>
@@ -77,13 +77,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			horiz -= delta_y;
 			break;
 		case GLFW_KEY_W:
-			TranslateMatrix.moveZ(0.1f);
+			TranslateMatrix.moveZ(0.5f);
 			break;
 		case GLFW_KEY_S:
 			TranslateMatrix.moveZ(-0.5f);
 			break;
 		case GLFW_KEY_D:
-			TranslateMatrix.moveX(-0.1f);
+			TranslateMatrix.moveX(-0.5f);
 			break;
 		case GLFW_KEY_A:
 			TranslateMatrix.moveX(0.5f);
@@ -109,7 +109,7 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 		for (int j = 0 ; j < div; j++) { // x
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = min_x + j * delta_x;
-			data[pos + 1] = 1.f - 10 * (rand() / float(RAND_MAX));
+			data[pos + 1] = 1.f - 50 * (rand() / float(RAND_MAX));
 			data[pos + 2] = z;
 		}
 	}
@@ -223,12 +223,18 @@ int main(int argc, char** args)
 	glfwGetFramebufferSize(window, &width, &height);
 	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)height / (float)width, -0.1f, 100.0f);
 	
-
-	GLfloat *ground_data = generateGround(-100,100,100,-100,100);
-	GLuint *indices = generateIndices(100);
+	const int divisions = 20;
+	const int number_vertices = 3 * divisions * divisions;
+	const int number_indicies = 6 * (divisions-1) * (divisions - 1);
+	const int size = 100;
+	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions);
+	GLuint *indices = generateIndices(divisions);
 
 	std::list<RenderObject> objs;
-	objs.insert(objs.end(), RenderObject(shader, ground_data, 3*100*100, indices, 99*99*6));
+	objs.insert(
+		objs.end(),
+		RenderObject(shader, ground_data, number_vertices, indices, number_indicies)
+	);
 
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
