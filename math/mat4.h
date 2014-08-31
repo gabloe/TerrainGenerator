@@ -7,7 +7,7 @@
 
 class MATH_API Mat4 {
 private:
-	float m[16];
+ float m[16];
 public:
 	Mat4();
 	Mat4(const Mat4& other);

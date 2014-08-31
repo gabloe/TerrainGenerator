@@ -18,18 +18,13 @@
 #include "math/mat4.h"
 #include "renderer/RenderObject.h"
 
-Mat4 TransformMatrix (
-	1, 0, 0, 0,
-	0, 1, 0, 0,
-	0, 0, 1, 0,
-	0, 0, 0, 1
-	);
-
 float vert;
 float horiz;
 
 float delta_x = 0.1f;
 float delta_y = 0.1f;
+
+Mat4 TranslateMatrix = Mat4::LookAt(Vec3(0, 0.1, -30), Vec3(0, 0, 0), Vec3(0, 1, 0));
 
 #ifdef _WIN32
 	#include <direct.h>
@@ -82,16 +77,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			horiz -= delta_y;
 			break;
 		case GLFW_KEY_W:
-			TransformMatrix.moveZ(0.1f);
+			TranslateMatrix.moveZ(0.1f);
 			break;
 		case GLFW_KEY_S:
-			TransformMatrix.moveZ(-0.1f);
+			TranslateMatrix.moveZ(-0.5f);
 			break;
 		case GLFW_KEY_D:
-			TransformMatrix.moveX(-0.01f);
+			TranslateMatrix.moveX(-0.1f);
 			break;
 		case GLFW_KEY_A:
-			TransformMatrix.moveX(0.01f);
+			TranslateMatrix.moveX(0.5f);
 			// move right
 			break;
 		case GLFW_KEY_P:
@@ -114,7 +109,7 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 		for (int j = 0 ; j < div; j++) { // x
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = min_x + j * delta_x;
-			data[pos + 1] = 0.f - rand() / float(RAND_MAX);
+			data[pos + 1] = 1.f - 10 * (rand() / float(RAND_MAX));
 			data[pos + 2] = z;
 		}
 	}
@@ -214,24 +209,6 @@ int main(int argc, char** args)
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	///*
-	GLfloat data[] = {
-		-0.5f, 0.5f, 0.0f,		// Top Left
-		0.5f, 0.5f, 0.0f,		// Top Right
-		-0.5f, -0.5f, 0.0f,		// Bottom Left
-		0.5f, -0.5f, 0.0f		// Bottom Right
-	};
-	// */
-	/*
-	GLfloat data[] {
-		-1.0f, -1.0f, 0.0f,
-			1.0f, -1.0f, 0.0f,
-			0.0f, 1.0f, 0.0f,
-	};
-	// */
-	//GLuint ind[] = { 0, 1, 2, 1, 4, 2 };
-	GLuint ind[] = { 0, 1, 2, 1, 4, 2 };
-
 	// Load the shader and compile it
 	const std::string BaseShaderDir = std::string("../resources/shaders/");
 	Shader shader(BaseShaderDir,std::string("shader"));
@@ -241,13 +218,17 @@ int main(int argc, char** args)
 	}else {
 		printf("Error with shader\n");
 	}
+	
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
-	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)height / (float)width, 0.1f, 100.0f);
-	const Mat4 TranslateMatrix = Mat4::LookAt(Vec3(4, 3, 3), Vec3(0, 0, 0), Vec3(0, 1, 0));
+	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)height / (float)width, -0.1f, 100.0f);
+	
+
+	GLfloat *ground_data = generateGround(-100,100,100,-100,100);
+	GLuint *indices = generateIndices(100);
 
 	std::list<RenderObject> objs;
-	objs.insert(objs.end(), RenderObject(shader, data, 12, ind, 6));
+	objs.insert(objs.end(), RenderObject(shader, ground_data, 3*100*100, indices, 99*99*6));
 
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
@@ -256,7 +237,7 @@ int main(int argc, char** args)
 		
 		// for objects to be rendered
 		for (RenderObject obj : objs) {
-			obj.render(Mat4(), Mat4());
+			obj.render(ProjectionMatrix, TranslateMatrix);
 		}
 
 		glfwSwapBuffers(window);
