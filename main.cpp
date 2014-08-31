@@ -1,25 +1,24 @@
 #define GLFW_DLL
 
 // OpenGL
-#include "GL/glew.h"
-#include <GLFW/glfw3.h>
+#include "GL/glew.h"	// glViewPort...
+#include <GLFW/glfw3.h>	// glfw*
 
 // C
-#include <cstdlib>
-#include <cstdio>
-#include <cmath>
+#include <cstdlib>	// EXIT_SUCCESS, EXIT_FAILURE, std::exit
+#include <cstdio>	// TODO: Is this needed?
+#include <cmath>	// sin, cos, ...
 
 // C++
-#include <iostream>
-#include <list>
-
+#include <iostream>	// std::cout
+#include <list>		// List<RenderObject>
+#include <string>	// std::string
 // Custom
-#include "math/mat3.h"
 #include "math/mat4.h"
 #include "renderer/RenderObject.h"
 #include "generators/Simplex.h"
 
-
+// Used to get the current directory, can use later for something?
 #ifdef _WIN32
 #include <direct.h>
 #define GetCurrentDir _getcwd
@@ -250,7 +249,8 @@ void print() {
 int main(int argc, char** args)
 {
 	init();print();
-        TranslateMatrix.moveZ(-1000.0f);
+	// Backup a lot
+    TranslateMatrix.moveZ(-1000.0f);
 
 
 	GLuint VertexArrayID;
