@@ -19,20 +19,12 @@ Vec3 meanWeightAngle(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3) {
 	return N;
 }
 
-
-RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertices, GLuint* indices, int number_indices) {
-
-	_shader = &shader;
-	shader.load();
-
-	_number_vertices = number_vertices;
-	_number_indices = number_indices;
-
+GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices, int number_indices) {
 	GLfloat *normals = new GLfloat[number_vertices];
-	memset(normals, 0, sizeof(GLfloat) * number_vertices);
+	memset(normals, 0, sizeof(GLfloat)* number_vertices);
 
 	for (int i = 0; i < number_indices; i += 3) {
-		
+
 		int i1 = 3 * indices[i + 0];
 		int i2 = 3 * indices[i + 1];
 		int i3 = 3 * indices[i + 2];
@@ -42,7 +34,7 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		Vec3 p3(vertices + i3);
 
 		Vec3 N = meanWeightEqual(p1, p2, p3);
-		
+
 		normals[i1 + 0] += N.getX();
 		normals[i1 + 1] += N.getY();
 		normals[i1 + 2] += N.getZ();
@@ -56,6 +48,18 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		normals[i3 + 2] += N.getZ();
 
 	}
+	return normals;
+}
+
+RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertices, GLuint* indices, int number_indices) {
+
+	_shader = &shader;
+	shader.load();
+
+	_number_vertices = number_vertices;
+	_number_indices = number_indices;
+
+	GLfloat *normals = computeNormals(vertices, number_vertices, indices, number_indices);
 
 	// Copy over the position data
 	glGenBuffers(1, &_vertex_buffer);
