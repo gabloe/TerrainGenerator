@@ -18,7 +18,8 @@
 #include "math/mat3.h"
 #include "math/mat4.h"
 #include "renderer/RenderObject.h"
-#include "generators\Simplex.h"
+#include "generators/Simplex.h"
+
 float vert;
 float horiz;
 
