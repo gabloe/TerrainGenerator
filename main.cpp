@@ -29,6 +29,7 @@
 #define GetCurrentDir getcwd
 #endif
 
+static int height = 480, width = 640;
 
 // Position Data
 const Vec3 Camera(0, 1, 1);
@@ -78,16 +79,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			glfwSetWindowShouldClose(window, GL_TRUE);
 			break;
 		case GLFW_KEY_UP:
-			TranslateMatrix.rotateX(0.0174532925f * (scale * 0.1f));
+			TranslateMatrix.rotateX(0.0174532925f * (scale * 0.2f));
 			break;
 		case GLFW_KEY_DOWN:
-			TranslateMatrix.rotateX(0.0174532925f * (scale * -0.1f));
+			TranslateMatrix.rotateX(0.0174532925f * (scale * -0.2f));
 			break;
 		case GLFW_KEY_LEFT:
-			TranslateMatrix.rotateY(0.0174532925f * (scale * 0.1f));
+			TranslateMatrix.rotateY(0.0174532925f * (scale * 0.2f));
 			break;
 		case GLFW_KEY_RIGHT:
-			TranslateMatrix.rotateY(0.0174532925f * (scale * -0.1f));
+			TranslateMatrix.rotateY(0.0174532925f * (scale * -0.2f));
 			break;
 		case GLFW_KEY_W:
 			TranslateMatrix.moveZ(scale * 5.0f);
@@ -107,6 +108,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			glPolygonMode(GL_FRONT_AND_BACK, MODES[mode]);
 		}
 	}
+}
+
+static void mousepos_callback(GLFWwindow *window, double x, double y) {
+	
+	TranslateMatrix.rotateX(-10.0f * 0.0174532925f * (y) / height);
+	TranslateMatrix.rotateY(-10.0f * 0.0174532925f * (x) / width);
+	glfwSetCursorPos(window, 0, 0);
 }
 
 float* generateGround(float min_x, float max_x, float min_z, float max_z, int div) {
@@ -173,8 +181,10 @@ GLuint* generateIndices(int div) {
 	return data;
 }
 
-void resized(GLFWwindow *window, int height, int width) {
-	glViewport(0, 0, height, width);
+void resized(GLFWwindow *window, int w, int h) {
+	width = w;
+	height = h;
+	glViewport(0, 0, w, h);
 }
 
 // Initializes all the subsystems, create the window.
@@ -197,6 +207,8 @@ void init() {
 
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetWindowSizeCallback(window, resized);
+	glfwSetCursorPosCallback(window, mousepos_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);	// Disable the cursor
 
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
