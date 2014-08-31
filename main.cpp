@@ -28,7 +28,7 @@ float delta_y = 0.1f;
 
 const Vec3 Camera(0, 1, 1);
 const Vec3 Origin(0, 0, 0);
-const Vec3 Up(0, -1, 0);
+const Vec3 Up(0, 1, 0);
 
 Mat4 TranslateMatrix = Mat4::LookAt(Camera, Origin, Up);
 
@@ -65,6 +65,10 @@ int mode = 0;
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	float scale = 1.0;
+	if (mods == GLFW_MOD_SHIFT) {
+		scale = 10.0;
+	}
 	if (action == GLFW_REPEAT || action== GLFW_PRESS){
 		switch (key) {
 		case GLFW_KEY_ESCAPE:
@@ -83,16 +87,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			horiz -= delta_y;
 			break;
 		case GLFW_KEY_W:
-			TranslateMatrix.moveZ(5.0f);
+			TranslateMatrix.moveZ(scale * 5.0f);
 			break;
 		case GLFW_KEY_S:
-			TranslateMatrix.moveZ(-5.0f);
+			TranslateMatrix.moveZ(scale * -5.0f);
 			break;
 		case GLFW_KEY_D:
-			TranslateMatrix.moveX(-0.5f);
+			TranslateMatrix.moveX(scale * -0.5f);
 			break;
 		case GLFW_KEY_A:
-			TranslateMatrix.moveX(0.5f);
+			TranslateMatrix.moveX(scale * 0.5f);
 			// move right
 			break;
 		case GLFW_KEY_P:
@@ -118,8 +122,8 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			float x = min_x + j * delta_x;
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
-			data[pos + 1] = (float)simplex2d( x , z ,7,2.323f);
-			//data[pos + 1] = 1.f - 1 * (rand() / float(RAND_MAX));
+			//data[pos + 1] = (float)simplex2d( x , z ,7,2.323f);
+			data[pos + 1] = -50 * (rand() / float(RAND_MAX));
 			data[pos + 2] = z;
 		}
 	}
