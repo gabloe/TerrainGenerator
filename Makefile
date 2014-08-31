@@ -53,8 +53,15 @@ test:
 
 .PHONY: renderer
 
+.PHONY: generators
+
 renderer:
 	$(MAKE) -C renderer
 
 math:
 	$(MAKE) -C math
+
+generators:
+	$(MAKE) -C generators
+
+
