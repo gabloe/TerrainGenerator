@@ -1,11 +1,11 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "def.h"
-
 #include <cstdio>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+
+#include "Simplex.h"
 
 #define F2 0.5*(sqrt(3.0)-1.0)
 #define G2 (3.0-sqrt(3.0))/6.0
@@ -13,10 +13,6 @@
 #define G3 1.0/6.0
 #define F4 (sqrt(5.0)-1.0)/4.0
 #define G4 (5.0-sqrt(5.0))/20.0
-
-typedef struct {
-   double x, y, z;
-} Grad;
 
 double max = -32000;
 double min = 32000;
@@ -32,6 +28,7 @@ double noise3D(double, double, double, short*, short*, Grad*);
 short* p;
 short* perm;
 short* permMod12;
+Grad* gradients3D;
 
 // Writes the data to a file.
 void _write(const char* fname, double *data, short MESH_SIZE) {
@@ -209,12 +206,12 @@ double raw2D(double x, double y, short* perm, short* permMod12, Grad* gradients)
 // Generates the 2d noise value at a particular <x,y> coordinate.
 // Each octave doubles the frequency of the previous octave.  Higher octaves increase the level of detail, but have worse performance.
 // Persistence scales the frequency of the wave function.
-NOISE_API double simplex2d(double x, double y, short* perm, short* permMod12, Grad* gradients, int octaves, float persistence) {
+NOISE_API float simplex2d(float x,float y, int octaves, float persistence) {
    double total = 0;
    for (int i=0;i<octaves;++i) {
 	  double freq = pow(2.0,i);
 	  double amp = pow(persistence,i);
-	  total += raw2D(x*freq,y*freq,perm,permMod12,gradients) * amp;
+	  total += raw2D(x*freq,y*freq,perm,permMod12,gradients3D) * amp;
    }
    if (total > max) {
 	   max = total;
@@ -222,18 +219,18 @@ NOISE_API double simplex2d(double x, double y, short* perm, short* permMod12, Gr
    else if (total < min) {
 	   min = total;
    }
-   return total;
+   return (float)total;
 }
 
 // Generates the 3d noise value at a particular <x,y,z> coordinate.
 // Each octave doubles the frequency of the previous octave.  Higher octaves increase the level of detail, but have worse performance.
 // Persistence scales the frequency of the wave function.
-NOISE_API double simplex3d(double x, double y, double z, short* perm, short* permMod12, Grad* gradients, int octaves, float persistence) {
+NOISE_API float simplex3d(float x, float y, float z, int octaves, float persistence) {
    double total = 0;
    for (int i=0;i<octaves;++i) {
 	  double freq = pow(2.0,i);
 	  double amp = pow(persistence,i);
-	  total += raw3D(x*freq,y*freq,z*freq,perm,permMod12,gradients) * amp;
+	  total += raw3D(x*freq, y*freq, z*freq, perm, permMod12, gradients3D) * amp;
    }
    if (total > max) {
 	   max = total;
@@ -241,15 +238,15 @@ NOISE_API double simplex3d(double x, double y, double z, short* perm, short* per
    else if (total < min) {
 	   min = total;
    }
-   return total;
+   return (float)total;
 }
 
 // Produces 2d simplex noise (square of noise)
-double* gen2DNoise(int mesh_size,float point_dist,short* perm,short* permMod12,Grad* gradients,int octaves,float pers) {
+double* gen2DNoise(int mesh_size,float point_dist,Grad* gradients,int octaves,float pers) {
    double* narr = (double*)malloc(mesh_size*mesh_size*sizeof(double));
    for (int i=0;i<mesh_size;++i) {
 	  for (int j=0;j<mesh_size;++j) {
-		  narr[i + j*mesh_size] = simplex2d(i*point_dist, j*point_dist, perm, permMod12, gradients, octaves, pers);
+		  narr[i + j*mesh_size] = simplex2d(i*point_dist, j*point_dist, octaves, pers);
 	  }
    }
    return narr;
@@ -261,7 +258,7 @@ double* gen3DNoise(int mesh_size,float point_dist,short* perm,short* permMod12,G
    for (int i=0;i<mesh_size;++i) {
 	  for (int j=0;j<mesh_size;++j) {
 		 for (int k=0;k<mesh_size;++k) {
-			 narr[i + mesh_size * (j + mesh_size * k)] = simplex3d(i*point_dist, j*point_dist, k*point_dist, perm, permMod12, gradients, octaves, pers);
+			 narr[i + mesh_size * (j + mesh_size * k)] = simplex3d(i*point_dist, j*point_dist, k*point_dist, octaves, pers);
 		 }
 	  }
    }
@@ -339,6 +336,34 @@ void generatePermutations(int seed) {
 	}
 }
 
+NOISE_API void init_simplex(int seed) {
+	generatePermutations(seed);
+	gradients3D = (Grad*)malloc(12 * sizeof(Grad));
+	// Generate gradients
+	int cnt = 0;
+	for (int i = -1; i<2; i += 2) {
+		for (int j = -1; j<2; j += 2) {
+			gradients3D[cnt].x = (double)i;
+			gradients3D[cnt].y = (double)j;
+			gradients3D[cnt++].z = 0.0;
+		}
+	}
+	for (int i = -1; i<2; i += 2) {
+		for (int j = -1; j<2; j += 2) {
+			gradients3D[cnt].x = (double)i;
+			gradients3D[cnt].z = (double)j;
+			gradients3D[cnt++].y = 0.0;
+		}
+	}
+	for (int i = -1; i<2; i += 2) {
+		for (int j = -1; j<2; j += 2) {
+			gradients3D[cnt].y = (double)i;
+			gradients3D[cnt].z = (double)j;
+			gradients3D[cnt++].x = 0.0;
+		}
+	}
+}
+
 int __main(int argc, char** argv) {
    int MESH_SIZE = 64;
    int OCTAVES = 5;
@@ -405,7 +430,7 @@ int __main(int argc, char** argv) {
    double* narrOne = NULL;
    double* narrTwo = NULL;
    if (DIMENSIONS == 2) {
-	  narr = gen2DNoise(MESH_SIZE, POINT_DIST, perm, permMod12, gradients3D, OCTAVES, PERS);
+	  narr = gen2DNoise(MESH_SIZE, POINT_DIST, gradients3D, OCTAVES, PERS);
 	  printf("done.\n\n", POINT_DIST);
 	  printf("Writing output file.\n");
 	  _write("out.pgm", narr, MESH_SIZE);

@@ -1,5 +1,6 @@
 #define GLFW_DLL
 
+
 // OpenGL
 #include "GL/glew.h"
 #include <GLFW/glfw3.h>
@@ -17,7 +18,7 @@
 #include "math/mat3.h"
 #include "math/mat4.h"
 #include "renderer/RenderObject.h"
-
+#include "generators\Simplex.h"
 float vert;
 float horiz;
 
@@ -98,6 +99,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 float* generateGround(float min_x, float max_x, float min_z, float max_z, int div) {
 	
+	init_simplex(242342);
+
 	float x_len = max_x - min_x;
 	float z_len = max_z - min_z;
 	float delta_x = x_len / (div - 1);
@@ -107,9 +110,10 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 	for ( int i = 0; i < div; i++) { // z
 		float z = max_z - i * delta_z;
 		for (int j = 0 ; j < div; j++) { // x
+			float x = min_x + j * delta_x;
 			int pos = 3 * i * div + 3 * j;
-			data[pos] = min_x + j * delta_x;
-			data[pos + 1] = 1.f - 50 * (rand() / float(RAND_MAX));
+			data[pos] = x;
+			data[pos + 1] = simplex2d(x, z ,10,1.0); //1.f - 50 * (rand() / float(RAND_MAX));
 			data[pos + 2] = z;
 		}
 	}
@@ -203,6 +207,7 @@ void print() {
 	printf("OpenGL Vendor: %s\n", glGetString(GL_RENDERER));
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VERSION));
 }
+
 
 int main(int argc, char** args)
 {
