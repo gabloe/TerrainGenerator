@@ -60,16 +60,17 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 	for (int i = 0; i < number_vertices; i += 3) {
 		Vec3 t(normals + i);
 		t.normalize();
-		std::cout << t << std::endl;
 		normals[i+0] = t.getX();
 		normals[i+1] = t.getY();
 		normals[i+2] = t.getZ();
 	}
 
+
 	// Copy over the position data
 	glGenBuffers(1, &_vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, number_vertices * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+
 
 	// Copy over the normals
 	glGenBuffers(1, &_normal_buffer);
@@ -83,30 +84,34 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, number_indices * sizeof(GLuint), indices, GL_STATIC_DRAW);
 	}
 	std::string *a = new std::string("v_Position");
-	std::string *b = new std::string("v_normal");
+	std::string *b = new std::string("v_Normal");
 
 	std::string *y = new std::string("projection");
 	std::string *z = new std::string("translate");
+	
+	std::cout << "hi! " << glewGetErrorString(glGetError()) << std::endl;
 
 	if ((_position_index = shader.getVariable(*a)) < 0) {
 		std::cout << "Error: Could not load v_Position" << std::endl;
-	}
+	}std::cout << "a" << glewGetErrorString(glGetError()) << std::endl;
 
+	
 	if ((_normal_index = shader.getVariable(*b)) < 0) {
 		std::cout << "Error: Could not load v_Normal" << std::endl;
-	}
-
+	}std::cout << "b" << glewGetErrorString(glGetError()) << std::endl;
+	
 	if ((_projection_index = shader.getUniform(*y)) < 0) {
 		std::cout << "Error: Could not load projection" << std::endl;
-	}
+	}std::cout << "y" << glewGetErrorString(glGetError()) << std::endl;
+
 	if ((_translation_index = shader.getUniform(*z)) < 0) {
 		std::cout << "Error: Could not load translate" << std::endl;
-	}
-
-	if (glGetError()) {
+	}std::cout << "z" << glewGetErrorString(glGetError()) << std::endl;
+	if (GLenum err = glGetError()) {
 		std::cout << "Error creating render object" << std::endl;
+		std::cout << glewGetErrorString(err) << std::endl;
 	}
-
+	std::cout << glewGetErrorString(glGetError()) << std::endl;
 	delete normals;
 
 	delete a;
