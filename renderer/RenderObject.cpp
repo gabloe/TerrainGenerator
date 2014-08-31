@@ -24,7 +24,7 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 RenderObject::~RenderObject() {}
 
 
-void RenderObject::render(Mat4 &projection, Mat4& translate) {
+void RenderObject::render(const Mat4 &projection, const Mat4& translate) {
 	// Load the shader program
 	_shader->load();
 

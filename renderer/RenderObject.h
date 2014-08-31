@@ -31,7 +31,7 @@ public:
 	RenderObject(Shader &shader, GLfloat* vertices, int number_vertices, GLuint* indices, int number_indices);
 	~RenderObject();
 
-	void render(Mat4&,Mat4&);
+	void render(const Mat4&,const Mat4&);
 	
 };
 

@@ -17,13 +17,6 @@
 #include "math/mat4.h"
 #include "renderer/RenderObject.h"
 
-Mat4 ProjectionMatrix(
-	1, 0, 0, 0,
-	0, 1, 0, 0,
-	0, 0, 1, 0,
-	0, 0, 0, 1
-	);
-
 Mat4 TransformMatrix (
 	1, 0, 0, 0,
 	0, 1, 0, 0,
@@ -247,7 +240,7 @@ int main(int argc, char** args)
 		printf("Error with shader\n");
 	}
 
-	buildProjectionMatrix(15.f, 9.0/16.0, -0.001f, 100.f);
+	const Mat4 ProjectionMatrix = buildProjectionMatrix(15.f, 9.0/16.0, -0.001f, 100.f);
 
 	// Create our object
 	RenderObject obj(shader, data, 12, ind, 6);

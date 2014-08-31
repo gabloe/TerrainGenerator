@@ -33,7 +33,7 @@ public:
 	void moveY(float dist) { m[13] += dist; }
 	void moveZ(float dist) { m[14] += dist; }
 
-	const float* getData() { return m; }
+	const float* getData() const { return m; };
 
 	MATH_API friend std::ostream& operator << (std::ostream& os, Mat4& obj);
 };
