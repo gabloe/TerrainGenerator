@@ -34,8 +34,8 @@ Mat4 TransformMatrix (
 float vert;
 float horiz;
 
-float delta_x = 0.01f;
-float delta_y = 0.01f;
+float delta_x = 0.1f;
+float delta_y = 0.1f;
 
 #ifdef _WIN32
 	#include <direct.h>
@@ -151,7 +151,6 @@ GLuint* generateIndices(int div) {
 	for ( ; i < max_i; i++){
 		int j = 0;
 		for ( ; j < max_j; j++) {
-			
 			int pos = 6 * ( i * (div - 1) + j);
 
 			// Create indices
@@ -169,28 +168,17 @@ GLuint* generateIndices(int div) {
 			B++;
 			C++;
 			D++;
-
 		}
-
 		A++;
 		B++;
 		C++;
 		D++;
-
-
 	}
-
-	/*
-	for (int i = 0; i < max_i * max_j * 6; i++){
-		if (i > 0 && i % 3 == 0){
-			std::cout << std::endl;
-		}
-		std::cout << data[i] << " ";
-	}
-	std::cout << std::endl;
-	// */
-
 	return data;
+}
+
+void resized(GLFWwindow* window, int width, int height) {
+	glViewport(0, 0, width, height);
 }
 
 // Initializes all the subsystems, create the window.
@@ -200,24 +188,19 @@ void init() {
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
 	}
-
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-	int major, minor, rev;
-
-	glfwGetVersion(&major, &minor, &rev);
-
-	std::cerr << "GLFW sversion recieved: " << major << ", " << minor << ", " << rev << std::endl;
+	
 	window = glfwCreateWindow(640, 480, "Terrain Generator", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
-	}
-	glfwMakeContextCurrent(window);
+	}glfwMakeContextCurrent(window);
 
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetFramebufferSizeCallback(window, resized);
 
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
@@ -227,78 +210,55 @@ void init() {
 		exit(EXIT_FAILURE);
 	}glGetError();
 	
-	glfwSetKeyCallback(window, key_callback);
-
 	// Do some stuff
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
-
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
 }
 
 // Just prints OpenGL information
 void print() {
 	char current[FILENAME_MAX];
-
 	if (GetCurrentDir(current, sizeof(current))){
 		printf("Current Working Directory : %s\n" , current );
 	}
-
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VENDOR));
 	printf("OpenGL Vendor: %s\n", glGetString(GL_RENDERER));
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VERSION));
-
 }
 
 int main(int argc, char** args)
 {
-	init();
-	print();
-
-	// Square Data
+	init();print();
+	
 	GLfloat data[] = {
-		-0.5f,	0.5f,	0.01f,	// 0
-		0.5f,	0.5f,	0.01f,	// 1
-		0.5f,	-0.5f,	0.01f,	// 2
-		-0.5f,	-0.5f,	0.01f	// 3
+		-0.5f, -0.1f, 0.5f,	// 0
+		0.5f, -0.1f, 0.5f,	// 1
+		-0.5f, 0.1f, -0.5f,	// 2
+		0.5f, 0.1f, -0.5f// 3
 	};
-	GLuint ind[] = {
-		0, 1, 3,	// T1
-		0, 3, 2		// T2
-	};
+	GLuint ind[] = { 0, 1, 3, 0, 3, 2 };
 
 	// Load the shader and compile it
-	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
+	const std::string BaseShaderDir = std::string("../resources/shaders/");
+	Shader shader(BaseShaderDir,std::string("shader"));
 
-	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR) {
+	if (shader.getError() == SHADER_ERROR::NO_SHADER_ERROR) {
 		printf("No error loading shader\n");
 	}else {
 		printf("Error with shader\n");
 	}
 
-	int width, height;
-
-	glfwGetFramebufferSize(window, &width, &height);
-
-	float ratio = (float)width / (float)height;
-	ProjectionMatrix = buildProjectionMatrix(45.0f ,ratio, -1.0f, 100.0f);
+	buildProjectionMatrix(15.f, 9.0/16.0, -0.001f, 100.f);
 
 	// Create our object
-	RenderObject obj;
-	obj.setVertices(data, 12);
-	obj.setIndices(ind, 6);
-	obj.setMode(GL_TRIANGLES);
-	obj.setShaderProgram(&program);
-	obj.setProjectionMatrix(&ProjectionMatrix);
-	obj.moveToGPU();
+	RenderObject obj(shader, data, 12, ind, 6);
 
 	// Main Loop.  Do the stuff!
-	while (!glfwWindowShouldClose(window))
-	{	
-		glClear(GL_DEPTH_BUFFER_BIT);
+	while (!glfwWindowShouldClose(window)) {
 
-		obj.render();
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
+		
+		// for objects to be rendered
+		obj.render(ProjectionMatrix,TransformMatrix);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

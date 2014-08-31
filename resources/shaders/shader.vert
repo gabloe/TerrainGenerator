@@ -1,9 +1,11 @@
 #version 150
+
 in vec3 v_Position;
 
-out vec4 pos;
-uniform mat4 projection;
-void main(void)
-{
-    pos = projection * vec4(v_Position, 1.0);
+out vec4 result;
+
+uniform mat4 projection,translate;
+
+void main(void) {
+    result = projection*translate*vec4(v_Position, 1.0);
 }

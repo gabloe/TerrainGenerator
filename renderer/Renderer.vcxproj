@@ -129,13 +129,13 @@
     <ClInclude Include="ObjectGenerator.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderObject.h" />
-    <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ObjectGenerator.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderObject.cpp" />
-    <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\math\math.vcxproj">

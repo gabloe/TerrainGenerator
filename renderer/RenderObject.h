@@ -4,7 +4,7 @@
 
 #include "GL/glew.h"
 
-#include "ShaderProgram.h"
+#include "Shader.h"
 
 #include "../math/vec3.h"
 #include "../math/mat4.h"
@@ -13,57 +13,25 @@ class RENDERER_API RenderObject
 {
 
 private:
+	Mat4 *_projection;
+	Mat4 _translation;
 
-	Vec3 position;
-	Mat4 *proj;
+	GLuint _number_vertices, _number_indices;
 
-	GLuint num_vert, num_norm, num_ind;
-	GLenum mode;
+	// Pointers to variables for shaders
+	GLuint _vertex_buffer;
+	GLuint _index_buffer;
+	GLuint _position_index;
+	GLuint _projection_index;
+	GLuint _translation_index;
 
-	GLfloat *vert;
-	GLfloat *norms;
-	GLuint *inds;
-
-	GLuint v_buffer;
-	GLuint i_buffer;
-	GLuint v_position;
-	GLuint p_mat;
-
-	ShaderProgram* program;
+	Shader* _shader;
 
 public:
-	RenderObject();
+	RenderObject(Shader &shader, GLfloat* vertices, int number_vertices, GLuint* indices, int number_indices);
 	~RenderObject();
 
-	// Set
-	void setVertices(GLfloat *vert, int num);
-	void setNormals(GLfloat *norms, int num);
-	void setIndices(GLuint *inds, int num);
-	void setPosition(Vec3 p);
-
-	void setMode(GLenum mode);
-	void setShaderProgram(ShaderProgram* p);
-	void setProjectionMatrix(Mat4* m);
-	void moveToGPU();
-
-	// Get
-	GLuint* getIndices();
-	GLfloat* getVertices();
-	GLfloat* getNormals();
-
-	GLuint getNumIndices();
-	GLuint getNumVertices();
-	GLuint getNumNormals();
-
-	GLuint getVertexBufferIndex();
-	GLuint getIndexBufferIndex();
-	GLuint getShaderPosition();
-
-	GLenum getDisplayMode();
+	void render(Mat4&,Mat4&);
 	
-	void render();
-	Vec3 getPosition();
-
-	ShaderProgram* getShaderProgram();
 };
 

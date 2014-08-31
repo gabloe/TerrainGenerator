@@ -1,25 +1,8 @@
 #include "ObjectGenerator.h"
 
 
-ObjectGenerator::ObjectGenerator()
-{
-}
-
-
-ObjectGenerator::~ObjectGenerator()
-{
-}
-
-RenderObject* createAndSet(GLfloat* vert , int num_v , GLfloat* norm , int num_n , GLuint* indices , int num_i , Vec3 pos) {
-	RenderObject* res = new RenderObject();
-	if (res) {
-
-	}
-	return res;
-}
-
 //  2D Objects
-RenderObject* ObjectGenerator::createSquare(Vec3 position) {
+RENDERER_API RenderObject* ObjectGenerator::createSquare(Shader &s, Vec3 &position) {
 	GLfloat *verts = new GLfloat[12];
 	GLuint *inds = new GLuint[6];
 	int pos = 0;
@@ -39,40 +22,27 @@ RenderObject* ObjectGenerator::createSquare(Vec3 position) {
 	inds[4] = 4;
 	inds[5] = 2;
 
-	RenderObject *ret = new RenderObject();
-	ret->setVertices(verts,12);
-	ret->setIndices(inds,6);
-	ret->setPosition(position);
-	ret->setMode(GL_TRIANGLES);
-
-	return ret;
+	return new RenderObject(s,verts,12,inds,6);
 }
-RenderObject* ObjectGenerator::createTriangle(Vec3 position) {
+
+RENDERER_API RenderObject* ObjectGenerator::createTriangle(Shader &s, Vec3 &position) {
 	return 0;
 }
 
-RenderObject* ObjectGenerator::createCircle(Vec3 position, unsigned int detail) {
-	RenderObject* res = new RenderObject();
-	if (res) {
-
-	}
-	return res;
+RENDERER_API RenderObject* ObjectGenerator::createCircle(Shader &s, Vec3 &position, unsigned int radius) {
+	return 0;
 }
 
 // 3D Objects
-RenderObject* ObjectGenerator::createCube(Vec3 position) {
-	RenderObject* res = new RenderObject();
-	if (res) {
-
-	}
-	return res;
-}
-
-RenderObject* ObjectGenerator::createPyramid(Vec3 position) {
+RENDERER_API RenderObject* ObjectGenerator::createCube(Shader &s, Vec3 &position) {
 	return 0;
 }
 
-RenderObject* ObjectGenerator::createSphere(Vec3 position, unsigned int detail) {
+RENDERER_API RenderObject* ObjectGenerator::createPyramid(Shader &s, Vec3 &position) {
+	return 0;
+}
+
+RENDERER_API RenderObject* ObjectGenerator::createSphere(Shader &s, Vec3 &position, unsigned int radius) {
 	return 0;
 }
 

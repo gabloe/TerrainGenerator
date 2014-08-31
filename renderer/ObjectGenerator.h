@@ -8,16 +8,14 @@
 class RENDERER_API ObjectGenerator
 {
 public:
-	ObjectGenerator();
-	~ObjectGenerator();
 
-	RenderObject* createSquare(Vec3 position);
-	RenderObject* createTriangle(Vec3 position);
-	RenderObject* createCircle(Vec3 position, unsigned int detail);
+	static RenderObject* createSquare(Shader &s, Vec3 &position);
+	static RenderObject* createTriangle(Shader &s, Vec3 &position);
+	static RenderObject* createCircle(Shader &s, Vec3 &position, unsigned int radius);
 
-	RenderObject* createCube(Vec3 position);
-	RenderObject* createSphere(Vec3 position, unsigned int detail);
-	RenderObject* createPyramid(Vec3 position);
+	static RenderObject* createCube(Shader &s, Vec3 &position);
+	static RenderObject* createSphere(Shader &s, Vec3 &position, unsigned int radius);
+	static RenderObject* createPyramid(Shader &s, Vec3 &position);
 
 };
 

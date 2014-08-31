@@ -1,78 +1,57 @@
 #include "RenderObject.h"
 
-RenderObject::RenderObject() {}
+RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertices, GLuint* indices, int number_indices) {
+	_shader = &shader;
+
+	shader.load();
+
+	glGenBuffers(1, &_vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, number_vertices* sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+
+
+	glGenBuffers(1, &_index_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, number_indices * sizeof(GLuint), indices, GL_STATIC_COPY);
+
+	_position_index = shader.getVariable(std::string("v_Position"));
+	_projection_index = shader.getUniform(std::string("projection"));
+	_projection_index = shader.getUniform(std::string("translate"));
+
+	shader.unload();
+
+}
 RenderObject::~RenderObject() {}
 
-// Set
-void RenderObject::setVertices(GLfloat *vert, int num) { this->vert = vert; this->num_vert = num; }
-void RenderObject::setNormals(GLfloat *norms, int num) { this->norms = norms; this->num_norm = num; }
-void RenderObject::setIndices(GLuint *inds, int num) { this->inds = inds; this->num_ind = num; }
-void RenderObject::setPosition(Vec3 p) { this->position = p; }
 
-void RenderObject::setMode(GLenum mode) { this->mode = mode; }
-void RenderObject::setShaderProgram(ShaderProgram* p) { this->program = p; }
-
-// Get
-GLuint* RenderObject::getIndices() { return this->inds; }
-GLfloat* RenderObject::getVertices() { return this->vert; }
-GLfloat* RenderObject::getNormals() { return this->norms; }
-
-GLuint RenderObject::getNumIndices() { return this->num_ind; }
-GLuint RenderObject::getNumVertices() { return this->num_vert; }
-GLuint RenderObject::getNumNormals() { return this->num_norm; }
-
-GLuint RenderObject::getVertexBufferIndex() { return v_buffer; }
-GLuint RenderObject::getIndexBufferIndex() { return i_buffer; }
-GLuint RenderObject::getShaderPosition() { return v_position; }
-
-GLenum RenderObject::getDisplayMode() { return this->mode; }
-
-Vec3 RenderObject::getPosition() { return this->position; }
-
-ShaderProgram* RenderObject::getShaderProgram() { return this->program; }
-
-void RenderObject::setProjectionMatrix(Mat4* mat) {
-	this->proj = mat;
-}
-
-void RenderObject::moveToGPU() {
-	program->load();
-
-	glGenBuffers(1, &v_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, v_buffer);
-	glBufferData(GL_ARRAY_BUFFER, num_vert * sizeof(float), vert, GL_STATIC_DRAW);
-
-
-	glGenBuffers(1, &i_buffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, i_buffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_ind * sizeof(GLuint), inds, GL_STATIC_COPY);
-
-	v_position = glGetAttribLocation(program->getProgram(), "v_Position");
-	p_mat = glGetUniformLocation(program->getProgram(), "projection");
-
-	program->unload();
-
-}
-
-void RenderObject::render() {
+void RenderObject::render(Mat4 &projection, Mat4& translate) {
 	// Load the shader program
-	program->load();
+	_shader->load();
 
-	// Turn on variables
-	glEnableVertexAttribArray(v_position);
+	// Load uniforms
+	glUniformMatrix4fv(_projection_index, 1, false, projection.getData());
+	glUniformMatrix4fv(_translation_index, 1, false, translate.getData());
 
 	// Select the data
-	glBindBuffer(GL_ARRAY_BUFFER, v_buffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, i_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer);
+
+	// Turn on variables
+	glEnableVertexAttribArray(_position_index);
+	glVertexAttribPointer(_position_index,
+		3,			// how many elements per item
+		GL_FLOAT,	// the element type
+		GL_FALSE,	// normalized
+		0,			// stride
+		0);			// offset
 	
-	glVertexAttribPointer(v_position, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glUniformMatrix4fv(p_mat, 1, false, proj->getData());
-
-	std::cout << *proj << std::endl;
-
 	// Draw
-	glDrawElements(GL_TRIANGLES, num_ind, GL_UNSIGNED_INT, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer);
+	glDrawElements(
+		GL_TRIANGLES,		// type to draw
+		_number_indices,	// how mant indices
+		GL_UNSIGNED_INT,	// index data type
+		(void*)0);			// offset
 
 	// Unload the shader program
-	program->unload();
+	_shader->unload();
 }

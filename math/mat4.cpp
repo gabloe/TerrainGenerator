@@ -1,5 +1,13 @@
 #include "mat4.h"
 
+Mat4::Mat4() {
+	for (int i = 0; i < 16; ++i) m[i] = 0;
+}
+
+Mat4::Mat4(Mat4 &other) {
+	for (int i = 0; i < 16; ++i) m[i] = other.m[i];
+}
+
 Mat4::Mat4(Vec4 r1, Vec4 r2, Vec4 r3, Vec4 r4) {
 	m[0] = r1.getX();
 	m[1] = r1.getY();

@@ -8,7 +8,8 @@ class MATH_API Mat4 {
 private:
 	float m[16];
 public:
-	//Mat4(Mat4& other);
+	Mat4();
+	Mat4(Mat4& other);
 
 	Mat4(Vec4 r1, Vec4 r2, Vec4 r3, Vec4 r4);
 	
