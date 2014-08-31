@@ -11,6 +11,7 @@
 
 // C++
 #include <iostream>
+#include <list>
 
 // Custom
 #include "math/mat3.h"
@@ -242,16 +243,18 @@ int main(int argc, char** args)
 
 	const Mat4 ProjectionMatrix = buildProjectionMatrix(15.f, 9.0/16.0, -0.001f, 100.f);
 
-	// Create our object
-	RenderObject obj(shader, data, 12, ind, 6);
+	std::list<RenderObject> objs;
+	objs.insert(objs.end(), RenderObject(shader, data, 12, ind, 6));
 
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
-
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
+		// Clear everything on the screen
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		
 		// for objects to be rendered
-		obj.render(ProjectionMatrix,TransformMatrix);
+		for (RenderObject obj : objs) {
+			obj.render(ProjectionMatrix, TransformMatrix);
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
