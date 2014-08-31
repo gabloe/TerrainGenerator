@@ -36,6 +36,9 @@ public:
 
 	const float* getData() const { return m; };
 
+	static Mat4 RotateX(float);
+	static Mat4 RotateY(float);
+	static Mat4 RotateZ(float);
 	static Mat4 Perspective(float fov, float aspect, float near, float far);
 	static Mat4 LookAt(const Vec3&, const Vec3&, const Vec3&);
 

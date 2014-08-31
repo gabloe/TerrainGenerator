@@ -121,6 +121,20 @@ Mat4 Mat4::Perspective(float fov, float aspect, float near, float far) {
 	return ret;
 }
 
+void Mat4::rotateX(float angle) {
+	Mat4 t = Mat4::RotateX(angle);
+	*this = *this * t;
+}
+
+void Mat4::rotateY(float angle) {
+	Mat4 t = Mat4::RotateY(angle);
+	*this = *this * t;
+}
+
+void Mat4::rotateZ(float angle) {
+	Mat4 t = Mat4::RotateZ(angle);
+	*this = *this * t;
+}
 
 Vec3 normalize(const Vec3& other) {
 	float div = other * other;
@@ -153,6 +167,31 @@ Mat4 Mat4::LookAt(const Vec3 &eye, const Vec3 &center, const Vec3 &up) {
 
 	ret.m[15] = 0;
 
+	return ret;
+}
+
+Mat4 Mat4::RotateX(float x) {
+	Mat4 ret;
+	ret.m[5]  = cos(x);
+	ret.m[6]  = -sin(x);
+	ret.m[9]  = sin(x);
+	ret.m[10] = cos(x);
+	return ret;
+}
+Mat4 Mat4::RotateY(float x) {
+	Mat4 ret;
+	ret.m[0] = cos(x);
+	ret.m[2] = sin(x);
+	ret.m[8] = -sin(x);
+	ret.m[10] = cos(x);
+	return ret;
+}
+Mat4 Mat4::RotateZ(float x) {
+	Mat4 ret;
+	ret.m[0] = cos(x);
+	ret.m[1] = -sin(x);
+	ret.m[4] = sin(x);
+	ret.m[5] = cos(x);
 	return ret;
 }
 

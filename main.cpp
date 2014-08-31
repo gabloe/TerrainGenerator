@@ -78,16 +78,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			glfwSetWindowShouldClose(window, GL_TRUE);
 			break;
 		case GLFW_KEY_UP:
-			vert += delta_x;
+			TranslateMatrix.rotateX(0.0174532925f * (scale * 0.1f));
 			break;
 		case GLFW_KEY_DOWN:
-			vert -= delta_x;
+			TranslateMatrix.rotateX(0.0174532925f * (scale * -0.1f));
 			break;
 		case GLFW_KEY_LEFT:
-			horiz += delta_y;
+			TranslateMatrix.rotateY(0.0174532925f * (scale * 0.1f));
 			break;
 		case GLFW_KEY_RIGHT:
-			horiz -= delta_y;
+			TranslateMatrix.rotateY(0.0174532925f * (scale * -0.1f));
 			break;
 		case GLFW_KEY_W:
 			TranslateMatrix.moveZ(scale * 5.0f);

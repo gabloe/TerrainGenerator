@@ -27,6 +27,7 @@ float Vec4::getW() {
 	return this->v[3];
 }
 
+
 Vec4 Vec4::operator+(Vec4 rhs) {
 	return Vec4(
 		getX() + rhs.getX(),
