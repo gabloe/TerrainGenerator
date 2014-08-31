@@ -203,6 +203,7 @@ void print() {
 int main(int argc, char** args)
 {
 	init();print();
+        TranslateMatrix.moveZ(-1000.0f);
 
 
 	GLuint VertexArrayID;
