@@ -2,6 +2,20 @@
 
 #include <string>
 
+Vec3 helper(Vec3 &a, Vec3 &b, Vec3 &c) {
+	Vec3 t1 = b - a;
+	Vec3 t2 = c - a;
+
+	Vec3 N = t1.cross(t2);
+
+	float sin_alpha = sqrt((N * N) / ((t1 * t1) * (t2 * t2)));
+
+	N.normalize();
+	N.scale(asin(sin_alpha));
+
+	return N;
+}
+
 RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertices, GLuint* indices, int number_indices) {
 
 	_shader = &shader;
@@ -10,9 +24,56 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 	_number_vertices = number_vertices;
 	_number_indices = number_indices;
 
+	GLfloat *normals = new GLfloat[number_vertices];
+	memset(normals, 0, sizeof(GLfloat) * number_vertices);
+
+	for (int i = 0; i < number_indices; i += 3) {
+		
+		int i1 = 3 * indices[i + 0];
+		int i2 = 3 * indices[i + 1];
+		int i3 = 3 * indices[i + 2];
+
+		Vec3 p1(vertices + i1);
+		Vec3 p2(vertices + i2);
+		Vec3 p3(vertices + i3);
+
+
+		Vec3 t1 = helper(p1, p2, p3);
+		Vec3 t2 = helper(p2, p1, p3);
+		Vec3 t3 = helper(p3, p1, p2);
+		
+		t1.normalize();
+		t2.normalize();
+		t3.normalize();
+
+		normals[i1 + 0] += t1.getX();
+		normals[i1 + 1] += t1.getY();
+		normals[i1 + 2] += t1.getZ();
+
+		normals[i2 + 0] += t2.getX();
+		normals[i2 + 1] += t2.getY();
+		normals[i2 + 2] += t2.getZ();
+
+		normals[i3 + 0] += t3.getX();
+		normals[i3 + 1] += t3.getY();
+		normals[i3 + 2] += t3.getZ();
+
+	}
+	for (int i = 0; i < number_vertices; i += 3) {
+		Vec3 t(normals + i);
+		t.normalize();
+		normals[i+0] = t.getX();
+		normals[i+1] = t.getY();
+		normals[i+2] = t.getZ();
+	}
+
 	glGenBuffers(1, &_vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, number_vertices * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &_normal_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, _normal_buffer);
+	glBufferData(GL_ARRAY_BUFFER, number_vertices * sizeof(GLfloat), normals, GL_STATIC_DRAW);
 
 	if (indices) {
 		glGenBuffers(1, &_index_buffer);
@@ -20,16 +81,23 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, number_indices * sizeof(GLuint), indices, GL_STATIC_DRAW);
 	}
 	std::string *a = new std::string("v_Position");
-	std::string *b = new std::string("projection");
-	std::string *c = new std::string("translate");
+	std::string *b = new std::string("v_normal");
+
+	std::string *y = new std::string("projection");
+	std::string *z = new std::string("translate");
 
 	if ((_position_index = shader.getVariable(*a)) < 0) {
 		std::cout << "Error: Could not load v_Position" << std::endl;
 	}
-	if ((_projection_index = shader.getUniform(*b)) < 0) {
+
+	if ((_normal_index = shader.getVariable(*b)) < 0) {
+		std::cout << "Error: Could not load v_Normal" << std::endl;
+	}
+
+	if ((_projection_index = shader.getUniform(*y)) < 0) {
 		std::cout << "Error: Could not load projection" << std::endl;
 	}
-	if ((_translation_index = shader.getUniform(*c)) < 0) {
+	if ((_translation_index = shader.getUniform(*z)) < 0) {
 		std::cout << "Error: Could not load translate" << std::endl;
 	}
 
@@ -37,9 +105,12 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		std::cout << "Error creating render object" << std::endl;
 	}
 
+	delete normals;
+
 	delete a;
 	delete b;
-	delete c;
+	delete y;
+	delete z;
 
 	shader.unload();
 
@@ -57,6 +128,7 @@ void RenderObject::render(const Mat4 &projection, const Mat4& translate) {
 	
 	// Turn on variables
 	glEnableVertexAttribArray(_position_index);
+	glEnableVertexAttribArray(_normal_index);
 	glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer);
 	glVertexAttribPointer(
 		_position_index,// attribute
@@ -65,7 +137,15 @@ void RenderObject::render(const Mat4 &projection, const Mat4& translate) {
 		GL_FALSE,		// normalized
 		0,				// stride
 		(void*)0);		// offset
-	
+
+	glVertexAttribPointer(
+		_normal_index,// attribute
+		3,				// how many elements per item
+		GL_FLOAT,		// the element type
+		GL_FALSE,		// normalized
+		0,				// stride
+		(void*)0);		// offset
+
 	if (_number_indices) {
 		// Draw
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer);

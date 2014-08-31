@@ -21,8 +21,10 @@ private:
 
 	// Pointers to variables for shaders
 	GLuint _vertex_buffer;
+	GLuint _normal_buffer;
 	GLuint _index_buffer;
 	GLuint _position_index;
+	GLuint _normal_index;
 	GLuint _projection_index;
 	GLuint _translation_index;
 

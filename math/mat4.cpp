@@ -127,22 +127,13 @@ Vec3 normalize(const Vec3& other) {
 	return Vec3(other.getX() / div, other.getY() / div, other.getZ() / div);
 }
 
-Vec3 cross(const Vec3 &a, const Vec3 &b) {
-	return Vec3(
-		a.getY() * b.getZ() - a.getZ()*b.getY(),
-		a.getZ() * b.getX() - a.getX()*b.getZ(),
-		a.getX() * b.getY() - a.getY()*b.getX()
-		);
-}
-
-
 Mat4 Mat4::LookAt(const Vec3 &eye, const Vec3 &center, const Vec3 &up) {
 	Mat4 ret;
 
 	Vec3 f = normalize(center - eye);
 	Vec3 u = normalize(up);
-	Vec3 s = normalize(cross(f,u));
-	u = cross(s, f);
+	Vec3 s = normalize(f.cross(u));
+	u = s.cross(f);
 
 	ret.m[0] = s.getX();
 	ret.m[4] = s.getY();
