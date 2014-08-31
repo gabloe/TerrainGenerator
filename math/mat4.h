@@ -9,7 +9,7 @@ private:
 	float m[16];
 public:
 	Mat4();
-	Mat4(Mat4& other);
+	Mat4(const Mat4& other);
 
 	Mat4(Vec4 r1, Vec4 r2, Vec4 r3, Vec4 r4);
 	
@@ -20,10 +20,10 @@ public:
 	     );
 
 	// Add two matricies
-	Mat4 operator+(Mat4 &rhs);
+	Mat4 operator+(const Mat4 &rhs);
 	
 	// Multiply two matrices together
-	Mat4 operator*(Mat4 &rhs);
+	Mat4 operator*(const Mat4 &rhs);
 
 	void rotateX(float del);
 	void rotateY(float del);
