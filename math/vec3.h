@@ -20,6 +20,8 @@ public:
 	Vec3 operator-(const Vec3 &rhs) const;
 	float operator*(const Vec3 &rhs) const;
 
+	const float *getData() const;
+
 	void normalize();
 	void scale(float);
 

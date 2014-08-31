@@ -26,7 +26,11 @@ float horiz;
 float delta_x = 0.1f;
 float delta_y = 0.1f;
 
-Mat4 TranslateMatrix = Mat4::LookAt(Vec3( 0, 1, 1), Vec3(0, 0, 0), Vec3(0, -1, 0));
+const Vec3 Camera(0, 1, 1);
+const Vec3 Origin(0, 0, 0);
+const Vec3 Up(0, -1, 0);
+
+Mat4 TranslateMatrix = Mat4::LookAt(Camera, Origin, Up);
 
 #ifdef _WIN32
 	#include <direct.h>
@@ -114,7 +118,8 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			float x = min_x + j * delta_x;
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
-			data[pos + 1] = simplex2d( x , z ,7,2.323); //1.f - 50 * (rand() / float(RAND_MAX));
+			//data[pos + 1] = (float)simplex2d( x , z ,7,2.323f);
+			data[pos + 1] = 1.f - 50 * (rand() / float(RAND_MAX));
 			data[pos + 2] = z;
 		}
 	}
@@ -234,7 +239,7 @@ int main(int argc, char** args)
 	glfwGetFramebufferSize(window, &width, &height);
 	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)height / (float)width, -0.1f, 100.0f);
 	
-	const int divisions = 200;
+	const int divisions = 50;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions-1) * (divisions - 1);
 	const float size = 100.0f;
@@ -254,7 +259,7 @@ int main(int argc, char** args)
 		
 		// for objects to be rendered
 		for (RenderObject obj : objs) {
-			obj.render(ProjectionMatrix, TranslateMatrix);
+			obj.render(ProjectionMatrix, TranslateMatrix, Camera);
 		}
 
 		glfwSwapBuffers(window);

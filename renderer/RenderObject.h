@@ -23,8 +23,11 @@ private:
 	GLuint _vertex_buffer;
 	GLuint _normal_buffer;
 	GLuint _index_buffer;
+
 	GLuint _position_index;
 	GLuint _normal_index;
+
+	GLuint _camera_index;
 	GLuint _projection_index;
 	GLuint _translation_index;
 
@@ -34,7 +37,7 @@ public:
 	RenderObject(Shader &shader, GLfloat* vertices, int number_vertices, GLuint* indices, int number_indices);
 	~RenderObject();
 
-	void render(const Mat4&,const Mat4&);
+	void render(const Mat4&,const Mat4&,const Vec3&);
 	
 };
 

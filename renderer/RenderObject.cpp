@@ -86,6 +86,7 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 	std::string *a = new std::string("v_Position");
 	std::string *b = new std::string("v_Normal");
 
+	std::string *x = new std::string("camera");
 	std::string *y = new std::string("projection");
 	std::string *z = new std::string("translate");
 	
@@ -96,7 +97,11 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 	if ((_normal_index = shader.getVariable(*b)) < 0) {
 		std::cout << "Error: Could not load v_Normal" << std::endl;
 	}
-	
+
+	if ((_camera_index = shader.getUniform(*x)) < 0) {
+		std::cout << "Error: Could not load camera" << std::endl;
+	}
+
 	if ((_projection_index = shader.getUniform(*y)) < 0) {
 		std::cout << "Error: Could not load projection" << std::endl;
 	}
@@ -114,6 +119,8 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 
 	delete a;
 	delete b;
+
+	delete x;
 	delete y;
 	delete z;
 
@@ -123,13 +130,14 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 
 RenderObject::~RenderObject() {}
 
-void RenderObject::render(const Mat4 &projection, const Mat4& translate) {
+void RenderObject::render(const Mat4 &projection, const Mat4& translate, const Vec3 &camera) {
 	// Load the shader program
 	_shader->load();
 
 	// Load uniforms
 	glUniformMatrix4fv(_projection_index, 1, GL_FALSE, projection.getData());
 	glUniformMatrix4fv(_translation_index, 1, GL_FALSE, translate.getData());
+	glUniform3fv(_camera_index, 1, camera.getData());
 	
 	// Turn on variables
 	glEnableVertexAttribArray(_position_index);
