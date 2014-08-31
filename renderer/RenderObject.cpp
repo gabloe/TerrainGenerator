@@ -11,6 +11,15 @@ Vec3 meanWeightEqual(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3) {
 	return N;
 }
 
+Vec3 meanWeightAngle(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3) {
+	Vec3 L1 = p2 - p1;
+	Vec3 L2 = p3 - p1;
+	Vec3 N = L1.cross(L2);
+	N.normalize();
+	return N;
+}
+
+
 RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertices, GLuint* indices, int number_indices) {
 
 	_shader = &shader;
