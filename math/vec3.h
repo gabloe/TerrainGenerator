@@ -25,8 +25,10 @@ public:
 
 	Vec3 clone() const;
 
+	bool isZero() const;
+
 	Vec3 cross(const Vec3&) const;
 
-};
+	MATH_API friend std::ostream& operator<<(std::ostream& os, Vec3 &obj);
 
-std::ostream& operator<<(std::ostream& os, Vec3 &obj);
+};

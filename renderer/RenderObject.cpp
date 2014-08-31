@@ -1,6 +1,7 @@
 #include "RenderObject.h"
 
 #include <string>
+#include <cmath>
 
 Vec3 helper(Vec3 &a, Vec3 &b, Vec3 &c) {
 	Vec3 t1 = b - a;
@@ -8,11 +9,7 @@ Vec3 helper(Vec3 &a, Vec3 &b, Vec3 &c) {
 
 	Vec3 N = t1.cross(t2);
 
-	float sin_alpha = sqrt((N * N) / ((t1 * t1) * (t2 * t2)));
-
 	N.normalize();
-	N.scale(asin(sin_alpha));
-
 	return N;
 }
 
@@ -37,14 +34,15 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		Vec3 p2(vertices + i2);
 		Vec3 p3(vertices + i3);
 
-
 		Vec3 t1 = helper(p1, p2, p3);
 		Vec3 t2 = helper(p2, p1, p3);
 		Vec3 t3 = helper(p3, p1, p2);
-		
-		t1.normalize();
-		t2.normalize();
-		t3.normalize();
+
+		/*
+		std::cout << t1 << std::endl;
+		std::cout << t2 << std::endl;
+		std::cout << t3 << std::endl;
+		*/
 
 		normals[i1 + 0] += t1.getX();
 		normals[i1 + 1] += t1.getY();
@@ -62,19 +60,23 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 	for (int i = 0; i < number_vertices; i += 3) {
 		Vec3 t(normals + i);
 		t.normalize();
+		std::cout << t << std::endl;
 		normals[i+0] = t.getX();
 		normals[i+1] = t.getY();
 		normals[i+2] = t.getZ();
 	}
 
+	// Copy over the position data
 	glGenBuffers(1, &_vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, number_vertices * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
 
+	// Copy over the normals
 	glGenBuffers(1, &_normal_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, _normal_buffer);
 	glBufferData(GL_ARRAY_BUFFER, number_vertices * sizeof(GLfloat), normals, GL_STATIC_DRAW);
 
+	// If we have indices copy them over too
 	if (indices) {
 		glGenBuffers(1, &_index_buffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer);

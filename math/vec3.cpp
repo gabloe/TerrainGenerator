@@ -1,5 +1,7 @@
 #include "vec3.h"
 
+#include <cmath>
+
 Vec3::Vec3(void) {
 	v[0] = v[1] = v[2] = 0.f;
 }
@@ -50,12 +52,20 @@ float Vec3::operator*(const Vec3 &rhs) const {
 		);
 }
 
+bool Vec3::isZero() const {
+	bool res = true;
+	for (int i = 0; i < 3; ++i) res &= (abs(v[i]) < 0.00001);
+	return res;
+}
+
 void Vec3::normalize() {
-	scale(1 / (*this * *this));
+	float inv = 0.0;
+	for (int i = 0; i < 3; ++i) inv += (v[i] * v[i]);
+	scale(sqrt(1.0f / inv));
 }
 
 void Vec3::scale(float s) {
-	for (int i = 0; i < 3; ++i) this->v[i] *= s;
+	for (int i = 0; i < 3; ++i) v[i] *= s;
 }
 
 Vec3 Vec3::clone() const {

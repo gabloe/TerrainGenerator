@@ -20,5 +20,6 @@ public:
 	float operator*(Vec4 rhs);
 
 	Vec4 clone();
+
+	MATH_API friend std::ostream& operator<<(std::ostream& os, Vec4 &obj);
 };
-std::ostream& operator<<(std::ostream& os, Vec4 &obj);
