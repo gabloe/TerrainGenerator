@@ -1,6 +1,5 @@
 #version 150
 in vec3 v_Position;
-out vec4 gl_Postion;
 
 uniform mat4 transform,projection;
 void main(void)

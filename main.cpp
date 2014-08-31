@@ -1,32 +1,21 @@
 #define GLFW_DLL
 
-
-
+// OpenGL
 #include "GL/glew.h"
-
 #include <GLFW/glfw3.h>
 
+// C
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
 
+// C++
 #include <iostream>
 
+// Custom
 #include "math/mat3.h"
 #include "math/mat4.h"
 #include "renderer/RenderObject.h"
-
-#include <stdio.h>  /* defines FILENAME_MAX */
-/*
-
-projMatrix[0] = f / ratio;
-projMatrix[1 * 4 + 1] = f;
-projMatrix[2 * 4 + 2] = (farP + nearP) / (nearP - farP);
-projMatrix[3 * 4 + 2] = (2.0f * farP * nearP) / (nearP - farP);
-projMatrix[2 * 4 + 3] = -1.0f;
-projMatrix[3 * 4 + 3] = 0.0f;
-
-*/
 
 Mat4 ProjectionMatrix(
 	1, 0, 0, 0,
@@ -56,15 +45,8 @@ float delta_y = 0.01f;
 #define GetCurrentDir getcwd
 #endif
 
-#define BUFFER_OFFSET(i) ((char*)NULL + (i))
-
-// Variables
-GLuint vertexBuffer;
-GLuint elementbuffer;
-
+// The current window
 GLFWwindow *window;
-
-
 
 #define checkGL() {							\
 	GLenum err = glGetError();				\
@@ -133,11 +115,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			glPolygonMode(GL_FRONT_AND_BACK, MODES[mode]);
 		}
 	}
-}
-
-// used to display a RenderObject
-void display(RenderObject &renderObj) {
-	renderObj.render();
 }
 
 float* generateGround(float min_x, float max_x, float min_z, float max_z, int div) {
@@ -219,8 +196,6 @@ GLuint* generateIndices(int div) {
 // Initializes all the subsystems, create the window.
 void init() {
 
-	ProjectionMatrix = buildProjectionMatrix( 15.f , 9.0f /16.0f , 0.001f , 100.f);
-
 	glfwSetErrorCallback(error_callback);
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
@@ -235,10 +210,9 @@ void init() {
 
 	glfwGetVersion(&major, &minor, &rev);
 
-	fprintf(stderr, "GLFW sversion recieved: %d.%d.%d\n", major, minor, rev);
+	std::cerr << "GLFW sversion recieved: " << major << ", " << minor << ", " << rev << std::endl;
 	window = glfwCreateWindow(640, 480, "Terrain Generator", NULL, NULL);
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
@@ -248,23 +222,16 @@ void init() {
 	GLenum err = glewInit();
 	if (GLEW_OK != err) {
 		glfwTerminate();
-		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-		system("PAUSE");
+		std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
 		exit(EXIT_FAILURE);
 	}glGetError();
 	
-
-	if (!GLEW_VERSION_2_1){
-		std::cout << "GLew Version not supported?" << std::endl;
-		std::exit(-1);
-	}
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 
 	// Do some stuff
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
-	//glEnable(GL_DEPTH_TEST);
-
+	glEnable(GL_DEPTH_TEST);
 }
 
 // Just prints OpenGL information
@@ -281,35 +248,24 @@ void print() {
 
 }
 
-static void copyToGPU(RenderObject &obj) {
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)* obj.getNumVertices(), obj.getVertices(), GL_STATIC_DRAW);
-
-	// Indexes
-	glGenBuffers(1, &elementbuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getNumIndices() * sizeof(GLuint), obj.getIndices(), GL_STATIC_COPY);
-}
-
 int main(int argc, char** args)
 {
 	init();
 	print();
 
-	// load data
-
-
+	// Square Data
 	GLfloat data[] = {
 		-0.5f,	-0.1f,	0.5f,	// 0
 		0.5f,	-0.1f,	0.5f,	// 1
 		-0.5f,	0.1f,	-0.5f,	// 2
-		0.5f,	0.1f,	-0.5f// 3
+		0.5f,	0.1f,	-0.5f	// 3
 	};
-	GLuint ind[] = { 0, 1, 3 , 0 , 3 , 2 };
-	int ground_size = 50;
+	GLuint ind[] = {
+		0, 1, 3,	// T1
+		0, 3, 2		// T2
+	};
 
-
+	// Load the shader and compile it
 	ShaderProgram program("../resources/shaders/shader.vert", "../resources/shaders/shader.frag");
 
 	if (program.getError() == SHADER_ERROR::NO_SHADER_ERROR) {
@@ -318,42 +274,27 @@ int main(int argc, char** args)
 		printf("Error with shader\n");
 	}
 
-	RenderObject ground,obj;
-
-	/*
-	int vertex_size = ground_size * ground_size * 3;
-	int ind_size = (ground_size - 1) * (ground_size - 1) * 6;
-
-	ground.setVertices( generateGround(-30, 30, -30, 30 , ground_size ) , vertex_size );
-	ground.setIndices( generateIndices(ground_size) , ind_size );
-	ground.setMode(GL_TRIANGLES);
-	// */
+	// Create our object
+	RenderObject obj;
 	obj.setVertices(data, 12);
 	obj.setIndices(ind, 6);
 	obj.setMode(GL_TRIANGLES);
 	obj.setShaderProgram(&program);
-
 	obj.moveToGPU();
+
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window))
 	{	
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		display(obj);
+		obj.render();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
-	free(ground.getVertices());
-	free(ground.getIndices());
-
-	glDeleteBuffers(1, &vertexBuffer);
-	glDeleteBuffers(1, &elementbuffer);
-
-	glUseProgram(0);
-
+	
 	glfwDestroyWindow(window);
 	glfwTerminate();
-	exit(EXIT_SUCCESS);
+
+	return EXIT_SUCCESS;
 }

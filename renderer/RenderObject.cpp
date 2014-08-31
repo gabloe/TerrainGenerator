@@ -50,10 +50,19 @@ Vec3 RenderObject::getPosition() { return this->position; }
 ShaderProgram* RenderObject::getShaderProgram() { return this->program; }
 
 void RenderObject::render() {
+	// Load the shader program
 	program->load();
+	
+	// Select the data
 	glBindBuffer(GL_ARRAY_BUFFER, v_buffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, i_buffer);
+
+	// Turn on variables
 	glVertexAttribPointer(v_position, 3, GL_FLOAT, false, 0, 0);
+
+	// Draw
 	glDrawElements(GL_TRIANGLES, num_vert / 3, GL_UNSIGNED_SHORT, 0);
+
+	// Unload the shader program
 	program->unload();
 }
