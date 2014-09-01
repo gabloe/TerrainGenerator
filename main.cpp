@@ -302,10 +302,10 @@ int main(int argc, char** args)
 	glfwGetFramebufferSize(window, &width, &height);
 
 
-	const int divisions = 15;
+	const int divisions = 100;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
-	const float size = 100.0f;
+	const float size = 200.0f;
 	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions);
 	GLuint *indices = generateIndices(divisions);
 

@@ -15,8 +15,8 @@ void main(void) {
 	gl_Position = projection * translate * vec4(v_Position,1.0);
 
 	vec3 LightPosition = vec3(0.0,-1000.0,0.0);
-        vec3 cameraToVertex = V - camera;
-        float distance = length(cameraToVertex);
+	vec3 cameraToVertex = V - camera;
+	float distance = length(cameraToVertex);
 	vec3 L = normalize(LightPosition - camera);
 	vec3 E = normalize(-V);
 	vec3 R = normalize(reflect(-L,N));
@@ -28,5 +28,5 @@ void main(void) {
 	vec3 specular	= clamp(vec3(0.62, 0.32, 0.17) * pow(max(dot(R,E),0.0), 0.5 ), 0.0, 1.0);
 
 	color = ambient + diffuse + specular;
-        color = attenuation * color;
+	color = attenuation * color;
 }
