@@ -18,9 +18,11 @@ void main(void) {
 	vec4 E = normalize(-V);
 	vec4 R = normalize(reflect(-L,N));
 
+        float intensity = clamp(dot(L, vec4(v_Normal, 1.0)), 0.0, 1.0);
+
 	vec4 ambient	= vec4(0.62,0.32,0.17,1.0); // vec4(0.5, 0.0, 0.0, 1.0);
 	vec4 diffuse	= clamp(vec4(0.62, 0.32, 0.17, 1.0) * max(dot(N,L), 0.0), 0.0, 1.0);
 	vec4 specular	= clamp(vec4(0.62, 0.32, 0.17, 1.0) * pow(max(dot(R,E),0.0), 0.3 ), 0.0, 1.0);
 
-	color = ambient + diffuse + specular;
+	color = ambient + intensity * (diffuse + specular);
 }

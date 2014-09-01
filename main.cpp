@@ -302,7 +302,7 @@ int main(int argc, char** args)
 
 	
 
-	const int divisions = 10;
+	const int divisions = 25;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
 	const float size = 100.0f;
