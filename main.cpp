@@ -81,8 +81,9 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			float x = min_x + j * delta_x;
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
-			data[pos + 1] = (float)simplex2d( x , z ,7,2.323f)/10;
+			//data[pos + 1] = (float)simplex2d( x , z ,7,2.323f)/10;
 			//data[pos + 1] = 50 * (rand() / float(RAND_MAX));
+			data[pos + 1] = z;
 			data[pos + 2] = z;
 		}
 	}
@@ -304,8 +305,8 @@ float getHeight(RenderObject &ground) {
 	float del = abs(2 * data[0]) / divisions;
 
 	// x and z position index
-	float x_index = (x - data[0]) / del;
-	float z_index = (z - data[0]) / del;
+	float x_index = (x - data[0] + del / 2.0f) / del;
+	float z_index = (z - data[0] + del / 2.0f) / del;
 
 	// If we are on the ground
 	if (x_index < divisions && z_index < divisions ) {
