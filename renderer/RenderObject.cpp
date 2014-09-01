@@ -48,9 +48,9 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 		Vec3 p2(vertices + i2);
 		Vec3 p3(vertices + i3);
 
-		Vec3 N1 = meanWeightAngle(p1, p2, p3);
-		Vec3 N2 = meanWeightAngle(p2, p3, p1);
-		Vec3 N3 = meanWeightAngle(p3, p1, p2);
+		Vec3 N1 = meanWeightEqual(p1, p2, p3);
+		Vec3 N2 = meanWeightEqual(p2, p3, p1);
+		Vec3 N3 = meanWeightEqual(p3, p1, p2);
 
 		normals[i1 + 0] += N1.getX();
 		normals[i1 + 1] += N1.getY();

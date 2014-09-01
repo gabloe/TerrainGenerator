@@ -28,7 +28,7 @@
 #endif
 
 // Position Data
-Vec3 Camera(4.50184, 120.615, -138.001);
+Vec3 Camera(4.50184f, 120.615f, -138.001f);
 
 double horizontalAngle = 87.45;
 double verticalAngle = -1.0;
@@ -226,7 +226,7 @@ void init() {
 	// Initialize the GLFW system, if failure jump ship
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
-	}
+	}	
 
 	// Set the hints on how to render to the 
 	// screen, which OpenGL version we have, etc
