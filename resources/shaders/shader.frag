@@ -2,8 +2,8 @@
 
 out vec4 colorOut;
 
-in vec4 color;
+in vec3 color;
 
 void main(void) {
-	colorOut = color;
+	colorOut = vec4(color,1.0);
 }
