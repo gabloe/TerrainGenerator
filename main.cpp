@@ -305,7 +305,7 @@ int main(int argc, char** args)
 	const int divisions = 100;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
-	const float size = 200.0f;
+	const float size = 1000.0f;
 	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions);
 	GLuint *indices = generateIndices(divisions);
 
