@@ -43,6 +43,7 @@ clean:
 	$(MAKE) -C math clean
 	$(MAKE) -C renderer clean
 	$(MAKE) -C generators clean
+	mkdir bin
 
 test:
 	cd tests
@@ -64,4 +65,5 @@ math:
 generators:
 	$(MAKE) -C generators
 
-
+run: clean all
+	cd $(OBJ_BIN); ./$(EXECUTABLE) 
