@@ -289,14 +289,18 @@ float interpolate(float min, float max, float alpha) {
 	return min * (1.0f - alpha) + max * alpha;
 }
 
+Vec3 getAsVec3(const GLfloat *data, int x, int y, int div) {
+	return Vec3(&data[3*(x * div + y)]);
+}
+
 float getHeight(RenderObject &ground) {
 	
 	// Get ground data
 	const GLfloat *data = ground.getRawData();
 
 	// Get current x and y position in world space
-	float x = Camera.getX();
-	float z = Camera.getZ();
+	float x = Camera.getZ();
+	float z = Camera.getX();
 
 	// Guess the number of divisions
 	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
@@ -306,7 +310,7 @@ float getHeight(RenderObject &ground) {
 
 	// x and z position index
 	float x_index = (x - data[0] + del / 2.0f) / del;
-	float z_index = (z - data[0] + del / 2.0f) / del;
+	float z_index = (z - data[2] + del / 2.0f) / del;
 
 	// If we are on the ground
 	if (x_index < divisions && z_index < divisions ) {
@@ -320,9 +324,10 @@ float getHeight(RenderObject &ground) {
 
 		// If we are in the upper triange...
 		if ( low_x > low_z ) {			// Upper Triangle
-			Vec3 upper_left(&data[3 * x_idx*divisions + 3 * z_idx]);
-			Vec3 upper_right(&data[3 * x_idx*divisions + 3 * z_idx + 3]);
-			Vec3 bottom_left(&data[3 * x_idx*divisions + 3 * z_idx + 3 * divisions]);
+
+			Vec3 upper_left = getAsVec3(data, x_idx, z_idx, divisions);
+			Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
+			Vec3 bottom_left = getAsVec3(data, x_idx + 1, z_idx, divisions);
 
 			float segment_len = (Vec2(upper_right.getX(), upper_right.getZ())
 				- Vec2(x_index, z_index)).getMagnitude();
@@ -337,9 +342,9 @@ float getHeight(RenderObject &ground) {
 
 		} else if (low_x < low_z) {		// Lower Triangle
 
-			Vec3 upper_right(&data[3 * x_idx*divisions + 3 * z_idx + 3]);
-			Vec3 bottom_left(&data[3 * x_idx*divisions + 3 * z_idx + 3 * divisions]);
-			Vec3 bottom_right(&data[3 * x_idx*divisions + 3 * z_idx + 3 * divisions + 3]);
+			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
+			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
+			Vec3 bottom_right = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);
 
 			float segment_len = (Vec2(upper_right.getX(), upper_right.getZ())
 				- Vec2(x_index, z_index)).getMagnitude();
@@ -349,11 +354,12 @@ float getHeight(RenderObject &ground) {
 			float r_y = (1.0f - low_x) * upper_right.getY() + low_x * bottom_right.getY();
 			float b_y = (1.0f - low_z) * bottom_left.getY() + low_z * bottom_right.getY();
 			float d_y = interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
+
 			return (d_y + r_y + b_y) / 3.0f;
 
 		} else {						// On the line
-			Vec3 upper_right(&data[3 * x_idx*divisions + 3 * z_idx + 3]);
-			Vec3 bottom_left(&data[3 * x_idx*divisions + 3 * z_idx + 3 * divisions]);
+			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
+			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
 
 			float segment_len = (Vec2(upper_right.getX(), upper_right.getZ())
 				- Vec2(x_index, z_index)).getMagnitude();
