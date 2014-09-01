@@ -33,7 +33,7 @@ Vec3 Camera(4.50184f, 120.615f, -138.001f);
 double horizontalAngle = 87.45;
 double verticalAngle = -1.0;
 double initialiFOV = 45.0;
-float initial_speed = 0.25f;
+float initial_speed = 2.5f;
 float mouseSpeed = 0.0005f;
 
 // The window and related data
@@ -139,7 +139,7 @@ void update() {
 
 	float speed = initial_speed;
 	if (shift_down) {
-		speed = 2;
+		speed = 3.5;
 	}
 
 	double xpos,ypos;
@@ -283,7 +283,7 @@ float getHeight(RenderObject &ground) {
 	float x = Camera.getX();
 	float z = Camera.getZ();
 
-	std::cout << "x:" << x << ", z: " << z << std::endl;
+	//std::cout << "x:" << x << ", z: " << z << std::endl;
 
 	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
 	float del = abs(2 * data[0]) / divisions;
@@ -291,7 +291,7 @@ float getHeight(RenderObject &ground) {
 	int x_index = (x - data[0] + del - 1) / del;
 	int z_index = (z - data[0] + del - 1) / del;
 
-	std::cout << x_index << ", " << z_index << std::endl;
+	//std::cout << x_index << ", " << z_index << std::endl;
 
 	if (x_index < divisions && z_index < divisions ) {
 		return data[3 * (divisions * x_index + z_index) + 1];
@@ -344,6 +344,9 @@ int main(int argc, char** args)
 	update();
 	Camera =  Vec3(Camera.getX(), getHeight(ground), Camera.getZ());
 
+	float y = 30;
+	float heightOffset = 30;
+	Vec3 oldPos = Vec3(Camera.getX(), 0 , Camera.getZ());
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
 		// Clear everything on the screen
@@ -363,8 +366,17 @@ int main(int argc, char** args)
 		if (duration > 1000.0/60.0) {
 			update();
 			duration = 0;
-			float y = getHeight(ground);
-			std::cout << "Height: " << y << std::endl;
+			if (oldPos.getX() != Camera.getX() && oldPos.getZ() != Camera.getZ()) {
+				float tmp = getHeight(ground)+heightOffset;
+                        	if (tmp > y)
+					y+=0.5;
+				else if (tmp < y)
+					y-=0.5;
+				else
+					y=tmp;
+				oldPos = Vec3(Camera.getX(), 0, Camera.getZ());
+			}
+			//std::cout << "Height: " << y << std::endl;
 			Camera = Vec3(Camera.getX(), y , Camera.getZ());
 		}
 
