@@ -28,19 +28,24 @@
 #endif
 
 // Position Data
-Vec3 Camera(0, 0, 5);
+Vec3 Camera(0, -10, -1);
 
-Mat4 TranslateMatrix;
-
-float horizontalAngle = 0.0;
-float verticalAngle= 0.0f;
-float initialiFOV = 45.0f;
-float speed = 1.0f;
+double horizontalAngle = 45.0;
+double verticalAngle = 0.0;
+double initialiFOV = 45.0;
+float initial_speed = 0.25f;
 float mouseSpeed = 0.0005f;
 
 // The window and related data
 static GLFWwindow *window;
-static int height = 480, width = 640;
+static float height = 480, width = 640;
+
+const float znear = -1.0f;
+const float zfar = 0.0f;
+
+Mat4 TranslateMatrix;
+Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)width / (float)height, znear, zfar);
+
 
 #define checkGL() {							\
 	GLenum err = glGetError();				\
@@ -132,6 +137,11 @@ bool handleKey(int key, int check_key) {
 
 void update() {
 
+	float speed = initial_speed;
+	if (shift_down) {
+		speed = 2;
+	}
+
 	double xpos,ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
 	glfwSetCursorPos(window, width / 2, height / 2);
@@ -140,14 +150,15 @@ void update() {
 	verticalAngle	+= mouseSpeed *float(height * 0.5f - ypos);
 
 	Vec3 direction(
-		cos(verticalAngle) * sin(horizontalAngle),
-		sin(verticalAngle),
-		cos(verticalAngle) * cos(horizontalAngle)
+		float(cos(verticalAngle) * sin(horizontalAngle)),
+		(float)sin(verticalAngle),
+		(float)(cos(verticalAngle) * cos(horizontalAngle))
 	);
+
 	Vec3 right(
-		sin(horizontalAngle - 1.570796325f),
+		float(sin(horizontalAngle - 1.570796325f)),
 		0.0f,
-		cos(horizontalAngle - 1.570796325f)
+		float(cos(horizontalAngle - 1.570796325f))
 	);
 
 	Vec3 up = right.cross(direction);
@@ -190,9 +201,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 void resized_callback(GLFWwindow *window, int w, int h) {
-	width = w;
-	height = h;
+	width = float(w);
+	height = float(h);
 	glViewport(0, 0, w, h);
+
+	ProjectionMatrix = Mat4::Perspective(45.0f, width / height, znear, zfar);
+
 }
 
 static void error_callback(int error, const char* description)
@@ -222,7 +236,7 @@ void init() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	// Create our window using the hints given above
-	window = glfwCreateWindow(width, height, "Terrain Generator", NULL, NULL);
+	window = glfwCreateWindow((int)width, (int)height, "Terrain Generator", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
@@ -285,7 +299,7 @@ int main(int argc, char** args)
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 
-	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)width / (float)height, -0.1f, 100.0f);
+	
 
 	const int divisions = 50;
 	const int number_vertices = 3 * divisions * divisions;
