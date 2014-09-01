@@ -138,14 +138,8 @@ void checkKeys() {
 	glfwGetCursorPos(window, &cur_x, &cur_y);
 	glfwSetCursorPos(window, width / 2, height / 2);
 
-	horizontalAngle += mouseSpeed * float(width * 0.5 - cur_x);
-	verticalAngle += mouseSpeed * (height * 0.5 - cur_y);
-
-
-	float scale = 0.1;
-	if (shift_down) {
-		scale = 1.0;
-	}
+	horizontalAngle += mouseSpeed * float(width * 0.5f - cur_x);
+	verticalAngle += mouseSpeed * (height * 0.5f - cur_y);
 
 	Vec3 direction(
 		cos(verticalAngle) * sin(horizontalAngle),
@@ -160,14 +154,11 @@ void checkKeys() {
 
 	Vec3 up = right.cross(direction);
 
-	direction *= scale;
-	right *= scale;
-
 	if (glfwGetKey(window, GLFW_KEY_W) != GLFW_RELEASE) {
-		Camera += direction;
+		Camera -= direction;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) != GLFW_RELEASE) {
-		Camera -= direction;
+		Camera += direction;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) != GLFW_RELEASE) {
 		Camera += right;
@@ -318,6 +309,7 @@ int main(int argc, char** args)
 	delete indices;
 
 	double duration = 0;
+
 	checkKeys();
 
 	// Main Loop.  Do the stuff!
