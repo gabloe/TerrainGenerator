@@ -286,7 +286,7 @@ float area(const Vec3& A, const Vec3& B, const Vec3& C) {
 }
 
 float interpolate(float min, float max, float alpha) {
-	return min * (1.0 - alpha) + max * alpha;
+	return min * (1.0f - alpha) + max * alpha;
 }
 
 float getHeight(RenderObject &ground) {
@@ -333,7 +333,7 @@ float getHeight(RenderObject &ground) {
 			float l_y = interpolate(upper_left.getY(), bottom_left.getY(), low_x);
 			float d_y = interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
 
-			return (u_y + l_y + d_y) / 3.0;
+			return (u_y + l_y + d_y) / 3.0f;
 
 		} else if (low_x < low_z) {		// Lower Triangle
 
@@ -349,7 +349,7 @@ float getHeight(RenderObject &ground) {
 			float r_y = (1.0f - low_x) * upper_right.getY() + low_x * bottom_right.getY();
 			float b_y = (1.0f - low_z) * bottom_left.getY() + low_z * bottom_right.getY();
 			float d_y = interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
-			return (d_y + r_y + b_y) / 3.0;
+			return (d_y + r_y + b_y) / 3.0f;
 
 		} else {						// On the line
 			Vec3 upper_right(&data[3 * x_idx*divisions + 3 * z_idx + 3]);
