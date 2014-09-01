@@ -30,6 +30,12 @@ float Vec3::getZ() const {
 	return this->v[2];
 }
 
+float Vec3::getMagnitude() const {
+	float res = 0.0;
+	for (int i = 0; i < 3; ++i) res += v[i] * v[i];
+	return sqrt(res);
+}
+
 Vec3 Vec3::operator+(const Vec3 &rhs) const {
 	return Vec3(
 		getX() + rhs.getX(),
@@ -80,9 +86,7 @@ bool Vec3::isZero() const {
 }
 
 void Vec3::normalize() {
-	float inv = 0.0;
-	for (int i = 0; i < 3; ++i) inv += (v[i] * v[i]);
-	scale(sqrt(1.0f / inv));
+	scale(1.0f / getMagnitude());
 }
 
 void Vec3::scale(float s) {

@@ -15,7 +15,22 @@ Vec3 meanWeightAngle(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3) {
 	Vec3 L1 = p2 - p1;
 	Vec3 L2 = p3 - p1;
 	Vec3 N = L1.cross(L2);
+	float alpha = asin(N.getMagnitude() / (L1.getMagnitude()*L2.getMagnitude()));
+
 	N.normalize();
+	N *= alpha;
+	return N;
+}
+
+Vec3 meanWeightSineEdge(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3) {
+	Vec3 L1 = p2 - p1;
+	Vec3 L2 = p3 - p1;
+	Vec3 N = L1.cross(L2);
+	float bottom =L1.getMagnitude()*L2.getMagnitude();
+	float alpha = asin(N.getMagnitude() / (L1.getMagnitude()*L2.getMagnitude()));
+
+	N.normalize();
+	N *= alpha;
 	return N;
 }
 
@@ -33,19 +48,21 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 		Vec3 p2(vertices + i2);
 		Vec3 p3(vertices + i3);
 
-		Vec3 N = meanWeightEqual(p1, p2, p3);
+		Vec3 N1 = meanWeightAngle(p1, p2, p3);
+		Vec3 N2 = meanWeightAngle(p2, p3, p1);
+		Vec3 N3 = meanWeightAngle(p3, p1, p2);
 
-		normals[i1 + 0] += N.getX();
-		normals[i1 + 1] += N.getY();
-		normals[i1 + 2] += N.getZ();
+		normals[i1 + 0] += N1.getX();
+		normals[i1 + 1] += N1.getY();
+		normals[i1 + 2] += N1.getZ();
 
-		normals[i2 + 0] += N.getX();
-		normals[i2 + 1] += N.getY();
-		normals[i2 + 2] += N.getZ();
+		normals[i2 + 0] += N2.getX();
+		normals[i2 + 1] += N2.getY();
+		normals[i2 + 2] += N2.getZ();
 
-		normals[i3 + 0] += N.getX();
-		normals[i3 + 1] += N.getY();
-		normals[i3 + 2] += N.getZ();
+		normals[i3 + 0] += N3.getX();
+		normals[i3 + 1] += N3.getY();
+		normals[i3 + 2] += N3.getZ();
 
 	}
 	return normals;
