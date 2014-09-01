@@ -1,5 +1,6 @@
 
 #include "vec2.h"
+#include <cmath>
 
 Vec2::Vec2() {
 	v[0] = v[1] = 0;

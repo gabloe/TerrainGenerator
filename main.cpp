@@ -295,23 +295,11 @@ float getHeight(RenderObject &ground) {
 	float x = Camera.getX();
 	float z = Camera.getZ();
 
-<<<<<<< HEAD
-	//std::cout << "x:" << x << ", z: " << z << std::endl;
-
-	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
-	float del = abs(2 * data[0]) / divisions;
-
-	int x_index = (x - data[0] + del - 1) / del;
-	int z_index = (z - data[0] + del - 1) / del;
-
-	//std::cout << x_index << ", " << z_index << std::endl;
-=======
 	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
 	float del = abs(2 * data[0]) / divisions;
 
 	float x_index = (x - data[0]) / del;
 	float z_index = (z - data[0]) / del;
->>>>>>> FETCH_HEAD
 
 	if (x_index < divisions && z_index < divisions ) {
 
