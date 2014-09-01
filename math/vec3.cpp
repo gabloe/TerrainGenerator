@@ -38,16 +38,6 @@ Vec3 Vec3::operator+(const Vec3 &rhs) const {
 		);
 }
 
-Vec3 &Vec3::operator+=(const Vec3 &rhs) {
-	for (int i = 0; i < 3; ++i) v[i] += rhs.v[i];
-	return *this;
-}
-
-Vec3 &Vec3::operator-=(const Vec3 &rhs) {
-	for (int i = 0; i < 3; ++i) v[i] -= rhs.v[i];
-	return *this;
-}
-
 Vec3 Vec3::operator-(const Vec3 &rhs) const {
 	return Vec3(
 		getX() - rhs.getX(),
@@ -60,6 +50,27 @@ float Vec3::operator*(const Vec3 &rhs) const {
 	return (
 		getX() * rhs.getX() + getY() * rhs.getY() + getZ() * rhs.getZ()
 		);
+}
+
+Vec3 Vec3::operator*(float s) const {
+	Vec3 ret(*this);
+	for (int i = 0; i < 3; ++i) ret.v[i] *= s;
+	return ret;
+}
+
+Vec3 &Vec3::operator+=(const Vec3 &rhs) {
+	for (int i = 0; i < 3; ++i) v[i] += rhs.v[i];
+	return *this;
+}
+
+Vec3 &Vec3::operator-=(const Vec3 &rhs) {
+	for (int i = 0; i < 3; ++i) v[i] -= rhs.v[i];
+	return *this;
+}
+
+Vec3 &Vec3::operator*=(float other) {
+	for (int i = 0; i < 3; ++i) v[i] *= other;
+	return *this;
 }
 
 bool Vec3::isZero() const {

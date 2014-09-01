@@ -19,9 +19,11 @@ public:
 	Vec3 operator+(const Vec3 &rhs) const;
 	Vec3 operator-(const Vec3 &rhs) const;
 	float operator*(const Vec3 &rhs) const;
+	Vec3 operator*(float) const;
 
 	Vec3 &operator+=(const Vec3 &rhs);
 	Vec3 &operator-=(const Vec3 &rhs);
+	Vec3 &operator*=(float);
 
 	const float *getData() const;
 

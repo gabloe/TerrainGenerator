@@ -31,7 +31,8 @@
 Vec3 Camera(0, 1, 1);
 Vec3 Origin(0, 0, 0);
 Vec3 Up(0, 1, 0);
-Mat4 TranslateMatrix = Mat4::LookAt(Camera, Origin, Up);
+
+Mat4 TranslateMatrix;
 
 float horizontalAngle = 3.14159265f;
 float verticalAngle= 0.0f;
@@ -140,18 +141,27 @@ void checkKeys() {
 	horizontalAngle += mouseSpeed * float(width * 0.5 - cur_x);
 	verticalAngle += mouseSpeed * (height * 0.5 - cur_y);
 
-	float x = speed * cos(verticalAngle) * sin(horizontalAngle);
-	float y = speed * sin(verticalAngle);
-	float z = speed * cos(verticalAngle) * cos(horizontalAngle);
 
 	float scale = 0.1;
 	if (shift_down) {
 		scale = 1.0;
 	}
 
-	Vec3 direction(x, y, z);
-	Vec3 right(speed * sin(horizontalAngle- 3.14159265f * 0.5f), 0.0, speed * cos(horizontalAngle - 3.14159265f * 0.5f));
+	Vec3 direction(
+		cos(verticalAngle) * sin(horizontalAngle),
+		sin(verticalAngle),
+		cos(verticalAngle) * cos(horizontalAngle)
+	);
+	Vec3 right(
+		sin(horizontalAngle - 1.570796325f),
+		0.0f,
+		cos(horizontalAngle - 1.570796325f)
+	);
+
 	Vec3 up = right.cross(direction);
+
+	direction *= scale;
+	right *= scale;
 
 	if (glfwGetKey(window, GLFW_KEY_W) != GLFW_RELEASE) {
 		Camera += direction;
@@ -288,6 +298,7 @@ int main(int argc, char** args)
 
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
+
 	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)height / (float)width, -0.1f, 100.0f);
 
 	const int divisions = 50;
@@ -307,6 +318,7 @@ int main(int argc, char** args)
 	delete indices;
 
 	double duration = 0;
+	checkKeys();
 
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
