@@ -20,7 +20,7 @@ void main(void) {
 
 	vec4 ambient	= vec4(0.62,0.32,0.17,1.0); // vec4(0.5, 0.0, 0.0, 1.0);
 	vec4 diffuse	= clamp(vec4(0.62, 0.32, 0.17, 1.0) * max(dot(N,L), 0.0), 0.0, 1.0);
-	vec4 specular	= clamp(vec4(0.62, 0.32, 0.17, 1.0) * pow( max(dot(R,E),0.0), 0.3 ), 0.0, 1.0);
+	vec4 specular	= clamp(vec4(0.62, 0.32, 0.17, 1.0) * pow(max(dot(R,E),0.0), 0.3 ), 0.0, 1.0);
 
 	color = ambient + diffuse + specular;
 }
