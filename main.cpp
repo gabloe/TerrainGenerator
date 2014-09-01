@@ -41,8 +41,8 @@ float mouseSpeed = 0.0005f;
 static GLFWwindow *window;
 static float height = 768, width = 1024;
 
-const float znear = 1.0;
-const float zfar = -1.0f;
+const float znear	=  1.0f;
+const float zfar	= -1.0f;
 
 Mat4 TranslateMatrix;
 Mat4 ProjectionMatrix = Mat4::Perspective(90.0f, (float)width / (float)height, znear, zfar);
@@ -71,8 +71,8 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 
 	float x_len = max_x - min_x;
 	float z_len = max_z - min_z;
-	float delta_x = x_len / (div - 1);
-	float delta_z = z_len / (div - 1);
+	float delta_x = x_len / (div-1);
+	float delta_z = z_len / (div-1);
 	float* data = (float*)calloc(3 * div * div, sizeof(float));
 
 	for (int i = 0; i < div; i++) { // z
@@ -299,8 +299,8 @@ float getHeight(RenderObject &ground) {
 	const GLfloat *data = ground.getRawData();
 
 	// Get current x and y position in world space
-	float x = Camera.getZ();
-	float z = Camera.getX();
+	float x = Camera.getX();
+	float z = Camera.getZ();
 
 	// Guess the number of divisions
 	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
@@ -310,7 +310,7 @@ float getHeight(RenderObject &ground) {
 
 	// x and z position index
 	float x_index = (x - data[0] + del / 2.0f) / del;
-	float z_index = (z - data[2] + del / 2.0f) / del;
+	float z_index = (data[2] - z + del / 2.0f) / del;
 
 	// If we are on the ground
 	if (x_index < divisions && z_index < divisions ) {
@@ -318,13 +318,16 @@ float getHeight(RenderObject &ground) {
 		int x_idx = int(x_index);
 		int z_idx = int(z_index);
 
-		// Get inner point in square
+		// Get inner point in the square
 		float low_x = x_index - x_idx;
 		float low_z = z_index - z_idx;
 
-		// If we are in the upper triange...
-		if ( low_x > low_z ) {			// Upper Triangle
+		std::cout << "LowX: " << low_x << std::endl;
+		std::cout << "LowZ: " << low_z << std::endl;
 
+		// If we are in the upper triange...
+		if ( low_x < low_z ) {			// Upper Triangle
+			std::cout << "Case1" << std::endl;
 			Vec3 upper_left = getAsVec3(data, x_idx, z_idx, divisions);
 			Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
 			Vec3 bottom_left = getAsVec3(data, x_idx + 1, z_idx, divisions);
@@ -339,9 +342,9 @@ float getHeight(RenderObject &ground) {
 			float d_y = interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
 
 			return (u_y + l_y + d_y) / 3.0f;
-
-		} else if (low_x < low_z) {		// Lower Triangle
-
+			//return u_y;
+		} else if (low_x > low_z) {		// Lower Triangle
+			std::cout << "Case2" << std::endl;
 			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
 			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
 			Vec3 bottom_right = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);
@@ -358,6 +361,7 @@ float getHeight(RenderObject &ground) {
 			return (d_y + r_y + b_y) / 3.0f;
 
 		} else {						// On the line
+			std::cout << "Case3" << std::endl;
 			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
 			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
 
@@ -417,11 +421,7 @@ int main(int argc, char** args)
 	double duration = 0;
 
 	update();
-	Camera =  Vec3(Camera.getX(), getHeight(ground), Camera.getZ());
 
-	float y = 30;
-	float heightOffset = 30;
-	Vec3 oldPos = Vec3(Camera.getX(), 0 , Camera.getZ());
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
 		// Clear everything on the screen
@@ -438,10 +438,9 @@ int main(int argc, char** args)
 		glfwPollEvents();
 
 		duration += glfwGetTime();
-		if (duration > 1000.0/60.0) {
+		if (duration > 2500.0/60.0) {
 			update();
 			duration = 0;
-			y = getHeight(ground)+heightOffset;
 // TODO: Make this smooth
 /*
 			if (oldPos.getX() != Camera.getX() && oldPos.getZ() != Camera.getZ()) {
@@ -454,7 +453,6 @@ int main(int argc, char** args)
 			}
 			//std::cout << "Height: " << y << std::endl;
 */
-			Camera = Vec3(Camera.getX(), y , Camera.getZ());
 		}
 
 	}
