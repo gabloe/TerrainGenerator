@@ -288,13 +288,13 @@ float getHeight(RenderObject &ground) {
 	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
 	float del = abs(2 * data[0]) / divisions;
 
-	int x_index = (x - data[0]) / del;
-	int z_index = (z - data[0]) / del;
+	int x_index = (x - data[0] + del - 1) / del;
+	int z_index = (z - data[0] + del - 1) / del;
 
 	std::cout << x_index << ", " << z_index << std::endl;
 
 	if (x_index < divisions && z_index < divisions ) {
-		return data[3 * (divisions * x_index + z_index) + 2];
+		return data[3 * (divisions * x_index + z_index) + 1];
 	}
 
 	return 0.0;
