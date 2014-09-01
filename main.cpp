@@ -34,7 +34,7 @@ Vec3 Camera(4.50184f, 120.615f, -138.001f);
 double horizontalAngle = 87.45;
 double verticalAngle = -1.0;
 double initialiFOV = 45.0;
-float initial_speed = 2.5f;
+float initial_speed = 0.5f;
 float mouseSpeed = 0.0005f;
 
 // The window and related data
@@ -290,26 +290,35 @@ float interpolate(float min, float max, float alpha) {
 
 float getHeight(RenderObject &ground) {
 	
+	// Get ground data
 	const GLfloat *data = ground.getRawData();
 
+	// Get current x and y position in world space
 	float x = Camera.getX();
 	float z = Camera.getZ();
 
+	// Guess the number of divisions
 	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
+
+	// Guess the deltas
 	float del = abs(2 * data[0]) / divisions;
 
+	// x and z position index
 	float x_index = (x - data[0]) / del;
 	float z_index = (z - data[0]) / del;
 
+	// If we are on the ground
 	if (x_index < divisions && z_index < divisions ) {
-
+		// Get real index
 		int x_idx = int(x_index);
 		int z_idx = int(z_index);
 
+		// Get inner point in square
 		float low_x = x_index - x_idx;
 		float low_z = z_index - z_idx;
 
-		if ( low_x < low_z ) {			// Upper Triangle
+		// If we are in the upper triange...
+		if ( low_x > low_z ) {			// Upper Triangle
 			Vec3 upper_left(&data[3 * x_idx*divisions + 3 * z_idx]);
 			Vec3 upper_right(&data[3 * x_idx*divisions + 3 * z_idx + 3]);
 			Vec3 bottom_left(&data[3 * x_idx*divisions + 3 * z_idx + 3 * divisions]);
@@ -354,6 +363,7 @@ float getHeight(RenderObject &ground) {
 		}
 	}
 
+	// Not on the ground
 	return 0.0;
 }
 
@@ -383,7 +393,8 @@ int main(int argc, char** args)
 	glfwGetFramebufferSize(window, &width, &height);
 
 
-	const int divisions = 100;
+	//const int divisions = 100;
+	const int divisions = 16;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
 	const float size = 1000.0f;
@@ -425,7 +436,7 @@ int main(int argc, char** args)
 			duration = 0;
 			if (oldPos.getX() != Camera.getX() && oldPos.getZ() != Camera.getZ()) {
 				float tmp = getHeight(ground)+heightOffset;
-                        	if (tmp > y)
+             	if (tmp > y)
 					y+=0.5;
 				else if (tmp < y)
 					y-=0.5;
