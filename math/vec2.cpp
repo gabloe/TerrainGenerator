@@ -10,31 +10,43 @@ Vec2::Vec2(float x, float y) {
 	v[1] = y;
 }
 
-float Vec2::getX() {
+float Vec2::getX() const{
 	return v[0];
 }
 
-float Vec2::getY() {
+float Vec2::getY() const {
 	return v[1];
 }
 
 
-Vec2 Vec2::operator+(Vec2 rhs) {
+Vec2 Vec2::operator+(const Vec2 &rhs) const {
 	return Vec2(
 		getX() + rhs.getX(),
 		getY() + rhs.getY()
 		);
 }
 
+Vec2 Vec2::operator-(const Vec2 &rhs) const {
+	return Vec2(
+		getX() - rhs.getX(),
+		getY() - rhs.getY()
+		);
+}
 
-float Vec2::operator*(Vec2& rhs) {
+
+float Vec2::operator*(const Vec2& rhs) const {
 	return 	(
 		getX() * rhs.getX() +
 		getY() * rhs.getY()
 		);
 }
 
-Vec2 Vec2::clone() {
+float Vec2::getMagnitude() const {
+	float sum = v[0] * v[0] + v[1] * v[1];
+	return sqrt(sum);
+}
+
+Vec2 Vec2::clone() const{
 	return Vec2(
 		getX(),
 		getY()

@@ -11,13 +11,16 @@ public:
 	Vec2();
 	Vec2(float x, float y);
 
-	float getX();
-	float getY();
+	float getX() const;
+	float getY() const;
 
-	Vec2 operator+(Vec2 rhs);
-	float operator*(Vec2& rhs); // Dot Product
+	Vec2 operator+(const Vec2 &rhs) const;
+	Vec2 operator-(const Vec2 &rhs) const;
+	float operator*(const Vec2& rhs) const; // Dot Product
 
-	Vec2 clone();
+	float getMagnitude() const;
+
+	Vec2 clone() const;
 
 };
 
