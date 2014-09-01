@@ -15,6 +15,7 @@
 #include <string>	// std::string
 // Custom
 #include "math/mat4.h"
+#include "math/vec2.h"
 #include "renderer/RenderObject.h"
 #include "generators/Simplex.h"
 
@@ -276,6 +277,17 @@ void print() {
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VERSION));
 }
 
+float area(const Vec3& A, const Vec3& B, const Vec3& C) {
+	Vec3 AB = A - B;
+	Vec3 AC = A - C;
+	float theta = acos(AB * AC);
+	return float(0.5f * AB.getMagnitude() * AC.getMagnitude() * sin(theta));
+}
+
+float interpolate(float min, float max, float alpha) {
+	return min * (1.0 - alpha) + max * alpha;
+}
+
 float getHeight(RenderObject &ground) {
 	
 	const GLfloat *data = ground.getRawData();
@@ -283,18 +295,63 @@ float getHeight(RenderObject &ground) {
 	float x = Camera.getX();
 	float z = Camera.getZ();
 
-	std::cout << "x:" << x << ", z: " << z << std::endl;
-
 	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
 	float del = abs(2 * data[0]) / divisions;
 
-	int x_index = (x - data[0] + del - 1) / del;
-	int z_index = (z - data[0] + del - 1) / del;
-
-	std::cout << x_index << ", " << z_index << std::endl;
+	float x_index = (x - data[0]) / del;
+	float z_index = (z - data[0]) / del;
 
 	if (x_index < divisions && z_index < divisions ) {
-		return data[3 * (divisions * x_index + z_index) + 1];
+
+		int x_idx = int(x_index);
+		int z_idx = int(z_index);
+
+		float low_x = x_index - x_idx;
+		float low_z = z_index - z_idx;
+
+		if ( low_x < low_z ) {			// Upper Triangle
+			Vec3 upper_left(&data[3 * x_idx*divisions + 3 * z_idx]);
+			Vec3 upper_right(&data[3 * x_idx*divisions + 3 * z_idx + 3]);
+			Vec3 bottom_left(&data[3 * x_idx*divisions + 3 * z_idx + 3 * divisions]);
+
+			float segment_len = (Vec2(upper_right.getX(), upper_right.getZ())
+				- Vec2(x_index, z_index)).getMagnitude();
+			float total_len = (Vec2(upper_right.getX(), upper_right.getZ())
+				- Vec2(bottom_left.getX(), bottom_left.getZ())).getMagnitude();
+
+			float u_y = interpolate(upper_left.getY(), upper_right.getY(), low_x);
+			float l_y = interpolate(upper_left.getY(), bottom_left.getY(), low_x);
+			float d_y = interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
+
+			return (u_y + l_y + d_y) / 3.0;
+
+		} else if (low_x < low_z) {		// Lower Triangle
+
+			Vec3 upper_right(&data[3 * x_idx*divisions + 3 * z_idx + 3]);
+			Vec3 bottom_left(&data[3 * x_idx*divisions + 3 * z_idx + 3 * divisions]);
+			Vec3 bottom_right(&data[3 * x_idx*divisions + 3 * z_idx + 3 * divisions + 3]);
+
+			float segment_len = (Vec2(upper_right.getX(), upper_right.getZ())
+				- Vec2(x_index, z_index)).getMagnitude();
+			float total_len = (Vec2(upper_right.getX(), upper_right.getZ())
+				- Vec2(bottom_left.getX(), bottom_left.getZ())).getMagnitude();
+
+			float r_y = (1.0f - low_x) * upper_right.getY() + low_x * bottom_right.getY();
+			float b_y = (1.0f - low_z) * bottom_left.getY() + low_z * bottom_right.getY();
+			float d_y = interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
+			return (d_y + r_y + b_y) / 3.0;
+
+		} else {						// On the line
+			Vec3 upper_right(&data[3 * x_idx*divisions + 3 * z_idx + 3]);
+			Vec3 bottom_left(&data[3 * x_idx*divisions + 3 * z_idx + 3 * divisions]);
+
+			float segment_len = (Vec2(upper_right.getX(), upper_right.getZ())
+				- Vec2(x_index, z_index)).getMagnitude();
+			float total_len = (Vec2(upper_right.getX(), upper_right.getZ())
+				- Vec2(bottom_left.getX(), bottom_left.getZ())).getMagnitude();
+
+			return interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
+		}
 	}
 
 	return 0.0;
