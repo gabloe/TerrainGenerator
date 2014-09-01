@@ -12,7 +12,7 @@ void main(void) {
 	vec3 V = (translate * vec4(v_Position,1.0)).xyz;
 	vec3 N = vec4(normalize(v_Normal),1.0).xyz;
 
-	vec3 L = normalize(camera + V);
+	vec3 L = normalize(camera);
 	vec3 E = normalize(-V);
 	vec3 R = normalize(reflect(-L,N));
 
