@@ -276,6 +276,30 @@ void print() {
 	printf("OpenGL Vendor: %s\n", glGetString(GL_VERSION));
 }
 
+float getHeight(RenderObject &ground) {
+	
+	const GLfloat *data = ground.getRawData();
+
+	float x = Camera.getX();
+	float z = Camera.getZ();
+
+	std::cout << "x:" << x << ", z: " << z << std::endl;
+
+	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
+	float del = abs(2 * data[0]) / divisions;
+
+	int x_index = (x - data[0]) / del;
+	int z_index = (z - data[0]) / del;
+
+	std::cout << x_index << ", " << z_index << std::endl;
+
+	if (x_index < divisions && z_index < divisions ) {
+		return data[3 * (divisions * x_index + z_index) + 2];
+	}
+
+	return 0.0;
+}
+
 //////////////////////////////////////////////
 //					Main					//
 //////////////////////////////////////////////
@@ -309,23 +333,23 @@ int main(int argc, char** args)
 	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions);
 	GLuint *indices = generateIndices(divisions);
 
-	std::list<RenderObject> objs;
-	objs.insert(
-		objs.end(),
-		RenderObject(shader, ground_data, number_vertices, indices, number_indicies)
-		);
+	RenderObject ground(shader, ground_data, number_vertices, indices, number_indicies);
 
-	delete ground_data;
+	std::list<RenderObject> objs;
+
 	delete indices;
 
 	double duration = 0;
 
 	update();
+	Camera =  Vec3(Camera.getX(), getHeight(ground), Camera.getZ());
 
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
 		// Clear everything on the screen
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+		ground.render(ProjectionMatrix, TranslateMatrix, Camera);
 
 		// for objects to be rendered
 		for (RenderObject obj : objs) {
@@ -336,12 +360,16 @@ int main(int argc, char** args)
 		glfwPollEvents();
 
 		duration += glfwGetTime();
-		if (duration > 0.5) {
+		if (duration > 1000.0/60.0) {
 			update();
 			duration = 0;
+			float y = getHeight(ground);
+			std::cout << "Height: " << y << std::endl;
+			Camera = Vec3(Camera.getX(), y , Camera.getZ());
 		}
 
 	}
+	delete ground_data;
 
 	glfwDestroyWindow(window);
 	glfwTerminate();

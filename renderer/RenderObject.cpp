@@ -85,7 +85,7 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 
 	_number_vertices = number_vertices;
 	_number_indices = number_indices;
-
+	_raw_data = vertices;
 	GLfloat *normals = computeNormals(vertices, number_vertices, indices, number_indices);
 
 	// Copy over the position data
@@ -151,6 +151,12 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 }
 
 RenderObject::~RenderObject() {}
+
+int RenderObject::getNumberVertices() const {
+	return _number_vertices;
+}
+
+const GLfloat *RenderObject::getRawData() const { return _raw_data; }
 
 void RenderObject::render(const Mat4 &projection, const Mat4& translate, const Vec3 &camera) {
 	// Load the shader program
