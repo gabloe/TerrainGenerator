@@ -434,17 +434,19 @@ int main(int argc, char** args)
 		if (duration > 1000.0/60.0) {
 			update();
 			duration = 0;
+			y = getHeight(ground)+heightOffset;
+// TODO: Make this smooth
+/*
 			if (oldPos.getX() != Camera.getX() && oldPos.getZ() != Camera.getZ()) {
 				float tmp = getHeight(ground)+heightOffset;
-             	if (tmp > y)
+             			if (tmp > y - 0.5)
 					y+=0.5;
-				else if (tmp < y)
+				else if (tmp < y + 0.5)
 					y-=0.5;
-				else
-					y=tmp;
 				oldPos = Vec3(Camera.getX(), 0, Camera.getZ());
 			}
 			//std::cout << "Height: " << y << std::endl;
+*/
 			Camera = Vec3(Camera.getX(), y , Camera.getZ());
 		}
 
