@@ -48,21 +48,19 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 		Vec3 p2(vertices + i2);
 		Vec3 p3(vertices + i3);
 
-		Vec3 N1 = meanWeightEqual(p1, p2, p3);
-		Vec3 N2 = meanWeightEqual(p2, p3, p1);
-		Vec3 N3 = meanWeightEqual(p3, p1, p2);
+		Vec3 N = meanWeightEqual(p1, p2, p3);
 
-		normals[i1 + 0] += N1.getX();
-		normals[i1 + 1] += N1.getY();
-		normals[i1 + 2] += N1.getZ();
+		normals[i1 + 0] += N.getX();
+		normals[i1 + 1] += N.getY();
+		normals[i1 + 2] += N.getZ();
 
-		normals[i2 + 0] += N2.getX();
-		normals[i2 + 1] += N2.getY();
-		normals[i2 + 2] += N2.getZ();
+		normals[i2 + 0] += N.getX();
+		normals[i2 + 1] += N.getY();
+		normals[i2 + 2] += N.getZ();
 
-		normals[i3 + 0] += N3.getX();
-		normals[i3 + 1] += N3.getY();
-		normals[i3 + 2] += N3.getZ();
+		normals[i3 + 0] += N.getX();
+		normals[i3 + 1] += N.getY();
+		normals[i3 + 2] += N.getZ();
 
 	}
 	return normals;
