@@ -28,10 +28,10 @@
 #endif
 
 // Position Data
-Vec3 Camera(4, 120, -128);
+Vec3 Camera(4.50184, 120.615, -138.001);
 
-double horizontalAngle = 87.92;
-double verticalAngle = -0.63;
+double horizontalAngle = 87.45;
+double verticalAngle = -1.0;
 double initialiFOV = 45.0;
 float initial_speed = 0.25f;
 float mouseSpeed = 0.0005f;
