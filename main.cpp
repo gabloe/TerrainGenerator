@@ -131,7 +131,7 @@ GLuint* generateIndices(int div) {
 }
 
 bool shift_down = false;
-
+bool enable_flying = false;
 bool handleKey(int key, int check_key) {
 	if (key == check_key) return true;
 	return glfwGetKey(window, check_key) != GLFW_RELEASE;
@@ -198,6 +198,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		if (key == GLFW_KEY_P) {
 			mode = (mode + 1) % 2;
 			glPolygonMode(GL_FRONT_AND_BACK, MODES[mode]);
+		}
+
+		if (key == GLFW_KEY_SPACE) {
+			enable_flying = !enable_flying;
 		}
 	}
 }
@@ -294,7 +298,9 @@ Vec3 getAsVec3(const GLfloat *data, int x, int y, int div) {
 }
 
 float getHeight(RenderObject &ground) {
-	
+	if (enable_flying) {
+		return Camera.getY();
+	}
 	// Get ground data
 	const GLfloat *data = ground.getRawData();
 
@@ -326,7 +332,7 @@ float getHeight(RenderObject &ground) {
 		std::cout << "LowZ: " << low_z << std::endl;
 
 		// If we are in the upper triange...
-		if ( low_x < low_z ) {			// Upper Triangle
+		if ( low_x > low_z ) {			// Upper Triangle
 			std::cout << "Case1" << std::endl;
 			Vec3 upper_left = getAsVec3(data, x_idx, z_idx, divisions);
 			Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
@@ -343,7 +349,7 @@ float getHeight(RenderObject &ground) {
 
 			return (u_y + l_y + d_y) / 3.0f;
 			//return u_y;
-		} else if (low_x > low_z) {		// Lower Triangle
+		} else if (low_x < low_z) {		// Lower Triangle
 			std::cout << "Case2" << std::endl;
 			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
 			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
@@ -416,9 +422,9 @@ int main(int argc, char** args)
 
 	std::list<RenderObject> objs;
 
-	delete indices;
-
 	double duration = 0;
+
+	Camera = Vec3(Camera.getX(), getHeight(ground), Camera.getZ());
 
 	update();
 
@@ -451,11 +457,13 @@ int main(int argc, char** args)
 					y-=0.5;
 				oldPos = Vec3(Camera.getX(), 0, Camera.getZ());
 			}
-			//std::cout << "Height: " << y << std::endl;
-*/
+			//std::cout << "Height: " << y << std::endl; */
+			Camera = Vec3(Camera.getX(),getHeight(ground), Camera.getZ());
 		}
 
 	}
+
+	delete indices;
 	delete ground_data;
 
 	glfwDestroyWindow(window);
