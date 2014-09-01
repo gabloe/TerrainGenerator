@@ -38,6 +38,8 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 	GLfloat *normals = new GLfloat[number_vertices];
 	memset(normals, 0, sizeof(GLfloat)* number_vertices);
 
+	GLfloat *divisors = new GLfloat[number_vertices/3];
+
 	for (int i = 0; i < number_indices; i += 3) {
 
 		int i1 = 3 * indices[i + 0];
@@ -48,21 +50,31 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 		Vec3 p2(vertices + i2);
 		Vec3 p3(vertices + i3);
 
-		Vec3 N = meanWeightEqual(p1, p2, p3);
-
+		Vec3 N = (p1 - p2).cross(p1 - p3);
+		
 		normals[i1 + 0] += N.getX();
 		normals[i1 + 1] += N.getY();
 		normals[i1 + 2] += N.getZ();
+		divisors[i1 / 3] += N.getMagnitude();
 
 		normals[i2 + 0] += N.getX();
 		normals[i2 + 1] += N.getY();
 		normals[i2 + 2] += N.getZ();
+		divisors[i2 / 3] += N.getMagnitude();
 
 		normals[i3 + 0] += N.getX();
 		normals[i3 + 1] += N.getY();
 		normals[i3 + 2] += N.getZ();
-
+		divisors[i3 / 3] += N.getMagnitude();
 	}
+
+	for (int i = 0; i < number_vertices; i += 3) {
+		normals[i+1] /= divisors[i / 3];
+		normals[i+1] /= divisors[i / 3];
+		normals[i+2] /= divisors[i / 3];
+	}
+
+	delete divisors;
 	return normals;
 }
 
