@@ -38,6 +38,16 @@ Vec3 Vec3::operator+(const Vec3 &rhs) const {
 		);
 }
 
+Vec3 &Vec3::operator+=(const Vec3 &rhs) {
+	for (int i = 0; i < 3; ++i) v[i] += rhs.v[i];
+	return *this;
+}
+
+Vec3 &Vec3::operator-=(const Vec3 &rhs) {
+	for (int i = 0; i < 3; ++i) v[i] -= rhs.v[i];
+	return *this;
+}
+
 Vec3 Vec3::operator-(const Vec3 &rhs) const {
 	return Vec3(
 		getX() - rhs.getX(),

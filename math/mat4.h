@@ -29,6 +29,7 @@ public:
 	void rotateX(float del);
 	void rotateY(float del);
 	void rotateZ(float del);
+	void rotate(float, float, float);
 
 	void moveX(float dist) { m[12] += dist; }
 	void moveY(float dist) { m[13] += dist; }
@@ -39,6 +40,9 @@ public:
 	static Mat4 RotateX(float);
 	static Mat4 RotateY(float);
 	static Mat4 RotateZ(float);
+
+	static Mat4 Rotate(float,float,float);
+
 	static Mat4 Perspective(float fov, float aspect, float near, float far);
 	static Mat4 LookAt(const Vec3&, const Vec3&, const Vec3&);
 

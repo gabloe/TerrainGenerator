@@ -28,10 +28,16 @@
 #endif
 
 // Position Data
-const Vec3 Camera(0, 1, 1);
-const Vec3 Origin(0, 0, 0);
-const Vec3 Up(0, 1, 0);
+Vec3 Camera(0, 1, 1);
+Vec3 Origin(0, 0, 0);
+Vec3 Up(0, 1, 0);
 Mat4 TranslateMatrix = Mat4::LookAt(Camera, Origin, Up);
+
+float horizontalAngle = 3.14159265f;
+float verticalAngle= 0.0f;
+float initialiFOV = 45.0f;
+float speed = 0.1f;
+float mouseSpeed = 0.0005f;
 
 // The window and related data
 static GLFWwindow *window;
@@ -126,35 +132,42 @@ bool handleKey(int key, int check_key) {
 }
 
 void checkKeys() {
+
+	double cur_x, cur_y;
+	glfwGetCursorPos(window, &cur_x, &cur_y);
+	glfwSetCursorPos(window, width / 2, height / 2);
+
+	horizontalAngle += mouseSpeed * float(width * 0.5 - cur_x);
+	verticalAngle += mouseSpeed * (height * 0.5 - cur_y);
+
+	float x = speed * cos(verticalAngle) * sin(horizontalAngle);
+	float y = speed * sin(verticalAngle);
+	float z = speed * cos(verticalAngle) * cos(horizontalAngle);
+
 	float scale = 0.1;
 	if (shift_down) {
 		scale = 1.0;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_UP) != GLFW_RELEASE) {
-		TranslateMatrix.rotateX(0.0174532925f * (scale * 0.2f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_DOWN) != GLFW_RELEASE) {
-		TranslateMatrix.rotateX(0.0174532925f * (scale * -0.2f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT) != GLFW_RELEASE) {
-		TranslateMatrix.rotateY(0.0174532925f * (scale * 0.2f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) != GLFW_RELEASE) {
-		TranslateMatrix.rotateY(0.0174532925f * (scale * -0.2f));
-	}
+	Vec3 direction(x, y, z);
+	Vec3 right(speed * sin(horizontalAngle- 3.14159265f * 0.5f), 0.0, speed * cos(horizontalAngle - 3.14159265f * 0.5f));
+	Vec3 up = right.cross(direction);
+
 	if (glfwGetKey(window, GLFW_KEY_W) != GLFW_RELEASE) {
-		TranslateMatrix.moveZ(scale * 5.0f);
+		Camera += direction;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) != GLFW_RELEASE) {
-		TranslateMatrix.moveZ(scale * -5.0f);
+		Camera -= direction;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) != GLFW_RELEASE) {
-		TranslateMatrix.moveX(scale * -0.5f);
+		Camera += right;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) != GLFW_RELEASE) {
-		TranslateMatrix.moveX(scale * 0.5f);
+		Camera -= right;
 	}
+
+	TranslateMatrix = Mat4::LookAt(Camera, Camera + direction, up);
+
 }
 
 //////////////////////////////////////////////
@@ -175,13 +188,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			glPolygonMode(GL_FRONT_AND_BACK, MODES[mode]);
 		}
 	}
-}
-
-static void mousepos_callback(GLFWwindow *window, double x, double y) {
-	TranslateMatrix.rotateX(-10.0f * 0.0174532925f * (float)y / height);
-	TranslateMatrix.rotateY(-10.0f * 0.0174532925f * (float)x / width);
-	// Reset to the center
-	glfwSetCursorPos(window, 0, 0);
 }
 
 void resized_callback(GLFWwindow *window, int w, int h) {
@@ -226,7 +232,6 @@ void init() {
 	// Set callbacks for GLFW, window, keyboard, and mouse
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetWindowSizeCallback(window, resized_callback);
-	glfwSetCursorPosCallback(window, mousepos_callback);
 
 	// Disable the mouse so that we can lookaround
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

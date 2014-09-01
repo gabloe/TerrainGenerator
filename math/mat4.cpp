@@ -113,6 +113,11 @@ void Mat4::rotateZ(float angle) {
 	*this = *this * t;
 }
 
+void Mat4::rotate(float x, float y, float z) {
+	Mat4 t = Mat4::Rotate(x,y,z);
+	*this = *this * t;
+}
+
 Vec3 normalize(const Vec3& other) {
 	float div = other * other;
 	return Vec3(other.getX() / div, other.getY() / div, other.getZ() / div);
@@ -193,6 +198,32 @@ Mat4 Mat4::RotateZ(float x) {
 	return ret;
 }
 
+Mat4 Mat4::Rotate(float x, float y, float z) {
+	float cx = cos(x);
+	float cy = cos(y);
+	float cz = cos(z);
+
+	float sx = sin(x);
+	float sy = sin(y);
+	float sz = sin(z);
+
+	return Mat4(
+		cy * cz,
+			-cy * sz,
+			sy,
+			0.0,
+		sx * sy * cz - cx * sz,
+			-sx * sy * sz + cx * cz,
+			-sx * cy,
+			0.0,
+		-cx * sy * cz + sx * sz,
+			cx * sy * sz + sx * cz,
+			cx * cy,
+			0.0,
+		0.0, 0.0, 1.0, 0.0
+	);
+
+}
 // Print
 std::ostream& operator<<(std::ostream& os, Mat4& obj) {
 	for (int i = 0; i < 4; i++)
