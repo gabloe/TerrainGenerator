@@ -14,17 +14,19 @@ void main(void) {
 
 	gl_Position = projection * translate * vec4(v_Position,1.0);
 
-	vec3 LightPosition = vec3(0.0,-100.0,0.0);
-        float distance = length(vec3(LightPosition - camera));
+	vec3 LightPosition = vec3(0.0,-1000.0,0.0);
+        vec3 cameraToVertex = V - camera;
+        float distance = length(cameraToVertex);
 	vec3 L = normalize(LightPosition - camera);
 	vec3 E = normalize(-V);
 	vec3 R = normalize(reflect(-L,N));
 
-	float attenuation = 200.0 / distance;
+	float attenuation = clamp(100.0 / distance, 0.0, 1.0);
 
-	vec3 ambient	= vec3(0.0,0.0,0.0); // vec4(0.5, 0.0, 0.0, 1.0);
+	vec3 ambient	= vec3(0.2,0.1,0.1); // vec4(0.5, 0.0, 0.0, 1.0);
 	vec3 diffuse	= clamp(vec3(0.5, 0.5, 0.5) * max(dot(-N,L), 0.0), 0.0, 1.0);
-	vec3 specular	= clamp(vec3(0.0, 0.0, 0.20) * pow(max(dot(R,E),0.0), 0.5 ), 0.0, 1.0);
+	vec3 specular	= clamp(vec3(0.62, 0.32, 0.17) * pow(max(dot(R,E),0.0), 0.5 ), 0.0, 1.0);
 
-	color = attenuation * (ambient + diffuse + specular);
+	color = ambient + diffuse + specular;
+        color = attenuation * color;
 }
