@@ -261,7 +261,7 @@ void init() {
 	// The background color should be a 
 	// nice light blue color
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 }
 
 // Just prints OpenGL information
