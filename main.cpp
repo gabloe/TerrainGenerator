@@ -40,8 +40,8 @@ float mouseSpeed = 0.0005f;
 static GLFWwindow *window;
 static float height = 768, width = 1024;
 
-const float znear = -10.0f;
-const float zfar = 10.0f;
+const float znear = -1.0;
+const float zfar = 1.0f;
 
 Mat4 TranslateMatrix;
 Mat4 ProjectionMatrix = Mat4::Perspective(90.0f, (float)width / (float)height, znear, zfar);
@@ -261,7 +261,8 @@ void init() {
 	// The background color should be a 
 	// nice light blue color
 	glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 }
 
 // Just prints OpenGL information
@@ -301,7 +302,7 @@ int main(int argc, char** args)
 	glfwGetFramebufferSize(window, &width, &height);
 
 
-	const int divisions = 25;
+	const int divisions = 15;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
 	const float size = 100.0f;
