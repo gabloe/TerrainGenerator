@@ -93,6 +93,7 @@ Vec3 Vec3::clone() const {
 	return Vec3(getX(), getY(), getZ());
 }
 
+// Correct : Validated
 Vec3 Vec3::cross(const Vec3 &b) const {
 	return Vec3(
 		getY() * b.getZ() - getZ()*b.getY(),

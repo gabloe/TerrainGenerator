@@ -164,9 +164,7 @@ Mat4 Mat4::LookAt(const Vec3 &eye, const Vec3 &center, const Vec3 &up) {
 
 	ret.m[12] = -(s * eye);
 	ret.m[13] = -(u * eye);
-	ret.m[14] = -(f * eye);
-
-	ret.m[15] = 0;
+	ret.m[14] = (f * eye);
 
 	return ret;
 }

@@ -28,16 +28,14 @@
 #endif
 
 // Position Data
-Vec3 Camera(0, 1, 1);
-Vec3 Origin(0, 0, 0);
-Vec3 Up(0, 1, 0);
+Vec3 Camera(0, 0, 5);
 
 Mat4 TranslateMatrix;
 
-float horizontalAngle = 3.14159265f;
+float horizontalAngle = 0.0;
 float verticalAngle= 0.0f;
 float initialiFOV = 45.0f;
-float speed = 0.1f;
+float speed = 1.0f;
 float mouseSpeed = 0.0005f;
 
 // The window and related data
@@ -132,14 +130,14 @@ bool handleKey(int key, int check_key) {
 	return glfwGetKey(window, check_key) != GLFW_RELEASE;
 }
 
-void checkKeys() {
+void update() {
 
-	double cur_x, cur_y;
-	glfwGetCursorPos(window, &cur_x, &cur_y);
+	double xpos,ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
 	glfwSetCursorPos(window, width / 2, height / 2);
 
-	horizontalAngle += mouseSpeed * float(width * 0.5f - cur_x);
-	verticalAngle += mouseSpeed * (height * 0.5f - cur_y);
+	horizontalAngle += mouseSpeed * (width * 0.5f - xpos);
+	verticalAngle	+= mouseSpeed *float(height * 0.5f - ypos);
 
 	Vec3 direction(
 		cos(verticalAngle) * sin(horizontalAngle),
@@ -155,16 +153,16 @@ void checkKeys() {
 	Vec3 up = right.cross(direction);
 
 	if (glfwGetKey(window, GLFW_KEY_W) != GLFW_RELEASE) {
-		Camera -= direction;
+		Camera += direction * speed;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) != GLFW_RELEASE) {
-		Camera += direction;
+		Camera -= direction * speed;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) != GLFW_RELEASE) {
-		Camera += right;
+		Camera += right * speed;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) != GLFW_RELEASE) {
-		Camera -= right;
+		Camera -= right * speed;
 	}
 
 	TranslateMatrix = Mat4::LookAt(Camera, Camera + direction, up);
@@ -268,10 +266,7 @@ void print() {
 int main(int argc, char** args)
 {
 	init(); print();
-	// Backup a lot
-	TranslateMatrix.moveZ(-1000.0f);
-
-
+	
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
@@ -290,7 +285,7 @@ int main(int argc, char** args)
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 
-	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)height / (float)width, -0.1f, 100.0f);
+	const Mat4 ProjectionMatrix = Mat4::Perspective(45.0f, (float)width / (float)height, -0.1f, 100.0f);
 
 	const int divisions = 50;
 	const int number_vertices = 3 * divisions * divisions;
@@ -310,7 +305,7 @@ int main(int argc, char** args)
 
 	double duration = 0;
 
-	checkKeys();
+	update();
 
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
@@ -327,7 +322,7 @@ int main(int argc, char** args)
 
 		duration += glfwGetTime();
 		if (duration > 0.5) {
-			checkKeys();
+			update();
 			duration = 0;
 		}
 
