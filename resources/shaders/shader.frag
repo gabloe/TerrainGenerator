@@ -2,6 +2,7 @@
 
 out vec4 colorOut;
 
+
 in vec3 color;
 
 void main(void) {
