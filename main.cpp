@@ -29,7 +29,7 @@
 #endif
 
 // Position Data
-Vec3 Camera(4.50184f, 120.615f, -138.001f);
+Vec3 Camera(0.0f, 200.0f, 0.0f);
 
 double horizontalAngle = 87.45;
 double verticalAngle = -1.0;
@@ -294,10 +294,13 @@ float interpolate(float min, float max, float alpha) {
 }
 
 Vec3 getAsVec3(const GLfloat *data, int x, int y, int div) {
-	return Vec3(&data[3*(x * div + y)]);
+	return Vec3(data + 3*(x * div + y));
 }
 
 float getHeight(RenderObject &ground) {
+	static int count = -1;
+
+	count = (count + 1) % 100;
 	if (enable_flying) {
 		return Camera.getY();
 	}
@@ -308,18 +311,26 @@ float getHeight(RenderObject &ground) {
 	float x = Camera.getX();
 	float z = Camera.getZ();
 
+	if (count == 0) {
+		std::cout << "Position: " << x << ", " << z << std::endl;
+	}
+
 	// Guess the number of divisions
 	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
 
 	// Guess the deltas
-	float del = abs(2 * data[0]) / divisions;
+	float del = abs(2.0f * data[0]) / divisions;
 
 	// x and z position index
-	float x_index = (x - data[0] + del / 2.0f) / del;
-	float z_index = (data[2] - z + del / 2.0f) / del;
+	float x_index = 0.5 * divisions - (x) / del;
+	float z_index = 0.5 * divisions + (z) / del;
+
+	if (count == 0) {
+		std::cout << "Indices: " << x_index << ", " << z_index << std::endl;
+	}
 
 	// If we are on the ground
-	if (x_index < divisions && z_index < divisions ) {
+	if (x_index > 0 && x_index < divisions && z_index > 0 && z_index < divisions ) {
 		// Get real index
 		int x_idx = int(x_index);
 		int z_idx = int(z_index);
@@ -328,12 +339,13 @@ float getHeight(RenderObject &ground) {
 		float low_x = x_index - x_idx;
 		float low_z = z_index - z_idx;
 
-		std::cout << "LowX: " << low_x << std::endl;
-		std::cout << "LowZ: " << low_z << std::endl;
+		if (count == 0) {
+			std::cout << "LowX: " << low_x << std::endl;
+			std::cout << "LowZ: " << low_z << std::endl;
+		}
 
 		// If we are in the upper triange...
-		if ( low_x > low_z ) {			// Upper Triangle
-			std::cout << "Case1" << std::endl;
+		if ( low_x < low_z ) {			// Upper Triangle
 			Vec3 upper_left = getAsVec3(data, x_idx, z_idx, divisions);
 			Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
 			Vec3 bottom_left = getAsVec3(data, x_idx + 1, z_idx, divisions);
@@ -347,10 +359,17 @@ float getHeight(RenderObject &ground) {
 			float l_y = interpolate(upper_left.getY(), bottom_left.getY(), low_x);
 			float d_y = interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
 
-			return (u_y + l_y + d_y) / 3.0f;
+			float result = (u_y + l_y + d_y) / 3.0f;
+
+			if (count == 0){
+				std::cout << "Case1" << std::endl;
+				std::cout << "Result: " << result << std::endl << std::endl;
+			}
+
+			return result;
 			//return u_y;
-		} else if (low_x < low_z) {		// Lower Triangle
-			std::cout << "Case2" << std::endl;
+		}
+		else if (low_x > low_z) {		// Lower Triangle
 			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
 			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
 			Vec3 bottom_right = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);
@@ -364,22 +383,46 @@ float getHeight(RenderObject &ground) {
 			float b_y = (1.0f - low_z) * bottom_left.getY() + low_z * bottom_right.getY();
 			float d_y = interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
 
-			return (d_y + r_y + b_y) / 3.0f;
+			float result = (d_y + r_y + b_y) / 3.0f;
+
+			if (count == 0){
+				std::cout << "Case2" << std::endl;
+				std::cout << "Result: " << result << std::endl << std::endl;
+			}
+
+			return result;
 
 		} else {						// On the line
-			std::cout << "Case3" << std::endl;
-			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
-			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
 
-			float segment_len = (Vec2(upper_right.getX(), upper_right.getZ())
-				- Vec2(x_index, z_index)).getMagnitude();
-			float total_len = (Vec2(upper_right.getX(), upper_right.getZ())
-				- Vec2(bottom_left.getX(), bottom_left.getZ())).getMagnitude();
+			float result;
+			if (x_index == z_index) {
+				result = getAsVec3(data, x_idx, z_idx, divisions).getY();
+			}
+			else{
+				Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
+				Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
 
-			return interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
+				float segment_len = (Vec2(upper_right.getX(), upper_right.getZ())
+					- Vec2(x_index, z_index)).getMagnitude();
+				float total_len = (Vec2(upper_right.getX(), upper_right.getZ())
+					- Vec2(bottom_left.getX(), bottom_left.getZ())).getMagnitude();
+
+				result = interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
+			}
+			if (count == 0){
+				std::cout << "Case3" << std::endl;
+				std::cout << "Result: " << result << std::endl << std::endl;
+			}
+
+
+			return result;
 		}
 	}
 
+	if (count == 0) {
+		std::cout << "Not over ground" << std::endl;
+		std::cout << "Indices: " << x_index << ", " << z_index << std::endl << std::endl;
+	}
 	// Not on the ground
 	return 0.0;
 }
@@ -411,7 +454,7 @@ int main(int argc, char** args)
 
 
 	//const int divisions = 100;
-	const int divisions = 16;
+	const int divisions = 8;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
 	const float size = 1000.0f;
