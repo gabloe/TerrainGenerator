@@ -32,9 +32,9 @@
 Vec3 Camera(0.0f, 200.0f, 0.0f);
 
 double horizontalAngle = 0.0f;
-double verticalAngle = -1.57079632679f;
+double verticalAngle = -0.78539816339f;
 double initialiFOV = 45.0;
-float initial_speed = 0.5f;
+float initial_speed = 0.05f;
 float mouseSpeed = 0.0005f;
 
 // The window and related data
@@ -42,7 +42,7 @@ static GLFWwindow *window;
 static float height = 768, width = 1024;
 
 const float znear	=  0.1f;
-const float zfar	= 100.0f;
+const float zfar	= 1000.0f;
 
 Mat4 TranslateMatrix;
 Mat4 ProjectionMatrix = Mat4::Perspective(90.0f, (float)width / (float)height, znear, zfar);
@@ -151,7 +151,7 @@ void update() {
 
 	float speed = initial_speed;
 	if (shift_down) {
-		speed = 3.5;
+		speed = 1.0f;
 	}
 
 	double xpos,ypos;
@@ -308,9 +308,7 @@ Vec3 getAsVec3(const GLfloat *data, int x, int y, int div) {
 }
 
 float getHeight(RenderObject &ground) {
-	static int count = -1;
-
-	count = (count + 1) % 100;
+	
 	if (enable_flying) {
 		return Camera.getY();
 	}
@@ -328,15 +326,8 @@ float getHeight(RenderObject &ground) {
 	float del = abs(2.0f * data[0]) / (divisions-1);
 
 	// x and z position index
-	float x_index = 0.5 * (divisions-1) - (x) / del;
-	float z_index = 0.5 * (divisions-1) - (z) / del;
-
-	if (count == 0) {
-		std::cout << "Position: " << Camera << std::endl;
-		std::cout << "Divisions: " << divisions << std::endl;
-		std::cout << "Delta: " << del << std::endl;
-		std::cout << "Indices: " << x_index << ", " << z_index << std::endl;
-	}
+	float x_index = 0.5f * (divisions-1.0f) - x / del;
+	float z_index = 0.5f * (divisions-1.0f) - z / del;
 
 	// If we are on the ground
 	if (x_index > 0 && x_index < divisions && z_index > 0 && z_index < divisions ) {
@@ -348,55 +339,22 @@ float getHeight(RenderObject &ground) {
 		float low_x = x_index - x_idx;
 		float low_z = z_index - z_idx;
 
-		if (count == 0) {
-
-			std::cout << "x_idx: " << x_idx << std::endl;
-			std::cout << "z_idx: " << z_idx << std::endl;
-
-			std::cout << "LowX: " << low_x << std::endl;
-			std::cout << "LowZ: " << low_z << std::endl;
-		}
-
 		float result;
 
 		// If we are in the upper triange...
 		if ( low_x < low_z ) {			// Upper Triangle
-			
-			if (count == 0) {
-				std::cout << "Case 1" << std::endl;
-			}
-
 			Vec3 upper_left = getAsVec3(data, x_idx, z_idx, divisions);
 			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
 			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
-
-			if (count == 0) {
-				std::cout << "ul: " << upper_left << ", ur: " << upper_right << ", bl: " << bottom_left << std::endl;
-			}
 			result = getY(upper_left, upper_right, bottom_left, x, z);
 		}
 		else if (low_x > low_z) {		// Lower Triangle
-			if (count == 0) {
-				std::cout << "Case 2" << std::endl;
-			}
-
 			Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
 			Vec3 bottom_left = getAsVec3(data, x_idx + 1, z_idx, divisions);
 			Vec3 bottom_right = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);
-
-			if (count == 0) {
-				std::cout << "ur: " << upper_right << ", bl: " << bottom_left << ", br: " << bottom_right << std::endl;
-			}
-
 			result = getY(bottom_right, upper_right, bottom_left, x, z);
 		} else {						// On the line
-
-			if (count == 0){
-				std::cout << "Case3" << std::endl;
-			}
-
 			if (x_index == x_idx) {
-				std::cout << "here?" << std::endl;
 				result = getAsVec3(data, x_idx, z_idx, divisions).getY();
 			} else{
 				Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
@@ -412,19 +370,10 @@ float getHeight(RenderObject &ground) {
 			}
 
 		}
-
-		if (count == 0){
-			std::cout << "Result: " << result << std::endl << std::endl;
-		}
 		return result + 20;
 	}
-
-	if (count == 0) {
-		std::cout << "Not over ground" << std::endl;
-		std::cout << "Indices: " << x_index << ", " << z_index << std::endl << std::endl;
-	}
 	// Not on the ground
-	return 0.0;
+	return 100.0f;
 }
 
 //////////////////////////////////////////////
@@ -454,7 +403,7 @@ int main(int argc, char** args)
 
 
 	//const int divisions = 100;
-	const int divisions = 8;
+	const int divisions = 16;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
 	const float size = 1000.0f;
