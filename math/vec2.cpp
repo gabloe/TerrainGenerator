@@ -42,6 +42,21 @@ float Vec2::operator*(const Vec2& rhs) const {
 		);
 }
 
+
+Vec2 &Vec2::operator+=(const Vec2 &rhs) {
+	this->v[0] += rhs.getX();
+	this->v[1] += rhs.getY();
+	return *this;
+}
+
+Vec2 &Vec2::operator-=(const Vec2 &rhs) {
+	this->v[0] -= rhs.getX();
+	this->v[1] -= rhs.getY();
+	return *this;
+}
+
+
+
 float Vec2::getMagnitude() const {
 	float sum = v[0] * v[0] + v[1] * v[1];
 	return sqrt(sum);

@@ -41,8 +41,8 @@ float mouseSpeed = 0.0005f;
 static GLFWwindow *window;
 static float height = 768, width = 1024;
 
-const float znear	=  1.0f;
-const float zfar	= -1.0f;
+const float znear	=  0.1f;
+const float zfar	= 100.0f;
 
 Mat4 TranslateMatrix;
 Mat4 ProjectionMatrix = Mat4::Perspective(90.0f, (float)width / (float)height, znear, zfar);
@@ -84,12 +84,20 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
 			//data[pos + 1] = (float)simplex2d( x , z ,7,2.323f)/10;
-			//data[pos + 1] = 50 * (rand() / float(RAND_MAX));
-			data[pos + 1] = z/4.0;
+			data[pos + 1] = 50 * (rand() / float(RAND_MAX));
+			//data[pos + 1] = z/4.0;
 			data[pos + 2] = z;
 		}
 	}
 	return data;
+}
+
+float getY(const Vec3 &A, const Vec3 &B, const Vec3 &C, float x, float z) {
+	Vec3 Normal = (C - A).cross(B - A);
+	Normal.normalize();
+	if (Normal.getY() == 0.0) return A.getY();
+	float d = -(A * Normal);
+	return -(Normal.getX() * x + Normal.getZ() * z + d) / Normal.getY();
 }
 
 GLuint* generateIndices(int div) {
@@ -365,23 +373,13 @@ float getHeight(RenderObject &ground) {
 			if (count == 0) {
 				std::cout << "ul: " << upper_left << ", ur: " << upper_right << ", bl: " << bottom_left << std::endl;
 			}
-
-			Vec3 Normal = (upper_left - upper_right).cross(bottom_left - upper_right);
-			Normal.normalize();
-
-			if (Normal.getY() == 0.0f) {
-				result = upper_left.getY(); 
-			} else {
-				result = (Normal.getX() * (x - upper_right.getX()) + Normal.getZ() * (z - upper_right.getZ())) / -Normal.getY() + upper_right.getY();
-			}
-
+			result = getY(upper_left, upper_right, bottom_left, x, z);
 		}
 		else if (low_x > low_z) {		// Lower Triangle
 			if (count == 0) {
 				std::cout << "Case 2" << std::endl;
 			}
 
-			Vec3 pos(x, 0, z);
 			Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
 			Vec3 bottom_left = getAsVec3(data, x_idx + 1, z_idx, divisions);
 			Vec3 bottom_right = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);
@@ -390,16 +388,7 @@ float getHeight(RenderObject &ground) {
 				std::cout << "ur: " << upper_right << ", bl: " << bottom_left << ", br: " << bottom_right << std::endl;
 			}
 
-
-			Vec3 Normal = (bottom_right- upper_right).cross(bottom_left - upper_right);
-			Normal.normalize();
-
-			if (Normal.getY() == 0.0f) {
-				result = bottom_right.getY();
-			}
-			else {
-				result = (Normal.getX() * (x - upper_right.getX()) + Normal.getZ() * (z - upper_right.getZ())) / -Normal.getY() + upper_right.getY();
-			}
+			result = getY(bottom_right, upper_right, bottom_left, x, z);
 		} else {						// On the line
 
 			if (count == 0){
@@ -407,17 +396,19 @@ float getHeight(RenderObject &ground) {
 			}
 
 			if (x_index == x_idx) {
+				std::cout << "here?" << std::endl;
 				result = getAsVec3(data, x_idx, z_idx, divisions).getY();
 			} else{
-				Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
-				Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
+				Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
+				Vec3 bottom_left = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);
 
-				float segment_len = (Vec2(upper_right.getX(), upper_right.getZ())
-					- Vec2(x_index, z_index)).getMagnitude();
-				float total_len = (Vec2(upper_right.getX(), upper_right.getZ())
-					- Vec2(bottom_left.getX(), bottom_left.getZ())).getMagnitude();
+				Vec2 u(upper_right.getX(), upper_right.getZ());
+				Vec2 b(bottom_left.getX(), bottom_left.getZ());
 
-				result = interpolate(upper_right.getY(), bottom_left.getY(), segment_len / total_len);
+				float len = (u - Vec2(x, z)).getMagnitude();
+				float total = (u - b).getMagnitude();
+		
+				result = interpolate(upper_right.getY(), bottom_left.getY() , len / total);
 			}
 
 		}
@@ -425,7 +416,7 @@ float getHeight(RenderObject &ground) {
 		if (count == 0){
 			std::cout << "Result: " << result << std::endl << std::endl;
 		}
-		return result + 1;
+		return result + 20;
 	}
 
 	if (count == 0) {
@@ -496,7 +487,7 @@ int main(int argc, char** args)
 		glfwPollEvents();
 
 		duration += glfwGetTime();
-		if (duration > 2500.0/60.0) {
+		if (duration > 1000.0/20.0) {
 			update();
 			duration = 0;
 // TODO: Make this smooth

@@ -18,6 +18,9 @@ public:
 	Vec2 operator-(const Vec2 &rhs) const;
 	float operator*(const Vec2& rhs) const; // Dot Product
 
+	Vec2 &operator-=(const Vec2 &rhs);
+	Vec2 &operator+=(const Vec2 &rhs);
+
 	float getMagnitude() const;
 
 	Vec2 clone() const;
