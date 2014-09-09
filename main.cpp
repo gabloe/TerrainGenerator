@@ -381,7 +381,7 @@ float getHeight(RenderObject &ground) {
 
 		float result;
 		std::cout.precision(4);
-		// If we are in the upper triange...
+		// If we are in the upper triangle...
 		if ( low_x < low_z ) {			// Upper Triangle
 			Vec3 upper_left = getAsVec3(data, x_idx, z_idx, divisions);
 			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
