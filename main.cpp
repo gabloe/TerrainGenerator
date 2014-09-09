@@ -30,6 +30,8 @@
 #define GetCurrentDir getcwd
 #endif
 
+Vec3 p1, p2, p3;
+
 // Position Data
 Vec3 Camera(0.0f, 200.0f, 0.0f);
 
@@ -43,7 +45,7 @@ float mouseSpeed = 0.0005f;
 static GLFWwindow *window;
 static float height = 768, width = 1024;
 
-const float znear	=  0.1f;
+const float znear	=  0.01f;
 const float zfar	= 1000.0f;
 
 Mat4 TranslateMatrix;
@@ -77,7 +79,7 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 	float delta_z = z_len / (div-1);
 	float* data = (float*)calloc(3 * div * div, sizeof(float));
 
-	std::cout << "Delta: " << delta_x << std::endl;
+	//std::cout << "Delta: " << delta_x << std::endl;
 	
 	for (int i = 0; i < div; i++) { // z
 		float z = max_z - i * delta_z;
@@ -162,7 +164,7 @@ void update() {
 
 	float speed = initial_speed;
 	if (shift_down) {
-		speed = 4.0f;
+		speed = 0.5f;
 	}
 
 	double xpos,ypos;
@@ -335,14 +337,12 @@ float interpolate(float min, float max, float alpha) {
 }
 
 Vec3 getAsVec3(const GLfloat *data, int i, int j, int div) {
-	return Vec3(data + 3 * (i * div + j));
+	return Vec3(data + 3 * (j * div + i));
 }
 
 float getHeight(RenderObject &ground) {
 	
-	if (enable_flying) {
-		return Camera.getY();
-	}
+	float result = 80.0;
 
 	// Get ground data
 	const GLfloat *data = ground.getRawData();
@@ -353,8 +353,7 @@ float getHeight(RenderObject &ground) {
 		
 	// Guess the number of divisions
 	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
-	std::cout << "Divisions: " << divisions << std::endl;
-
+	
 	// Guess the deltas
 	float min_x = data[0];
 	float max_z = data[2];
@@ -365,66 +364,68 @@ float getHeight(RenderObject &ground) {
 	float x_index = (x - min_x) / del;
 	float z_index = (max_z - z) / del;
 
-	std::cout << "Position: " << Camera << std::endl;
-	std::cout << "x_index: " << x_index << ", z_index: " << z_index << std::endl;
+	//std::cout << "Position: " << Camera << std::endl;
+	//std::cout << "x_index: " << x_index << ", z_index: " << z_index << std::endl;
+
 	// If we are on the ground
 	if (x_index > 0 && x_index < divisions && z_index > 0 && z_index < divisions ) {
 		// Get real index
 		int x_idx = int(x_index);
 		int z_idx = int(z_index);
                 
-		std::cout << "x_idx: " << x_idx << ", z_idx: " << z_idx << std::endl;
+		//std::cout << "x_idx: " << x_idx << ", z_idx: " << z_idx << std::endl;
 
 		// Get inner point in the square
 		float low_x = x_index - x_idx;
 		float low_z = z_index - z_idx;
 
-		float result;
-		std::cout.precision(4);
+		//std::cout.precision(4);
 		// If we are in the upper triangle...
 		if ( low_x < low_z ) {			// Upper Triangle
-			Vec3 upper_left = getAsVec3(data, x_idx, z_idx, divisions);
-			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
-			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx - 1, divisions);
+			p1 = getAsVec3(data, x_idx, z_idx + 1, divisions);		// Upper left
+			p2 = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);	// Upper Right
+			p3 = getAsVec3(data, x_idx, z_idx, divisions);	// Bottom left
 
-			std::cout << "Case 1: [" << upper_left << "," << upper_right << "," << bottom_left << "]" << std::endl;
+			//std::cout << "Case 1: [" << p1 << "," << p2 << "," << p3 << "]" << std::endl;
 
-			result = getY(upper_left, upper_right, bottom_left, x, z);
+			result = getY(p1, p2, p3, x, z);
 		}
 		else if (low_x > low_z) {		// Lower Triangle
-			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
-			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx - 1, divisions);
-			Vec3 bottom_right = getAsVec3(data, x_idx + 1, z_idx - 1, divisions);
+			p1 = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);		// Upper right
+			p2 = getAsVec3(data, x_idx, z_idx, divisions);		// Bottom left
+			p3 = getAsVec3(data, x_idx + 1, z_idx, divisions);	// Bottom right
 
-			std::cout << "Case 2: [" << upper_right << "," << bottom_right << "," << bottom_left << "]" << std::endl;
+			//std::cout << "Case 2: [" << p1 << "," << p2 << "," << p3 << "]" << std::endl;
 
-			result = getY(upper_right, bottom_right, bottom_left, x, z);
+			result = getY(p1, p2, p3, x, z);
 		}
                 else {						// On the line
 			if (x_index == x_idx) {
-				std::cout << "Case 3a" << std::endl;
-				result = getAsVec3(data, x_idx, z_idx, divisions).getY();
+				//std::cout << "Case 3a" << std::endl;
+				p1 = p2 = p3 = getAsVec3(data, x_idx, z_idx + 1, divisions);
+				result = p1.getY();
 			} else{
-				Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
-				Vec3 bottom_left = getAsVec3(data, x_idx - 1, z_idx, divisions);
+				p1 = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);	// Upper right
+				p3 = p2 = getAsVec3(data, x_idx, z_idx, divisions);	// Bottom left
 
-				std::cout << "Case 3.b: [" << upper_right << "," << bottom_left << "]" << std::endl;
+				//std::cout << "Case 3.b: [" << p1 << "," << p2 << "]" << std::endl;
 
-				Vec2 u(upper_right.getX(), upper_right.getZ());
-				Vec2 b(bottom_left.getX(), bottom_left.getZ());
+				Vec2 u(p1.getX(), p1.getZ());
+				Vec2 b(p2.getX(), p2.getZ());
 
 				float len = (u - Vec2(x, z)).getMagnitude();
 				float total = (u - b).getMagnitude();
 		
-				result = interpolate(upper_right.getY(), bottom_left.getY() , len / total);
+				result = interpolate(p1.getY(), p2.getY() , len / total);
 			}
-
 		}
-		std::cout << "result: " << result << std::endl << std::endl;
-		return result + 20;
 	}
 	// Not on the ground
-	return 100.0f;
+
+	if (enable_flying) {
+		return Camera.getY();
+	}
+	return result + 0.5f + ((shift_down)?1.5f:0.0f);
 }
 
 //////////////////////////////////////////////
@@ -447,14 +448,15 @@ int main(int argc, char** args)
 	}
 	else {
 		printf("Error with shader\n");
+		std::exit(-1);
 	}
 
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 
 
-	//const int divisions = 100;
-	const int divisions = 16;
+	const int divisions = 100;
+	//const int divisions = 16;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
 	const float size = 1000.0f;
@@ -479,11 +481,11 @@ int main(int argc, char** args)
 		// Clear everything on the screen
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-		ground.render(ProjectionMatrix, TranslateMatrix, Camera);
+		ground.render(ProjectionMatrix, TranslateMatrix, Camera,p1,p2,p3);
 
 		// for objects to be rendered
 		for (RenderObject obj : objs) {
-			obj.render(ProjectionMatrix, TranslateMatrix, Camera);
+			obj.render(ProjectionMatrix, TranslateMatrix, Camera,p1,p2,p3);
 		}
 		
 		glfwSwapBuffers(window);
@@ -494,7 +496,7 @@ int main(int argc, char** args)
 		duration += (cTime - previous);
 		previous = cTime;
 
-		if (duration > 1.0/24.0) {
+		if (duration > 1.0/60.0) {
 			update();
 			duration = 0.0f;
 // TODO: Make this smooth

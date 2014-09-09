@@ -108,7 +108,7 @@ Vec3 Vec3::cross(const Vec3 &b) const {
 
 const float *Vec3::getData() const { return v; }
 
-std::ostream& operator<<(std::ostream& os, Vec3 &obj) {
+std::ostream& operator<<(std::ostream& os, const Vec3 &obj) {
 	os << "(" <<
 		obj.getX() << "," <<
 		obj.getY() << "," <<

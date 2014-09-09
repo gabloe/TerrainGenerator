@@ -31,7 +31,9 @@ private:
 	GLuint _camera_index;
 	GLuint _projection_index;
 	GLuint _translation_index;
-
+	GLuint _p1_index;
+	GLuint _p2_index;
+	GLuint _p3_index;
 
 	Shader* _shader;
 
@@ -41,7 +43,7 @@ public:
 
 	int getNumberVertices() const;
 	const GLfloat *getRawData() const;
-	void render(const Mat4&,const Mat4&,const Vec3&);
+	void render(const Mat4&, const Mat4&, const Vec3&, const Vec3&, const Vec3&, const Vec3&);
 	
 };
 

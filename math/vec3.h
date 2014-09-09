@@ -38,6 +38,6 @@ public:
 
 	Vec3 cross(const Vec3&) const;
 
-	MATH_API friend std::ostream& operator<<(std::ostream& os, Vec3 &obj);
+	MATH_API friend std::ostream& operator<<(std::ostream& os, const Vec3 &obj);
 
 };

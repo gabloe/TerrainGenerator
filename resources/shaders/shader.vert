@@ -5,8 +5,14 @@ in vec3 v_Normal;
 
 uniform mat4 projection,translate;
 uniform vec3 camera;
+uniform vec3 p1,p2,p3;
 
 out vec3 color;
+
+bool isEqual(in vec3 a, in vec3 b) {
+	if( abs(a.x - b.x) > 0.00001f ) return false;
+	return abs(a.z - b.z) < 0.00001f;
+}
 
 void main(void) {
 	vec3 V = (vec4(v_Position,1.0)).xyz;
@@ -29,4 +35,13 @@ void main(void) {
 
 	color = ambient + diffuse + specular;
 	color = attenuation * color;
+
+	/*
+	// Hope this works, can I compare vecs?
+	if( isEqual(p1,v_Position) || isEqual(p2,v_Position) || isEqual(p3,v_Position) ) {
+		color = vec3(1.0,0.0,0.0);
+	}else {
+		color = vec3(0.0,0.0,0.0);
+	}
+	*/
 }

@@ -3,6 +3,9 @@
 #include <string>
 #include <cmath>
 
+
+#include <iostream>
+
 Vec3 meanWeightEqual(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3) {
 	Vec3 L1 = p2 - p1;
 	Vec3 L2 = p3 - p1;
@@ -111,7 +114,23 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 	std::string *x = new std::string("camera");
 	std::string *y = new std::string("projection");
 	std::string *z = new std::string("translate");
-	
+
+	std::string *str_p1 = new std::string("p1");
+	std::string *str_p2 = new std::string("p2");
+	std::string *str_p3 = new std::string("p3");
+
+	if ((_p1_index = shader.getUniform(*str_p1)) < 0) {
+		std::cout << "Error: Could not load p1" << std::endl;
+	}
+
+	if ((_p2_index = shader.getUniform(*str_p2)) < 0) {
+		std::cout << "Error: Could not load p2" << std::endl;
+	}
+
+	if ((_p3_index = shader.getUniform(*str_p3)) < 0) {
+		std::cout << "Error: Could not load p3" << std::endl;
+	}
+
 	if ((_position_index = shader.getVariable(*a)) < 0) {
 		std::cout << "Error: Could not load v_Position" << std::endl;
 	}
@@ -158,7 +177,7 @@ int RenderObject::getNumberVertices() const {
 
 const GLfloat *RenderObject::getRawData() const { return _raw_data; }
 
-void RenderObject::render(const Mat4 &projection, const Mat4& translate, const Vec3 &camera) {
+void RenderObject::render(const Mat4 &projection, const Mat4& translate, const Vec3 &camera, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3 ) {
 	// Load the shader program
 	_shader->load();
 
@@ -166,6 +185,10 @@ void RenderObject::render(const Mat4 &projection, const Mat4& translate, const V
 	glUniformMatrix4fv(_projection_index, 1, GL_FALSE, projection.getData());
 	glUniformMatrix4fv(_translation_index, 1, GL_FALSE, translate.getData());
 	glUniform3fv(_camera_index, 1, camera.getData());
+
+	glUniform3fv(_p1_index, 1, p1.getData());
+	glUniform3fv(_p2_index, 1, p2.getData());
+	glUniform3fv(_p3_index, 1, p3.getData());
 	
 	// Turn on variables
 	glEnableVertexAttribArray(_position_index);
