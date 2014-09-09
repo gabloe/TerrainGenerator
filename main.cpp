@@ -13,6 +13,8 @@
 #include <iostream>	// std::cout
 #include <list>		// List<RenderObject>
 #include <string>	// std::string
+#include <iomanip>	// std::setprecision
+
 // Custom
 #include "math/mat4.h"
 #include "math/vec2.h"
@@ -32,7 +34,7 @@
 Vec3 Camera(0.0f, 200.0f, 0.0f);
 
 double horizontalAngle = 0.0f;
-double verticalAngle = -0.78539816339f;
+double verticalAngle = 0.0f;
 double initialiFOV = 45.0;
 float initial_speed = 0.05f;
 float mouseSpeed = 0.0005f;
@@ -84,8 +86,8 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
 			//data[pos + 1] = (float)simplex2d( x , z ,7,2.323f)/10;
-			data[pos + 1] = 50 * (rand() / float(RAND_MAX));
-			//data[pos + 1] = z/4.0;
+			//data[pos + 1] = 50 * (rand() / float(RAND_MAX));
+			data[pos + 1] = z / 8.0f;
 			data[pos + 2] = z;
 		}
 	}
@@ -151,15 +153,15 @@ void update() {
 
 	float speed = initial_speed;
 	if (shift_down) {
-		speed = 1.0f;
+		speed = 4.0f;
 	}
 
 	double xpos,ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
 	glfwSetCursorPos(window, width / 2, height / 2);
 
-	horizontalAngle += mouseSpeed * (width * 0.5f - xpos);
-	verticalAngle	+= mouseSpeed *float(height * 0.5f - ypos);
+	horizontalAngle += mouseSpeed * float(width * 0.5f - xpos);
+	verticalAngle	+= mouseSpeed * float(height * 0.5f - ypos);
 
 	Vec3 direction(
 		float(cos(verticalAngle) * sin(horizontalAngle)),
@@ -212,6 +214,26 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 		if (key == GLFW_KEY_SPACE) {
 			enable_flying = !enable_flying;
+		}
+
+		if (key == GLFW_KEY_LEFT) {
+			horizontalAngle = -1.57079632679;
+			verticalAngle = 0.0f;
+		}
+
+		if (key == GLFW_KEY_RIGHT) {
+			horizontalAngle = 1.57079632679;
+			verticalAngle = 0.0f;
+		}
+
+		if (key == GLFW_KEY_UP) {
+			horizontalAngle = 0.0f;
+			verticalAngle = 0.0f;
+		}
+
+		if (key == GLFW_KEY_DOWN) {
+			horizontalAngle = 3.14159265359f;
+			verticalAngle = 0.0f;
 		}
 	}
 }
@@ -303,8 +325,8 @@ float interpolate(float min, float max, float alpha) {
 	return min * (1.0f - alpha) + max * alpha;
 }
 
-Vec3 getAsVec3(const GLfloat *data, int x, int y, int div) {
-	return Vec3(data + 3 * (y * div + x));
+Vec3 getAsVec3(const GLfloat *data, int i, int j, int div) {
+	return Vec3(data + 3 * (i * div + j));
 }
 
 float getHeight(RenderObject &ground) {
@@ -312,6 +334,7 @@ float getHeight(RenderObject &ground) {
 	if (enable_flying) {
 		return Camera.getY();
 	}
+
 	// Get ground data
 	const GLfloat *data = ground.getRawData();
 
@@ -321,44 +344,61 @@ float getHeight(RenderObject &ground) {
 		
 	// Guess the number of divisions
 	int divisions = (int)sqrt(ground.getNumberVertices() / 3);
+	std::cout << "Divisions: " << divisions << std::endl;
 
 	// Guess the deltas
+	float min_x = data[0];
+	float max_z = data[2];
+
 	float del = abs(2.0f * data[0]) / (divisions-1);
 
 	// x and z position index
-	float x_index = 0.5f * (divisions-1.0f) - x / del;
-	float z_index = 0.5f * (divisions-1.0f) - z / del;
+	float x_index = (x - min_x) / del;
+	float z_index = (max_z - z) / del;
 
+	std::cout << "Position: " << Camera << std::endl;
+	std::cout << "x_index: " << x_index << ", z_index: " << z_index << std::endl;
 	// If we are on the ground
 	if (x_index > 0 && x_index < divisions && z_index > 0 && z_index < divisions ) {
 		// Get real index
 		int x_idx = int(x_index);
 		int z_idx = int(z_index);
 
+		std::cout << "x_idx: " << x_idx << ", z_idx: " << z_idx << std::endl;
+
 		// Get inner point in the square
 		float low_x = x_index - x_idx;
 		float low_z = z_index - z_idx;
 
 		float result;
-
+		std::cout.precision(4);
 		// If we are in the upper triange...
 		if ( low_x < low_z ) {			// Upper Triangle
 			Vec3 upper_left = getAsVec3(data, x_idx, z_idx, divisions);
 			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
-			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx + 1, divisions);
+			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx - 1, divisions);
+
+			std::cout << "Case 1: [" << upper_left << "," << upper_right << "," << bottom_left << "]" << std::endl;
+
 			result = getY(upper_left, upper_right, bottom_left, x, z);
 		}
 		else if (low_x > low_z) {		// Lower Triangle
-			Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
-			Vec3 bottom_left = getAsVec3(data, x_idx + 1, z_idx, divisions);
-			Vec3 bottom_right = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);
+			Vec3 upper_right = getAsVec3(data, x_idx + 1, z_idx, divisions);
+			Vec3 bottom_left = getAsVec3(data, x_idx, z_idx - 1, divisions);
+			Vec3 bottom_right = getAsVec3(data, x_idx + 1, z_idx - 1, divisions);
+
+			std::cout << "Case 2: [" << upper_right << "," << bottom_right << "," << bottom_left << "]" << std::endl;
+
 			result = getY(bottom_right, upper_right, bottom_left, x, z);
 		} else {						// On the line
 			if (x_index == x_idx) {
+				std::cout << "Case 3a" << std::endl;
 				result = getAsVec3(data, x_idx, z_idx, divisions).getY();
 			} else{
 				Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
 				Vec3 bottom_left = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);
+
+				std::cout << "Case 3.b: [" << upper_right << "," << bottom_left << "]" << std::endl;
 
 				Vec2 u(upper_right.getX(), upper_right.getZ());
 				Vec2 b(bottom_left.getX(), bottom_left.getZ());
@@ -370,6 +410,7 @@ float getHeight(RenderObject &ground) {
 			}
 
 		}
+		std::cout << "result: " << result << std::endl << std::endl;
 		return result + 20;
 	}
 	// Not on the ground
@@ -414,11 +455,14 @@ int main(int argc, char** args)
 
 	std::list<RenderObject> objs;
 
-	double duration = 0;
-
 	Camera = Vec3(Camera.getX(), getHeight(ground), Camera.getZ());
 
+	glfwSetCursorPos(window, width / 2, height / 2);
+
 	update();
+
+	double duration = 0;
+	double previous = glfwGetTime();
 
 	// Main Loop.  Do the stuff!
 	while (!glfwWindowShouldClose(window)) {
@@ -435,10 +479,14 @@ int main(int argc, char** args)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		duration += glfwGetTime();
-		if (duration > 1000.0/20.0) {
+		// duration = duration + (current - previous)
+		double cTime = glfwGetTime();
+		duration += (cTime - previous);
+		previous = cTime;
+
+		if (duration > 1.0/24.0) {
 			update();
-			duration = 0;
+			duration = 0.0f;
 // TODO: Make this smooth
 /*
 			if (oldPos.getX() != Camera.getX() && oldPos.getZ() != Camera.getZ()) {
