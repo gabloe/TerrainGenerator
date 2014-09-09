@@ -86,8 +86,8 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
 			//data[pos + 1] = (float)simplex2d( x , z ,7,2.323f)/10;
-			//data[pos + 1] = 50 * (rand() / float(RAND_MAX));
-			data[pos + 1] = z / 8.0f;
+			data[pos + 1] = 50 * (rand() / float(RAND_MAX));
+			//data[pos + 1] = z / 8.0f;
 			data[pos + 2] = z;
 		}
 	}
@@ -95,6 +95,15 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 }
 
 float getY(const Vec3 &A, const Vec3 &B, const Vec3 &C, float x, float z) {
+/*
+        float det = (B.getZ() - C.getX()) * (A.getX() - C.getX()) + (C.getX() - B.getX()) * (A.getZ() - C.getZ());
+
+        float l1 = ((B.getZ() - C.getZ()) * (x - C.getX()) + (C.getX() - B.getX()) * (z - C.getZ())) / det;
+        float l2 = ((C.getZ() - A.getZ()) * (x - C.getX()) + (A.getX() - C.getX()) * (z - C.getZ())) / det;
+        float l3 = 1.0f - l1 - l2;
+
+        return l1 * A.getY() + l2 * B.getY() + l3 * C.getY();
+*/
 	Vec3 Normal = (C - A).cross(B - A);
 	Normal.normalize();
 	if (Normal.getY() == 0.0) return A.getY();
@@ -363,7 +372,7 @@ float getHeight(RenderObject &ground) {
 		// Get real index
 		int x_idx = int(x_index);
 		int z_idx = int(z_index);
-
+                
 		std::cout << "x_idx: " << x_idx << ", z_idx: " << z_idx << std::endl;
 
 		// Get inner point in the square
@@ -389,14 +398,15 @@ float getHeight(RenderObject &ground) {
 
 			std::cout << "Case 2: [" << upper_right << "," << bottom_right << "," << bottom_left << "]" << std::endl;
 
-			result = getY(bottom_right, upper_right, bottom_left, x, z);
-		} else {						// On the line
+			result = getY(upper_right, bottom_right, bottom_left, x, z);
+		}
+                else {						// On the line
 			if (x_index == x_idx) {
 				std::cout << "Case 3a" << std::endl;
 				result = getAsVec3(data, x_idx, z_idx, divisions).getY();
 			} else{
 				Vec3 upper_right = getAsVec3(data, x_idx, z_idx + 1, divisions);
-				Vec3 bottom_left = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);
+				Vec3 bottom_left = getAsVec3(data, x_idx - 1, z_idx, divisions);
 
 				std::cout << "Case 3.b: [" << upper_right << "," << bottom_left << "]" << std::endl;
 
