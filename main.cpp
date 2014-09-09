@@ -79,6 +79,8 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 	float delta_z = z_len / (div-1);
 	float* data = (float*)calloc(3 * div * div, sizeof(float));
 
+	Vec2 m_pos(200,-200);
+	float m_height = 5000.0f;
 	//std::cout << "Delta: " << delta_x << std::endl;
 	
 	for (int i = 0; i < div; i++) { // z
@@ -87,9 +89,14 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			float x = min_x + j * delta_x;
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
-			//data[pos + 1] = (float)simplex2d( x , z ,7,2.323f)/10;
-			data[pos + 1] = 50 * (rand() / float(RAND_MAX));
+
+			float height = abs(x - m_pos.getX()) + abs(z - m_pos.getY());
+			height = m_height / (5.0f + log(height + 1.0f));
+
+			//data[pos + 1] = height + (float)simplex2d( x , z ,7,2.323f)/10;
+			//data[pos + 1] = 50 * (rand() / float(RAND_MAX));
 			//data[pos + 1] = z / 8.0f;
+			data[pos + 1] = height + 1.0f;
 			data[pos + 2] = z;
 		}
 	}
@@ -425,7 +432,7 @@ float getHeight(RenderObject &ground) {
 	if (enable_flying) {
 		return Camera.getY();
 	}
-	return result + 0.5f + ((shift_down)?1.5f:0.0f);
+	return result + 2.0f;
 }
 
 //////////////////////////////////////////////
