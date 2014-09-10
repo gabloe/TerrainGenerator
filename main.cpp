@@ -66,6 +66,8 @@ Mat4 ProjectionMatrix = Mat4::Perspective(90.0f, (float)width / (float)height, z
 GLenum MODES[2] = { GL_FILL, GL_LINE };
 int mode = 0;
 
+float sqr(float a) { return a * a; }
+
 //////////////////////////////////////////////
 //			Simple Random Data				//
 //////////////////////////////////////////////
@@ -91,12 +93,13 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			data[pos] = x;
 
 			float height = abs(x - m_pos.getX()) + abs(z - m_pos.getY());
-			height = m_height / (5.0f + log(height + 1.0f));
+			height = 1000.0f * float(abs(sin(x * z))) / (1.0f + height) + height;
+			height = m_height / (2.0f + log(height + 1.0f));
 
-			//data[pos + 1] = height + (float)simplex2d( x , z ,7,2.323f)/10;
-			//data[pos + 1] = 50 * (rand() / float(RAND_MAX));
+			//data[pos + 1] = sqrt(height + (float)simplex2d( x , z ,7,2.323f)/10.0f);
+			data[pos + 1] = height + 5.0f * (rand() / float(RAND_MAX));
 			//data[pos + 1] = z / 8.0f;
-			data[pos + 1] = height + 1.0f;
+			//data[pos + 1] = height + 1.0f;
 			data[pos + 2] = z;
 		}
 	}

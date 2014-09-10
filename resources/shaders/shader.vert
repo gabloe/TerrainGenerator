@@ -10,8 +10,8 @@ uniform vec3 p1,p2,p3;
 out vec3 color;
 
 bool isEqual(in vec3 a, in vec3 b) {
-	if( abs(a.x - b.x) > 0.00001f ) return false;
-	return abs(a.z - b.z) < 0.00001f;
+	if( abs(a.x - b.x) > 0.00001 ) return false;
+	return abs(a.z - b.z) < 0.00001;
 }
 
 void main(void) {
