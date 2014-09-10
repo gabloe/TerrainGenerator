@@ -35,11 +35,11 @@ Vec3 p1, p2, p3;
 // Position Data
 Vec3 Camera(0.0f, 200.0f, 0.0f);
 
-double horizontalAngle = 0.0f;
-double verticalAngle = 0.0f;
+double horizontalAngle = 0.0;
+double verticalAngle = 0.0;
 double initialiFOV = 45.0;
 float initial_speed = 0.05f;
-float mouseSpeed = 0.0005f;
+double mouseSpeed = 0.0005;
 
 // The window and related data
 static GLFWwindow *window;
@@ -179,21 +179,40 @@ void update() {
 
 	double xpos,ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
+	
+	double new_x = mouseSpeed * (width / 2 - xpos);
+	double new_y = mouseSpeed * (height / 2 - ypos);
+
+	if (abs(new_x) > 0.001) {
+		horizontalAngle += new_x;
+	}
+
+	if (abs(new_y) > 0.001) {
+		verticalAngle += new_y;
+	}
+
+	
+	
+
 	glfwSetCursorPos(window, width / 2, height / 2);
 
-	horizontalAngle += mouseSpeed * float(width * 0.5f - xpos);
-	verticalAngle	+= mouseSpeed * float(height * 0.5f - ypos);
+	double sVA = sin(verticalAngle);
+	double cVA = cos(verticalAngle);
+	
+	double sHA = sin(horizontalAngle);
+	double cHA = cos(horizontalAngle);
+	
 
 	Vec3 direction(
-		float(cos(verticalAngle) * sin(horizontalAngle)),
-		(float)sin(verticalAngle),
-		(float)(cos(verticalAngle) * cos(horizontalAngle))
+		float(cVA * sHA),
+		(float)sVA,
+		(float)(cVA * cHA)
 	);
 
 	Vec3 right(
-		float(sin(horizontalAngle - 1.570796325f)),
+		float(sin(horizontalAngle - 1.570796325)),
 		0.0f,
-		float(cos(horizontalAngle - 1.570796325f))
+		float(cos(horizontalAngle - 1.570796325))
 	);
 
 	Vec3 up = right.cross(direction);
@@ -265,7 +284,7 @@ void resized_callback(GLFWwindow *window, int w, int h) {
 	glViewport(0, 0, w, h);
 
 	ProjectionMatrix = Mat4::Perspective(45.0f, width / height, znear, zfar);
-
+	update();
 }
 
 static void error_callback(int error, const char* description)
@@ -300,7 +319,7 @@ void init() {
 		exit(EXIT_FAILURE);
 	}glfwMakeContextCurrent(window);
 
-	// Set callbacks for GLFW, window, keyboard, and mouse
+	// Set callbacks for GLFW, window, and keyboard.
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetWindowSizeCallback(window, resized_callback);
 
