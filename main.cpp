@@ -14,12 +14,13 @@
 #include <list>		// List<RenderObject>
 #include <string>	// std::string
 #include <iomanip>	// std::setprecision
-
+#include <list>
 // Custom
 #include "math/mat4.h"
 #include "math/vec2.h"
 #include "renderer/RenderObject.h"
 #include "generators/Simplex.h"
+#include "generators/Perlin.h"
 
 // Used to get the current directory, can use later for something?
 #ifdef _WIN32
@@ -68,10 +69,45 @@ int mode = 0;
 
 float sqr(float a) { return a * a; }
 
+float interpolateFloat(float min, float max, float ratio) {
+	return min + (max-min) * ratio;
+}
+
 //////////////////////////////////////////////
 //			Simple Random Data				//
 //////////////////////////////////////////////
-float* generateGround(float min_x, float max_x, float min_z, float max_z, int div) {
+float* generateGround(float min_x, float max_x, float min_z, float max_z, int div, int numMountains) {
+
+	// Generate mountains
+	std::list<Vec3> mountains;
+	while (numMountains--) {
+		
+while (true) {
+			bool add = true;
+
+			float x = interpolateFloat(100 + min_x, max_x - 100, rand() / float(RAND_MAX)); // [0...1)
+			float y = interpolateFloat(200, 2000, rand() / float(RAND_MAX)); // [0...1)
+			float z = interpolateFloat(100 + min_z, max_z - 100, rand() / float(RAND_MAX)); // [0...1)
+
+			Vec3 newMountain(x, y, z);
+
+			// Only add if not to close to other mountains
+			for (Vec3 m : mountains) {
+				double dist = (m - newMountain).getMagnitude();
+				if (dist < 400) {
+					add = false;
+					break;
+				}
+			}
+
+			if (add) {
+				std::cout << "Adding: " << newMountain << std::endl;
+				mountains.insert(mountains.begin(), newMountain);
+				break;
+			}
+		}
+	}
+
 
 	init_simplex(242342);
 
@@ -80,10 +116,6 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 	float delta_x = x_len / (div-1);
 	float delta_z = z_len / (div-1);
 	float* data = (float*)calloc(3 * div * div, sizeof(float));
-
-	Vec2 m_pos(200,-200);
-	float m_height = 5000.0f;
-	//std::cout << "Delta: " << delta_x << std::endl;
 	
 	for (int i = 0; i < div; i++) { // z
 		float z = max_z - i * delta_z;
@@ -92,12 +124,28 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			int pos = 3 * i * div + 3 * j;
 			data[pos] = x;
 
-			float height = abs(x - m_pos.getX()) + abs(z - m_pos.getY());
-			height = 1000.0f * float(abs(sin(x * z))) / (1.0f + height) + height;
-			height = m_height / (2.0f + log(height + 1.0f));
 
-			data[pos + 1] = height + (float)simplex2d( x , z ,7,2.323f)/10.0f;
-			//data[pos + 1] = height + 5.0f * (rand() / float(RAND_MAX));
+			int num_seen = 0;
+			float height = 0;
+			for (Vec3 m : mountains) {
+				float dx = abs(x - m.getX());
+				if (dx < 2000) {
+					float dz = abs(z - m.getZ());
+					if (dz < 2000) {
+						++num_seen;
+						float scale = dx + dz;
+						float wave = 1000.0f * float(abs(sin(x * z))) / (1.0f + scale);
+						height += wave + m.getY() * abs(cos(scale/4000));// / (2.0f + log(scale + 1.0f));
+					}
+				}
+			}
+			if (num_seen) {
+				height = height / num_seen;
+			}
+			//data[pos + 1] = height + (float)simplex2d( x , z ,7,2.323f)/10.0f;
+			double d[2] = { x, z };
+			data[pos + 1] = height + 50.0f * (float)perlin2d(d);
+			//data[pos + 1] = height + 50.0f * (rand() / float(RAND_MAX));
 			//data[pos + 1] = z / 8.0f;
 			//data[pos + 1] = height + 1.0f;
 			data[pos + 2] = z;
@@ -173,9 +221,12 @@ bool handleKey(int key, int check_key) {
 void update() {
 
 	float speed = initial_speed;
-	if (shift_down) {
+	if (enable_flying) {
+		speed = 2.0f;
+	}else if (shift_down) {
 		speed = 0.5f;
 	}
+
 
 	double xpos,ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
@@ -489,7 +540,7 @@ int main(int argc, char** args)
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
 	const float size = 10000.0f;
-	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions);
+	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions, 100);
 	GLuint *indices = generateIndices(divisions);
 
 	RenderObject ground(shader, ground_data, number_vertices, indices, number_indicies);

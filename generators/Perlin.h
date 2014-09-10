@@ -2,6 +2,6 @@
 
 #include "def.h"
 
-NOISE_API float perlin(float x);
-NOISE_API float perlin2d(float x, float y);
-NOISE_API float perlin3d(float x, float y, float z);
+NOISE_API double perlin(double x);
+NOISE_API double perlin2d(double x[2]);
+NOISE_API double perlin3d(double x[3]);
