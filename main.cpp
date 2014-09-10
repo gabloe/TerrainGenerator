@@ -46,7 +46,7 @@ static GLFWwindow *window;
 static float height = 768, width = 1024;
 
 const float znear	=  0.01f;
-const float zfar	= 1000.0f;
+const float zfar	= 2000.0f;
 
 Mat4 TranslateMatrix;
 Mat4 ProjectionMatrix = Mat4::Perspective(90.0f, (float)width / (float)height, znear, zfar);
@@ -96,8 +96,8 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 			height = 1000.0f * float(abs(sin(x * z))) / (1.0f + height) + height;
 			height = m_height / (2.0f + log(height + 1.0f));
 
-			//data[pos + 1] = sqrt(height + (float)simplex2d( x , z ,7,2.323f)/10.0f);
-			data[pos + 1] = height + 5.0f * (rand() / float(RAND_MAX));
+			data[pos + 1] = height + (float)simplex2d( x , z ,7,2.323f)/10.0f;
+			//data[pos + 1] = height + 5.0f * (rand() / float(RAND_MAX));
 			//data[pos + 1] = z / 8.0f;
 			//data[pos + 1] = height + 1.0f;
 			data[pos + 2] = z;
@@ -465,11 +465,11 @@ int main(int argc, char** args)
 	glfwGetFramebufferSize(window, &width, &height);
 
 
-	const int divisions = 100;
+	const int divisions = 500;
 	//const int divisions = 16;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
-	const float size = 1000.0f;
+	const float size = 10000.0f;
 	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions);
 	GLuint *indices = generateIndices(divisions);
 
