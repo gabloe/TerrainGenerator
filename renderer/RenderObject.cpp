@@ -3,6 +3,7 @@
 #include <string>
 #include <cmath>
 
+#include <cassert>
 
 #include <iostream>
 
@@ -53,28 +54,43 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 		Vec3 p2(vertices + i2);
 		Vec3 p3(vertices + i3);
 
-		Vec3 N = (p1 - p2).cross(p1 - p3);
-		
+		Vec3 N = (p2 - p1).cross(p3 - p1);
+		N.normalize();
+
+		float t1 = N * (p2 - p1);
+		if (abs(t1) >  0.00001) {
+			std::cout << "T1 Failure: " << t1 << std::endl;
+			std::exit(-1);
+		}
+
+		t1 = N * (p3 - p1);
+		if (abs(t1) >  0.00001) {
+			std::cout << "T2 Failure: " << t1 << std::endl;
+			std::exit(-1);
+		}
+
 		normals[i1 + 0] += N.getX();
 		normals[i1 + 1] += N.getY();
 		normals[i1 + 2] += N.getZ();
-		divisors[i1 / 3] += N.getMagnitude();
 
 		normals[i2 + 0] += N.getX();
 		normals[i2 + 1] += N.getY();
 		normals[i2 + 2] += N.getZ();
-		divisors[i2 / 3] += N.getMagnitude();
 
 		normals[i3 + 0] += N.getX();
 		normals[i3 + 1] += N.getY();
 		normals[i3 + 2] += N.getZ();
-		divisors[i3 / 3] += N.getMagnitude();
 	}
 
 	for (int i = 0; i < number_vertices; i += 3) {
-		normals[i+1] /= divisors[i / 3];
-		normals[i+1] /= divisors[i / 3];
-		normals[i+2] /= divisors[i / 3];
+		float x = normals[i + 1]; x *= x;
+		float y = normals[i + 2]; y *= y;
+		float z = normals[i + 3]; z *= z;
+		float len = sqrt(x + y + z);
+
+		normals[i + 1] /= len;
+		normals[i + 2] /= len;
+		normals[i + 3] /= len;
 	}
 
 	delete divisors;

@@ -47,7 +47,7 @@ static GLFWwindow *window;
 static float height = 768, width = 1024;
 
 const float znear	=  0.01f;
-const float zfar	= 2000.0f;
+const float zfar	= 10000.0f;
 
 Mat4 TranslateMatrix;
 Mat4 ProjectionMatrix = Mat4::Perspective(90.0f, (float)width / (float)height, znear, zfar);
@@ -101,7 +101,6 @@ while (true) {
 			}
 
 			if (add) {
-				std::cout << "Adding: " << newMountain << std::endl;
 				mountains.insert(mountains.begin(), newMountain);
 				break;
 			}
@@ -135,17 +134,19 @@ while (true) {
 						++num_seen;
 						float scale = dx + dz;
 						float wave = 1000.0f * float(abs(sin(x * z))) / (1.0f + scale);
-						height += wave + m.getY() * abs(cos(scale/4000));// / (2.0f + log(scale + 1.0f));
+						height += wave + m.getY()/(2.0f + log(scale + 1.0f));
 					}
 				}
 			}
+
 			if (num_seen) {
 				height = height / num_seen;
 			}
+			
 			//data[pos + 1] = height + (float)simplex2d( x , z ,7,2.323f)/10.0f;
 			double d[2] = { x, z };
-			data[pos + 1] = height + 50.0f * (float)perlin2d(d);
-			//data[pos + 1] = height + 50.0f * (rand() / float(RAND_MAX));
+			//data[pos + 1] = height + 50.0f * (float)perlin2d(d);
+			data[pos + 1] = height + 50.0f * (rand() / float(RAND_MAX));
 			//data[pos + 1] = z / 8.0f;
 			//data[pos + 1] = height + 1.0f;
 			data[pos + 2] = z;
@@ -221,10 +222,13 @@ bool handleKey(int key, int check_key) {
 void update() {
 
 	float speed = initial_speed;
+
 	if (enable_flying) {
-		speed = 2.0f;
-	}else if (shift_down) {
-		speed = 0.5f;
+		speed *= 20.0f;
+	}
+	
+	if (shift_down) {
+		speed *= 10.0f;
 	}
 
 
