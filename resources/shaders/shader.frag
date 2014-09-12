@@ -14,6 +14,7 @@ const float shininess = 0.2;
 
 in vec3 N;
 in vec3 v;
+in mat4 normalMatrix;
 
 uniform vec3 p1,p2,p3;
 
@@ -44,23 +45,33 @@ material frontMaterial = material(
   5.0
 );
 
-const int numLights = 1;
+const int numLights = 2;
 lightSource lights[numLights];
 
-lightSource sun = lightSource(
-   vec4(0.0,10.0,0.0,0.0),
-   vec4(1.0,1.0,1.0,1.0),
+lightSource self = lightSource(
+   vec4(0.0,0.5,0.0,1.0),
+   vec4(0.2,1.0,0.5,1.0),
    vec4(0.1,0.1,0.1,1.0),
-   0.0, 1.0, 0.0,
-   180.0, 0.0,
+   1.0, 1.0, 1.0,
+   2.0, 0.0,
+   vec3(0.0,-1.0,0.0)
+);
+
+lightSource global = lightSource(
+   vec4(1.0,1.0,1.0,0.0),
+   vec4(0.2,1.0,0.5,1.0),
+   vec4(0.1,0.1,0.1,1.0),
+   1.0, 1.0, 1.0,
+   90.0, 0.0,
    vec3(0.0,0.0,0.0)
 );
 
 void main(void) {
-        lights[0] = sun;
+        lights[0] = global;
+		lights[1] = self;
 
         vec3 normalDir = normalize(N);
-	vec3 viewDir = normalize(v);
+	    vec3 viewDir = normalize(-v);
         vec3 lightDir;
         float attenuation;
 
@@ -71,7 +82,7 @@ void main(void) {
            if (lights[i].position.w == 0.0)
               {
               attenuation = 1.0;
-              lightDir = normalize(vec3(lights[i].position));
+              lightDir = vec3(normalize(lights[i].position));
               }
            else
               {
@@ -94,12 +105,14 @@ void main(void) {
                     }
                  }
               }
+
+
               vec3 diffuseReflection = attenuation *
 	                               vec3(lights[i].diffuse) * vec3(frontMaterial.diffuse) *
 	                               max(0.0, dot(normalDir, lightDir));
 
               vec3 specularReflection;
-              if (dot(N, lightDir) < 0.0) // light source on the wrong side?
+              if (dot(normalDir, lightDir) < 0.0) // light source on the wrong side?
 	         {
 	         specularReflection = vec3(0.0, 0.0, 0.0); // no specular reflection
 	         }

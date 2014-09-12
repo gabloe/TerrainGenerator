@@ -42,7 +42,7 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 	GLfloat *normals = new GLfloat[number_vertices];
 	memset(normals, 0, sizeof(GLfloat) * number_vertices);
 
-	//GLfloat *divisors = new GLfloat[number_vertices/3];
+	GLfloat *divisors = new GLfloat[number_vertices/3];
 
 	for (int i = 0; i < number_indices; i += 3) {
 
@@ -56,7 +56,7 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 
 		Vec3 N = (p2 - p1).cross(p3 - p1);
 		N.normalize();
-/*
+
 		float t1 = N * (p2 - p1);
 		if (abs(t1) >  0.00001) {
 			std::cout << "T1 Failure: " << t1 << std::endl;
@@ -79,10 +79,9 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 		normals[i3 + 0] += N.getX();
 		normals[i3 + 1] += N.getY();
 		normals[i3 + 2] += N.getZ();
-*/
+
 	}
 
-/*
 	for (int i = 0; i < number_vertices; i += 3) {
 		float x = normals[i + 1]; x *= x;
 		float y = normals[i + 2]; y *= y;
@@ -95,7 +94,6 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 	}
 
 	delete divisors;
-*/
 	return normals;
 }
 
@@ -109,16 +107,15 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 	_raw_data = vertices;
 	GLfloat *normals = computeNormals(vertices, number_vertices, indices, number_indices);
 
+	int size = number_vertices * sizeof(GLfloat);
+
 	// Copy over the position data
-	glGenBuffers(1, &_vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, number_vertices * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
-
-
-	// Copy over the normals
-	glGenBuffers(1, &_normal_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, _normal_buffer);
-	glBufferData(GL_ARRAY_BUFFER, number_vertices * sizeof(GLfloat), normals, GL_STATIC_DRAW);
+	glGenBuffers(1, &_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+	
+	glBufferData(GL_ARRAY_BUFFER, 2 * size, 0, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER,	0,		size,	vertices);
+	glBufferSubData(GL_ARRAY_BUFFER,	size,	size,	normals);
 
 	// If we have indices copy them over too
 	if (indices) {
@@ -126,17 +123,21 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, number_indices * sizeof(GLuint), indices, GL_STATIC_DRAW);
 	}
-	std::string *a = new std::string("v_Position");
-	std::string *b = new std::string("v_Normal");
 
-	std::string *x = new std::string("camera");
-	std::string *y = new std::string("projection");
-	std::string *z = new std::string("translate");
+
+	std::string *pos = new std::string("v_Position");
+	std::string *norm = new std::string("v_Normal");
+
+	std::string *cam = new std::string("camera");
+	std::string *proj = new std::string("projection");
+	std::string *tran = new std::string("translate");
 
 	std::string *str_p1 = new std::string("p1");
 	std::string *str_p2 = new std::string("p2");
 	std::string *str_p3 = new std::string("p3");
 
+
+	// Debug vertices
 	if ((_p1_index = shader.getUniform(*str_p1)) < 0) {
 		std::cout << "Error: Could not load p1" << std::endl;
 	}
@@ -149,26 +150,29 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 		std::cout << "Error: Could not load p3" << std::endl;
 	}
 
-	if ((_position_index = shader.getVariable(*a)) < 0) {
+	// input variableS
+	if ((_position_index = shader.getVariable(*pos)) < 0) {
 		std::cout << "Error: Could not load v_Position" << std::endl;
 	}
 
-	if ((_normal_index = shader.getVariable(*b)) < 0) {
+	if ((_normal_index = shader.getVariable(*norm)) < 0) {
 		std::cout << "Error: Could not load v_Normal" << std::endl;
 	}
 
-	if ((_camera_index = shader.getUniform(*x)) < 0) {
+	// Uniforms
+	if ((_camera_index = shader.getUniform(*cam)) < 0) {
 		std::cout << "Error: Could not load camera" << std::endl;
 	}
 
-	if ((_projection_index = shader.getUniform(*y)) < 0) {
+	if ((_projection_index = shader.getUniform(*proj)) < 0) {
 		std::cout << "Error: Could not load projection" << std::endl;
 	}
 
-	if ((_translation_index = shader.getUniform(*z)) < 0) {
+	if ((_translation_index = shader.getUniform(*tran)) < 0) {
 		std::cout << "Error: Could not load translate" << std::endl;
 	}
 
+	// Check for errors
 	if (GLenum err = glGetError()) {
 		std::cout << "Error creating render object" << std::endl;
 		std::cout << glewGetErrorString(err) << std::endl;
@@ -176,12 +180,12 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 
 	delete normals;
 
-	delete a;
-	delete b;
+	delete pos;
+	delete norm;
 
-	delete x;
-	delete y;
-	delete z;
+	delete cam;
+	delete proj;
+	delete tran;
 
 	shader.unload();
 
@@ -204,14 +208,13 @@ void RenderObject::render(const Mat4 &projection, const Mat4& translate, const V
 	glUniformMatrix4fv(_translation_index, 1, GL_FALSE, translate.getData());
 	glUniform3fv(_camera_index, 1, camera.getData());
 
+	// Debugging
 	glUniform3fv(_p1_index, 1, p1.getData());
 	glUniform3fv(_p2_index, 1, p2.getData());
 	glUniform3fv(_p3_index, 1, p3.getData());
 	
 	// Turn on variables
-	glEnableVertexAttribArray(_position_index);
-	glEnableVertexAttribArray(_normal_index);
-	glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 	glVertexAttribPointer(
 		_position_index,// attribute
 		3,				// how many elements per item
@@ -226,7 +229,10 @@ void RenderObject::render(const Mat4 &projection, const Mat4& translate, const V
 		GL_FLOAT,		// the element type
 		GL_FALSE,		// normalized
 		0,				// stride
-		(void*)0);		// offset
+		(void*)(sizeof(GLfloat) * _number_vertices));		// offset
+
+	glEnableVertexAttribArray(_position_index);
+	glEnableVertexAttribArray(_normal_index);
 
 	if (_number_indices) {
 		// Draw
@@ -239,8 +245,8 @@ void RenderObject::render(const Mat4 &projection, const Mat4& translate, const V
 	}else {
 		glDrawArrays(GL_TRIANGLES, 0, _number_vertices / 3);
 	}
-	
 
+	glDisableVertexAttribArray(_normal_index);
 	glDisableVertexAttribArray(_position_index);
 
 	// Unload the shader program

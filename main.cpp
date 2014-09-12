@@ -15,6 +15,9 @@
 #include <string>	// std::string
 #include <iomanip>	// std::setprecision
 #include <list>
+#include <sstream>
+
+
 // Custom
 #include "math/mat4.h"
 #include "math/vec2.h"
@@ -35,20 +38,20 @@
 Vec3 p1, p2, p3;
 
 // Position Data
-Vec3 Camera(0.0f, 200.0f, 0.0f);
+Vec3 Camera(0.0f, 1.0f, 0.0f);
 
 double horizontalAngle = 0.0;
 double verticalAngle = 0.0;
 double initialiFOV = 45.0;
-float initial_speed = 0.05f;
+float initial_speed = 0.00005f;
 double mouseSpeed = 0.0005;
 
 // The window and related data
 static GLFWwindow *window;
 static float height = 768, width = 1024;
 
-const float znear	=  0.01f;
-const float zfar	= 10000.0f;
+const float znear	=  0.0001f;
+const float zfar	= 100.0f;
 
 Mat4 TranslateMatrix;
 Mat4 ProjectionMatrix = Mat4::Perspective(90.0f, (float)width / (float)height, znear, zfar);
@@ -86,16 +89,16 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 while (true) {
 			bool add = true;
 
-			float x = interpolateFloat(100 + min_x, max_x - 100, rand() / float(RAND_MAX)); // [0...1)
-			float y = interpolateFloat(200, 2000, rand() / float(RAND_MAX)); // [0...1)
-			float z = interpolateFloat(100 + min_z, max_z - 100, rand() / float(RAND_MAX)); // [0...1)
+			float x = interpolateFloat(.01f + min_x, max_x - .01f, rand() / float(RAND_MAX)); // [0...1)
+			float y = interpolateFloat(.1f, .01f, rand() / float(RAND_MAX)); // [0...1)
+			float z = interpolateFloat(.01f + min_z, max_z - .01f, rand() / float(RAND_MAX)); // [0...1)
 
 			Vec3 newMountain(x, y, z);
 
 			// Only add if not to close to other mountains
 			for (Vec3 m : mountains) {
 				double dist = (m - newMountain).getMagnitude();
-				if (dist < 400) {
+				if (dist < 0.01) {
 					add = false;
 					break;
 				}
@@ -129,13 +132,13 @@ while (true) {
 			float height = 0;
 			for (Vec3 m : mountains) {
 				float dx = abs(x - m.getX());
-				if (dx < 2000) {
+				if (dx < 0.01) {
 					float dz = abs(z - m.getZ());
-					if (dz < 2000) {
+					if (dz < .001) {
 						++num_seen;
 						float scale = dx + dz;
-						float wave = 1000.0f * float(abs(sin(x * z))) / (1.0f + scale);
-						height += wave + m.getY()/(2.0f + log(scale + 1.0f));
+						float wave = 1.0f * float(abs(sin(x * z))) / (1.0f + scale);
+						height += wave + m.getY()/(2.0f + sqrt(scale + 1.0f));
 					}
 				}
 			}
@@ -147,7 +150,7 @@ while (true) {
 			//data[pos + 1] = height + (float)simplex2d( x , z ,7,2.323f)/10.0f;
 			double d[2] = { x, z };
 			//data[pos + 1] = height + 50.0f * (float)perlin2d(d);
-			data[pos + 1] = height + 50.0f * (rand() / float(RAND_MAX));
+			data[pos + 1] = height + 0.005f * (rand() / float(RAND_MAX));
 			//data[pos + 1] = z / 8.0f;
 			//data[pos + 1] = height + 1.0f;
 			data[pos + 2] = z;
@@ -157,15 +160,6 @@ while (true) {
 }
 
 float getY(const Vec3 &A, const Vec3 &B, const Vec3 &C, float x, float z) {
-/*
-        float det = (B.getZ() - C.getX()) * (A.getX() - C.getX()) + (C.getX() - B.getX()) * (A.getZ() - C.getZ());
-
-        float l1 = ((B.getZ() - C.getZ()) * (x - C.getX()) + (C.getX() - B.getX()) * (z - C.getZ())) / det;
-        float l2 = ((C.getZ() - A.getZ()) * (x - C.getX()) + (A.getX() - C.getX()) * (z - C.getZ())) / det;
-        float l3 = 1.0f - l1 - l2;
-
-        return l1 * A.getY() + l2 * B.getY() + l3 * C.getY();
-*/
 	Vec3 Normal = (C - A).cross(B - A);
 	Normal.normalize();
 	if (Normal.getY() == 0.0) return A.getY();
@@ -357,13 +351,21 @@ void init() {
 	// Initialize the GLFW system, if failure jump ship
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
-	}	
+	}
+
+	int major = 3;
+	int minor = 1;
+	#ifdef __MAC 
+	minor = 2;
+	#endif
 
 	// Set the hints on how to render to the 
 	// screen, which OpenGL version we have, etc
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
+	if (major >= 3 && minor > 1) {
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	}
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	// Create our window using the hints given above
 	window = glfwCreateWindow((int)width, (int)height, "Terrain Generator", NULL, NULL);
@@ -394,6 +396,7 @@ void init() {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+
 }
 
 // Just prints OpenGL information
@@ -417,6 +420,8 @@ float area(const Vec3& A, const Vec3& B, const Vec3& C) {
 float interpolate(float min, float max, float alpha) {
 	return min * (1.0f - alpha) + max * alpha;
 }
+
+#define clamp(v,a,b) (v<a)?a:(v>b)?b:v
 
 Vec3 getAsVec3(const GLfloat *data, int i, int j, int div) {
 	return Vec3(data + 3 * (j * div + i));
@@ -446,51 +451,46 @@ float getHeight(RenderObject &ground) {
 	float x_index = (x - min_x) / del;
 	float z_index = (max_z - z) / del;
 
-	//std::cout << "Position: " << Camera << std::endl;
-	//std::cout << "x_index: " << x_index << ", z_index: " << z_index << std::endl;
+	int x_idx = int(x_index);
+	int z_idx = int(z_index);
 
 	// If we are on the ground
-	if (x_index > 0 && x_index < divisions && z_index > 0 && z_index < divisions ) {
-		// Get real index
-		int x_idx = int(x_index);
-		int z_idx = int(z_index);
-                
-		//std::cout << "x_idx: " << x_idx << ", z_idx: " << z_idx << std::endl;
-
+	if (x_idx >= 0 && x_idx <= divisions && z_idx >= 0 && z_idx <= divisions ) {
+		
 		// Get inner point in the square
 		float low_x = x_index - x_idx;
 		float low_z = z_index - z_idx;
 
-		//std::cout.precision(4);
+		int upper = clamp(z_idx + 1,	0,	divisions - 1);
+		int lower = clamp(z_idx,		0,	divisions - 1);
+
+		int right = clamp(x_idx + 1,	0,	divisions - 1);
+		int left = clamp(x_idx,			0,	divisions - 1);
+
 		// If we are in the upper triangle...
 		if ( low_x < low_z ) {			// Upper Triangle
-			p1 = getAsVec3(data, x_idx, z_idx + 1, divisions);		// Upper left
-			p2 = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);	// Upper Right
-			p3 = getAsVec3(data, x_idx, z_idx, divisions);	// Bottom left
 
-			//std::cout << "Case 1: [" << p1 << "," << p2 << "," << p3 << "]" << std::endl;
-
-			result = getY(p1, p2, p3, x, z);
-		}
-		else if (low_x > low_z) {		// Lower Triangle
-			p1 = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);		// Upper right
-			p2 = getAsVec3(data, x_idx, z_idx, divisions);		// Bottom left
-			p3 = getAsVec3(data, x_idx + 1, z_idx, divisions);	// Bottom right
-
-			//std::cout << "Case 2: [" << p1 << "," << p2 << "," << p3 << "]" << std::endl;
+			p1 = getAsVec3(data, left,	upper, divisions);		// Upper left
+			p2 = getAsVec3(data, right, upper, divisions);		// Upper Right
+			p3 = getAsVec3(data, left,	lower, divisions);		// Lower left
 
 			result = getY(p1, p2, p3, x, z);
-		}
-                else {						// On the line
+		} else if (low_x > low_z) {		// Lower Triangle
+
+			p1 = getAsVec3(data, right, upper, divisions);		// Upper right
+			p2 = getAsVec3(data, left,  lower, divisions);		// Lower left
+			p3 = getAsVec3(data, right, lower, divisions);		// Lower right
+
+			result = getY(p1, p2, p3, x, z);
+		} else {						// On the line
 			if (x_index == x_idx) {
-				//std::cout << "Case 3a" << std::endl;
-				p1 = p2 = p3 = getAsVec3(data, x_idx, z_idx + 1, divisions);
+
+				p1 = p2 = p3 = getAsVec3(data, left, right, divisions);
 				result = p1.getY();
 			} else{
-				p1 = getAsVec3(data, x_idx + 1, z_idx + 1, divisions);	// Upper right
-				p3 = p2 = getAsVec3(data, x_idx, z_idx, divisions);	// Bottom left
-
-				//std::cout << "Case 3.b: [" << p1 << "," << p2 << "]" << std::endl;
+				p1 = getAsVec3(data, right, upper, divisions);	// Upper right
+				p2 = getAsVec3(data, left, lower, divisions);	// Lower left
+				p3 = p2;
 
 				Vec2 u(p1.getX(), p1.getZ());
 				Vec2 b(p2.getX(), p2.getZ());
@@ -507,7 +507,7 @@ float getHeight(RenderObject &ground) {
 	if (enable_flying) {
 		return Camera.getY();
 	}
-	return result + 2.0f;
+	return result + 0.002f;
 }
 
 //////////////////////////////////////////////
@@ -541,7 +541,7 @@ int main(int argc, char** args)
 	//const int divisions = 16;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
-	const float size = 10000.0f;
+	const float size = 1.0f;
 	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions, 100);
 	GLuint *indices = generateIndices(divisions);
 
@@ -581,17 +581,6 @@ int main(int argc, char** args)
 		if (duration > 1.0/60.0) {
 			update();
 			duration = 0.0f;
-// TODO: Make this smooth
-/*
-			if (oldPos.getX() != Camera.getX() && oldPos.getZ() != Camera.getZ()) {
-				float tmp = getHeight(ground)+heightOffset;
-             			if (tmp > y - 0.5)
-					y+=0.5;
-				else if (tmp < y + 0.5)
-					y-=0.5;
-				oldPos = Vec3(Camera.getX(), 0, Camera.getZ());
-			}
-			//std::cout << "Height: " << y << std::endl; */
 			Camera = Vec3(Camera.getX(),getHeight(ground), Camera.getZ());
 		}
 

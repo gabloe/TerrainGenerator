@@ -21,8 +21,7 @@ private:
 	GLuint _number_vertices, _number_indices;
 
 	// Pointers to variables for shaders
-	GLuint _vertex_buffer;
-	GLuint _normal_buffer;
+	GLuint _vbo;
 	GLuint _index_buffer;
 
 	GLuint _position_index;
