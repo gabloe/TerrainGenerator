@@ -1,5 +1,11 @@
 #version 150
 
+bool isEqual(in vec3 a, in vec3 b) {
+	if( abs(a.x - b.x) > 0.00001 ) return false;
+	return abs(a.z - b.z) < 0.00001;
+}
+
+
 out vec4 colorOut;
 
 const vec4 ambient = vec4(0.2,0.2,0.2,1.0);
@@ -53,8 +59,8 @@ lightSource sun = lightSource(
 void main(void) {
         lights[0] = sun;
 
-        vec3 normalDir = normalize(N); 
-	vec3 viewDir = normalize(v);  
+        vec3 normalDir = normalize(N);
+	vec3 viewDir = normalize(v);
         vec3 lightDir;
         float attenuation;
 
@@ -72,7 +78,7 @@ void main(void) {
               vec3 positionToLight = vec3(lights[i].position - vec4(v,1.0));
               float distance = length(positionToLight);
               lightDir = normalize(positionToLight);
-              attenuation = 1.0 / (lights[i].constantAttenuation + 
+              attenuation = 1.0 / (lights[i].constantAttenuation +
                                    lights[i].linearAttenuation * distance +
                                    lights[i].quadraticAttenuation * distance * distance);
               if (lights[i].spotCutoff <= 90.0)
@@ -88,10 +94,10 @@ void main(void) {
                     }
                  }
               }
-              vec3 diffuseReflection = attenuation * 
+              vec3 diffuseReflection = attenuation *
 	                               vec3(lights[i].diffuse) * vec3(frontMaterial.diffuse) *
 	                               max(0.0, dot(normalDir, lightDir));
- 
+
               vec3 specularReflection;
               if (dot(N, lightDir) < 0.0) // light source on the wrong side?
 	         {
@@ -99,12 +105,16 @@ void main(void) {
 	         }
               else // light source on the right side
 	         {
-	         specularReflection = attenuation * vec3(lights[i].specular) * vec3(frontMaterial.specular) * 
+	         specularReflection = attenuation * vec3(lights[i].specular) * vec3(frontMaterial.specular) *
 	                              pow(max(0.0, dot(reflect(-lightDir, normalDir), viewDir)), frontMaterial.shininess);
 	         }
- 
+
            totalLighting = totalLighting + diffuseReflection + specularReflection;
            }
-
-	color  = vec4(totalLighting, 1.0); 
+	vec3 t = normalize(v);
+	if( isEqual(t,N)) {
+		color = vec4(1.0,0.0,0.0,1.0);
+	}else {
+		color  = vec4(totalLighting, 1.0);
+	}
 }
