@@ -53,3 +53,9 @@ Thumbs.db
 *.a
 
 bin/main
+
+Main/Main.vcxproj
+
+Main/Main.vcxproj
+
+*.vcxproj

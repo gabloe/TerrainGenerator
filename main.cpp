@@ -241,12 +241,10 @@ void update() {
 
 
 	if (abs(new_x) > 0.001) {
-                std::cout << "test 1" << std::endl; 
 		horizontalAngle += new_x;
 	}
 
 	if (abs(new_y) > 0.001) {
-                std::cout << "test 2" << std::endl; 
 		verticalAngle += new_y;
 	}
 
