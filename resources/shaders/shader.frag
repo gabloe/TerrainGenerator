@@ -2,10 +2,7 @@
 
 out vec4 colorOut;
 
-const vec3 lightSrc = vec3(0.0,1000000.0,0.0);
 const vec4 ambient = vec4(0.2,0.2,0.2,1.0);
-const vec4 diffuse = vec4(1.0,1.0,1.0,1.0);
-const vec4 specular = vec4(0.1,0.1,0.1,1.0);
 
 const float shininess = 0.2;
 
@@ -16,22 +13,98 @@ uniform vec3 p1,p2,p3;
 
 out vec4 color;
 
+struct lightSource
+   {
+   vec4 position;
+   vec4 diffuse;
+   vec4 specular;
+   float constantAttenuation, linearAttenuation, quadraticAttenuation;
+   float spotCutoff, spotExponent;
+   vec3 spotDirection;
+   };
+
+struct material
+   {
+   vec4 ambient;
+   vec4 diffuse;
+   vec4 specular;
+   float shininess;
+   };
+
+material frontMaterial = material(
+  vec4(0.2, 0.2, 0.2, 1.0),
+  vec4(1.0, 0.8, 0.8, 1.0),
+  vec4(1.0, 1.0, 1.0, 1.0),
+  5.0
+);
+
+const int numLights = 1;
+lightSource lights[numLights];
+
+lightSource sun = lightSource(
+   vec4(0.0,10.0,0.0,0.0),
+   vec4(1.0,1.0,1.0,1.0),
+   vec4(0.1,0.1,0.1,1.0),
+   0.0, 1.0, 0.0,
+   180.0, 0.0,
+   vec3(0.0,0.0,0.0)
+);
+
 void main(void) {
-	vec3 L = normalize(lightSrc - v);   
-	vec3 E = normalize(-v); // we are in Eye Coordinates, so EyePos is (0,0,0)  
-	vec3 R = normalize(-reflect(L,N));  
+        lights[0] = sun;
+
+        vec3 normalDir = normalize(N); 
+	vec3 viewDir = normalize(v);  
+        vec3 lightDir;
+        float attenuation;
+
+        vec3 totalLighting = vec3(ambient) * vec3(frontMaterial.ambient);
+
+        for (int i=0; i<numLights; i++)
+           {
+           if (lights[i].position.w == 0.0)
+              {
+              attenuation = 1.0;
+              lightDir = normalize(vec3(lights[i].position));
+              }
+           else
+              {
+              vec3 positionToLight = vec3(lights[i].position - vec4(v,1.0));
+              float distance = length(positionToLight);
+              lightDir = normalize(positionToLight);
+              attenuation = 1.0 / (lights[i].constantAttenuation + 
+                                   lights[i].linearAttenuation * distance +
+                                   lights[i].quadraticAttenuation * distance * distance);
+              if (lights[i].spotCutoff <= 90.0)
+                 {
+                 float clampedCos = max(0.0, dot(-lightDir, normalize(lights[i].spotDirection)));
+                 if (clampedCos < cos(radians(lights[i].spotCutoff)))
+                    {
+                    attenuation = 0.0;
+                    }
+                 else
+                    {
+                    attenuation = attenuation * pow(clampedCos, lights[i].spotExponent);
+                    }
+                 }
+              }
+              vec3 diffuseReflection = attenuation * 
+	                               vec3(lights[i].diffuse) * vec3(frontMaterial.diffuse) *
+	                               max(0.0, dot(normalDir, lightDir));
  
-	//calculate Ambient Term:  
-	vec4 Iamb = ambient;    
+              vec3 specularReflection;
+              if (dot(N, lightDir) < 0.0) // light source on the wrong side?
+	         {
+	         specularReflection = vec3(0.0, 0.0, 0.0); // no specular reflection
+	         }
+              else // light source on the right side
+	         {
+	         specularReflection = attenuation * vec3(lights[i].specular) * vec3(frontMaterial.specular) * 
+	                              pow(max(0.0, dot(reflect(-lightDir, normalDir), viewDir)), frontMaterial.shininess);
+	         }
+ 
+           totalLighting = totalLighting + diffuseReflection + specularReflection;
+           }
 
-	//calculate Diffuse Term:  
-	vec4 Idiff = diffuse * max(dot(N,L), 0.0);
-	Idiff = clamp(Idiff, 0.0, 1.0);     
-   
-	// calculate Specular Term:
-	vec4 Ispec = specular * pow(max(dot(R,E),0.0),0.3 * shininess);
-	Ispec = clamp(Ispec, 0.0, 1.0); 
-
-	// write Total Color:  
-	color = max(ambient, clamp(Iamb + Idiff + Ispec, 0.0, 1.0)); 
+	color  = vec4(totalLighting, 1.0); 
 }
