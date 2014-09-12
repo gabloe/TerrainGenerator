@@ -29,6 +29,7 @@
 #else
 #include <unistd.h>
 #define GetCurrentDir getcwd
+#define abs(x) ((x)<0 ? -(x) : (x))
 #endif
 
 Vec3 p1, p2, p3;
@@ -231,25 +232,23 @@ void update() {
 		speed *= 10.0f;
 	}
 
-
 	double xpos,ypos;
+
 	glfwGetCursorPos(window, &xpos, &ypos);
 	
 	double new_x = mouseSpeed * (width / 2 - xpos);
 	double new_y = mouseSpeed * (height / 2 - ypos);
 
+
 	if (abs(new_x) > 0.001) {
+                std::cout << "test 1" << std::endl; 
 		horizontalAngle += new_x;
 	}
 
 	if (abs(new_y) > 0.001) {
+                std::cout << "test 2" << std::endl; 
 		verticalAngle += new_y;
 	}
-
-	
-	
-
-	glfwSetCursorPos(window, width / 2, height / 2);
 
 	double sVA = sin(verticalAngle);
 	double cVA = cos(verticalAngle);
@@ -287,6 +286,7 @@ void update() {
 
 	TranslateMatrix = Mat4::LookAt(Camera, Camera + direction, up);
 
+	glfwSetCursorPos(window, width / 2, height / 2);
 }
 
 //////////////////////////////////////////////
