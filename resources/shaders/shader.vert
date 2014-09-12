@@ -19,7 +19,7 @@ void main(void) {
 	
 	mat4 normalMatrix = transpose(inverse(translate));
 
-	v = v_Position; //vec3(translate * vec4(v_Position,1.0));
+	v = v_Position;//vec3(translate * vec4(v_Position,1.0));
 	N = normalize(v_Normal);
 
 	gl_Position = projection * translate * vec4(v_Position,1.0);

@@ -40,9 +40,9 @@ Vec3 meanWeightSineEdge(const Vec3 &p1, const Vec3 &p2, const Vec3 &p3) {
 
 GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices, int number_indices) {
 	GLfloat *normals = new GLfloat[number_vertices];
-	memset(normals, 0, sizeof(GLfloat)* number_vertices);
+	memset(normals, 0, sizeof(GLfloat) * number_vertices);
 
-	GLfloat *divisors = new GLfloat[number_vertices/3];
+	//GLfloat *divisors = new GLfloat[number_vertices/3];
 
 	for (int i = 0; i < number_indices; i += 3) {
 
@@ -56,7 +56,7 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 
 		Vec3 N = (p2 - p1).cross(p3 - p1);
 		N.normalize();
-
+/*
 		float t1 = N * (p2 - p1);
 		if (abs(t1) >  0.00001) {
 			std::cout << "T1 Failure: " << t1 << std::endl;
@@ -68,7 +68,6 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 			std::cout << "T2 Failure: " << t1 << std::endl;
 			std::exit(-1);
 		}
-
 		normals[i1 + 0] += N.getX();
 		normals[i1 + 1] += N.getY();
 		normals[i1 + 2] += N.getZ();
@@ -80,8 +79,10 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 		normals[i3 + 0] += N.getX();
 		normals[i3 + 1] += N.getY();
 		normals[i3 + 2] += N.getZ();
+*/
 	}
 
+/*
 	for (int i = 0; i < number_vertices; i += 3) {
 		float x = normals[i + 1]; x *= x;
 		float y = normals[i + 2]; y *= y;
@@ -94,6 +95,7 @@ GLfloat *computeNormals(GLfloat *vertices, int number_vertices, GLuint *indices,
 	}
 
 	delete divisors;
+*/
 	return normals;
 }
 

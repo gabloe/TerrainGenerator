@@ -2,8 +2,8 @@
 
 out vec4 colorOut;
 
-const vec3 lightSrc = vec3(0.0,1000.0,0.0);
-const vec4 ambient = vec4(0.5,0.5,0.5,1.0);
+const vec3 lightSrc = vec3(0.0,1000000.0,0.0);
+const vec4 ambient = vec4(0.2,0.2,0.2,1.0);
 const vec4 diffuse = vec4(1.0,1.0,1.0,1.0);
 const vec4 specular = vec4(0.1,0.1,0.1,1.0);
 
@@ -33,5 +33,5 @@ void main(void) {
 	Ispec = clamp(Ispec, 0.0, 1.0); 
 
 	// write Total Color:  
-	color = abs(normalize(vec4(v,1.0)));//Iamb + Idiff + Ispec;    
+	color = max(ambient, clamp(Iamb + Idiff + Ispec, 0.0, 1.0)); 
 }
