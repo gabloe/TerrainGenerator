@@ -16,6 +16,12 @@ uniform vec3 p1,p2,p3;
 
 out vec4 color;
 
+bool isEqual(in vec3 a, in vec3 b) {
+	if( abs(a.x - b.x) > 0.00001 ) return false;
+	return abs(a.z - b.z) < 0.00001;
+}
+
+
 void main(void) {
 	vec3 L = normalize(lightSrc - v);   
 	vec3 E = normalize(-v); // we are in Eye Coordinates, so EyePos is (0,0,0)  
@@ -32,6 +38,11 @@ void main(void) {
 	vec4 Ispec = specular * pow(max(dot(R,E),0.0),0.3 * shininess);
 	Ispec = clamp(Ispec, 0.0, 1.0); 
 
+	vec3 t = normalize(v);
 	// write Total Color:  
-	color = max(ambient, clamp(Iamb + Idiff + Ispec, 0.0, 1.0)); 
+	if( isEqual(N,t)) {
+		color = vec4(1.0, 0.0 ,0.0, 1.0);
+	}else {
+		color = max(ambient, clamp(Iamb + Idiff + Ispec, 0.0, 1.0)); 
+	}
 }
