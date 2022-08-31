@@ -354,10 +354,12 @@ void init() {
 	}
 
 	int major = 3;
-	int minor = 1;
-	#ifdef __MAC 
+	int minor = 3;
+	#ifdef __APPLE__
 	minor = 2;
 	#endif
+
+	printf("Using OpenGL version %i.%i\n", major, minor);
 
 	// Set the hints on how to render to the 
 	// screen, which OpenGL version we have, etc

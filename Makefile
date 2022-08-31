@@ -7,9 +7,11 @@ OBJ_BIN=bin
 UNAME := $(shell uname)
 
 ifeq ($(UNAME),Darwin)
-LIB_DIR=-L/usr/local/lib -L./lib/osx
-INC_DIR=-I/usr/local/include -Iincludes -I.
-LDLIBS =-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -lglfw3 -lGLEW
+GLFW_BREW_PATH := $(shell brew --prefix glfw)
+GLEW_BREW_PATH := $(shell brew --prefix glew)
+LIB_DIR=-L$(GLFW_BREW_PATH)/lib -L$(GLEW_BREW_PATH)/lib -L/usr/local/lib -L./lib/osx 
+INC_DIR=-I$(GLFW_BREW_PATH)/include/GLFW -I$(GLEW_BREW_PATH)/include/GL -I/usr/local/include -Iincludes -I. 
+LDLIBS =-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -lglfw -lGLEW
 EXECUTABLE=main
 else ifeq ($UNAME), Linux)
 LIB_DIR=-L/usr/local/lib -L./lib/linux
@@ -22,7 +24,7 @@ CXX = g++ -m32
 CXXFLAGS = -Wall --std=c++0x -DGLFW_BUILD_DLL -DGLEW_STATIC
 LIB_DIR=-Llib/Win32
 INC_DIR=-Iincludes
-LDLIBS =-lm -lglew32 -lopengl32 -lglu32 -lgdi32 -lglfw3
+LDLIBS =-lm -lglew32 -lopengl32 -lglu32 -lgdi32 -lglfw
 EXECUTABLE=main.exe
 
 endif
