@@ -18,7 +18,7 @@ private:
 	SHADER_ERROR _error;
 
 public:
-	Shader(const std::string&, const std::string&);
+	Shader(const std::string&, const std::string& = std::string("shader"));
 	~Shader();
 
 	GLuint getVariable(std::string&);

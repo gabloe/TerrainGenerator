@@ -1,5 +1,8 @@
 #define GLFW_DLL
 
+// main
+#include "main.h"
+
 // OpenGL
 #include "GL/glew.h"	// glViewPort...
 #include <GLFW/glfw3.h>	// glfw*
@@ -12,11 +15,9 @@
 // C++
 #include <iostream>	// std::cout
 #include <list>		// List<RenderObject>
-#include <string>	// std::string
 #include <iomanip>	// std::setprecision
 #include <list>
 #include <sstream>
-
 
 // Custom
 #include "math/mat4.h"
@@ -24,16 +25,6 @@
 #include "renderer/RenderObject.h"
 #include "generators/Simplex.h"
 #include "generators/Perlin.h"
-
-// Used to get the current directory, can use later for something?
-#ifdef _WIN32
-#include <direct.h>
-#define GetCurrentDir _getcwd
-#else
-#include <unistd.h>
-#define GetCurrentDir getcwd
-#define abs(x) ((x)<0 ? -(x) : (x))
-#endif
 
 Vec3 p1, p2, p3;
 
@@ -55,6 +46,14 @@ const float zfar	= 100.0f;
 
 Mat4 TranslateMatrix;
 Mat4 ProjectionMatrix = Mat4::Perspective(90.0f, (float)width / (float)height, znear, zfar);
+
+std::string join_path() {return "";}
+
+template <typename... Args>
+std::string join_path(std::string first, Args... args)
+{
+    return first + kPathSeparator + join_path(args...);
+}
 
 
 #define checkGL() {							\
@@ -85,8 +84,7 @@ float* generateGround(float min_x, float max_x, float min_z, float max_z, int di
 	// Generate mountains
 	std::list<Vec3> mountains;
 	while (numMountains--) {
-		
-while (true) {
+		while (true) {
 			bool add = true;
 
 			float x = interpolateFloat(.01f + min_x, max_x - .01f, rand() / float(RAND_MAX)); // [0...1)
@@ -98,7 +96,7 @@ while (true) {
 			// Only add if not to close to other mountains
 			for (Vec3 m : mountains) {
 				double dist = (m - newMountain).getMagnitude();
-				if (dist < 0.01) {
+				if (dist < 0.01f) {
 					add = false;
 					break;
 				}
@@ -134,7 +132,7 @@ while (true) {
 				float dx = abs(x - m.getX());
 				if (dx < 0.01) {
 					float dz = abs(z - m.getZ());
-					if (dz < .001) {
+					if (dz < 0.5) {
 						++num_seen;
 						float scale = dx + dz;
 						float wave = 1.0f * float(abs(sin(x * z))) / (1.0f + scale);
@@ -144,7 +142,7 @@ while (true) {
 			}
 
 			if (num_seen) {
-				height = height / num_seen;
+				height = height / num_seen + 0.01f * (rand() / float(RAND_MAX));
 			}
 			
 			//data[pos + 1] = height + (float)simplex2d( x , z ,7,2.323f)/10.0f;
@@ -523,31 +521,24 @@ int main(int argc, char** args)
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	// Load the shader and compile it
-	const std::string BaseShaderDir = std::string("../resources/shaders/");
-	Shader shader(BaseShaderDir, std::string("shader"));
-
-	if (shader.getError() == SHADER_ERROR::NO_SHADER_ERROR) {
-		printf("No error loading shader\n");
-	}
-	else {
-		printf("Error with shader\n");
-		std::exit(-1);
-	}
-
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 
+	// Load the ground shader and compile it
+	const std::string base_shader_dir = join_path("..", "resources", "shaders");
+	const std::string ground_shader_dir = join_path(base_shader_dir, "ground");
 
-	const int divisions = 500;
+	Shader ground_shader(ground_shader_dir);
+
+	const int divisions = 75;
 	//const int divisions = 16;
 	const int number_vertices = 3 * divisions * divisions;
 	const int number_indicies = 6 * (divisions - 1) * (divisions - 1);
 	const float size = 1.0f;
-	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions, 100);
+	GLfloat *ground_data = generateGround(-size, size, -size, size, divisions, 10);
 	GLuint *indices = generateIndices(divisions);
 
-	RenderObject ground(shader, ground_data, number_vertices, indices, number_indicies);
+	RenderObject ground(ground_shader, ground_data, number_vertices, indices, number_indicies);
 
 	std::list<RenderObject> objs;
 

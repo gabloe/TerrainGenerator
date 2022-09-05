@@ -136,6 +136,9 @@ RenderObject::RenderObject(Shader &shader, GLfloat* vertices, int number_vertice
 	std::string *str_p2 = new std::string("p2");
 	std::string *str_p3 = new std::string("p3");
 
+	//shader.setFloat("material.shininess", 32.0f);
+    //shader.setInt("material.diffuse", 0);
+    //shader.setInt("material.specular", 1);
 
 	// Debug vertices
 	if ((_p1_index = shader.getUniform(*str_p1)) < 0) {

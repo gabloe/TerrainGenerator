@@ -159,6 +159,14 @@ Shader::Shader(const std::string &base_dir, const std::string &name) {
 		std::cout << "Could not load program" << std::endl;
 	}
 	printLog(_shader_program);
+
+	if (this->getError() == SHADER_ERROR::NO_SHADER_ERROR) {
+		printf("No error loading shader\n");
+	}
+	else {
+		printf("Error with shader\n");
+		std::exit(-1);
+	}
 }
 
 /* Cleanup */
