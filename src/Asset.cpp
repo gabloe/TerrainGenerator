@@ -23,7 +23,7 @@ const std::string asset::getExecutablePath() {
         executable_path = path_buf;
     }
     #elif defined(__linux__)
-    if (creadlink("/proc/self/exe", &path_buf[0], path_length) > 0) {
+    if (readlink("/proc/self/exe", &path_buf[0], path_length) > 0) {
         executable_path = path_buf;
     }
     #else
