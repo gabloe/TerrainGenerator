@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <limits.h>
+#include <memory>
 
 #if defined(__APPLE__) || defined(__MACH__)
 #include <mach-o/dyld.h>
