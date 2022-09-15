@@ -33,25 +33,25 @@ struct VertexType {
 
 TerrainGenerator::TerrainGenerator(config::ConfigReader& configReader)
     : OGLApplication(),
-      modelPath(asset::Asset::MODELS_DIR + "/tree.DAE"),
-      vertexShaderPath(asset::Asset::SHADERS_DIR + "/shader.vert"),
-      fragmentShaderPath(asset::Asset::SHADERS_DIR + "/shader.frag") {
+      modelPath(asset::Asset::Instance().MODELS_DIR + "/tree.DAE"),
+      vertexShaderPath(asset::Asset::Instance().SHADERS_DIR + "/shader.vert"),
+      fragmentShaderPath(asset::Asset::Instance().SHADERS_DIR + "/shader.frag") {
   if (configReader.ContainsKey("model")) {
     std::string modelName = configReader.ReadString("model");
-    modelPath = asset::Asset::MODELS_DIR + "/" + modelName;
+    modelPath = asset::Asset::Instance().MODELS_DIR + "/" + modelName;
     logging::Logger::LogInfo("Overriding default model vale: " + modelPath);
   }
 
   if (configReader.ContainsKey("vertexShader")) {
     std::string vertexShaderName = configReader.ReadString("vertexShader");
-    vertexShaderPath = asset::Asset::SHADERS_DIR + "/" + vertexShaderName;
+    vertexShaderPath = asset::Asset::Instance().SHADERS_DIR + "/" + vertexShaderName;
     logging::Logger::LogInfo("Overriding default vertex value: " +
                              vertexShaderPath);
   }
 
   if (configReader.ContainsKey("fragmentShader")) {
     std::string fragmentShaderName = configReader.ReadString("fragmentShader");
-    fragmentShaderPath = asset::Asset::SHADERS_DIR + "/" + fragmentShaderName;
+    fragmentShaderPath = asset::Asset::Instance().SHADERS_DIR + "/" + fragmentShaderName;
     logging::Logger::LogInfo("Overriding default fragment value: " +
                              fragmentShaderPath);
   }

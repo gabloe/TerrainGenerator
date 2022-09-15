@@ -12,7 +12,7 @@
 #include <Asset.hpp>
 
 int main(int argc, const char* argv[]) {
-  std::string configPath = asset::Asset::CONFIG_PATH;
+  std::string configPath = asset::Asset::Instance().CONFIG_PATH;
   if (argc == 2) {
     configPath = argv[1];
   }

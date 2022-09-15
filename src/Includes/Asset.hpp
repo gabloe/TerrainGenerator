@@ -14,13 +14,29 @@
 
 namespace asset {
 
-const std::string getExecutablePath();
+	const std::string getExecutablePath();
 
-class Asset {
-    public:
-        static const std::string RESOURCE_DIR;
-        static const std::string SHADERS_DIR;
-        static const std::string MODELS_DIR;
-        static const std::string CONFIG_PATH;
-};
+	class Asset {
+	private:
+
+		static std::unique_ptr<Asset> instance;
+
+	protected:
+		Asset();
+
+	public:
+		static const Asset& Instance()
+		{
+			if (instance == nullptr)
+			{
+				instance = std::unique_ptr<Asset>(new Asset{});
+			}
+			return *instance;
+		}
+
+		const std::string RESOURCE_DIR;
+		const std::string SHADERS_DIR;
+		const std::string MODELS_DIR;
+		const std::string CONFIG_PATH;
+	};
 } // namespace asset
