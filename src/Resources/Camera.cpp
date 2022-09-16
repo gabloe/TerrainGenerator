@@ -114,27 +114,26 @@ void Camera::UpdateVectors(){
 
 void Camera::UpdateMovementSpeedStep(int increase, float deltaT) {
   // Don't step up if we are already at the highest step
-  if (MovementSpeedStep >= *std::max_element(AllMovementTypes.begin(), AllMovementTypes.end())) {
+  if (MovementTypeIndex > AllMovementTypes.size() - 1) {
     return;
   }
 
   // Increase the time delta until we hit the step up threshold
   MovementSpeedDeltaT += deltaT;
 
-  if (MovementSpeedDeltaT >= MOVEMENT_SPEED_DELTAT_STEP_THRESHOLD) {
+  if (MovementSpeedDeltaT >= MOVEMENT_SPEED_DELTA_T_STEP_THRESHOLD) {
     // Reset the speed time delta and test whether movement speed should increase
     MovementSpeedDeltaT = 0;
     MovementSpeedStep += increase; // Update the speed % increase
     const MovementType movementTypeTest = static_cast<MovementType>(MovementSpeedStep);
     MovementType newMovementType = MovementType::DEFAULT;
 
-    // Test if the new movement speed is at or above one of the steps
-    for (auto t : AllMovementTypes) {
-      if (movementTypeTest >= t) {
-        newMovementType = t;
-        logging::Logger::LogDebug("MovementType: " + std::string(MovementTypeToString(t)) + " (" + std::to_string(t) + "% / " + std::to_string(MovementSpeedStep) + "%)");
-        break;
-      }
+    // Test if the new movement speed is at or above the next step
+    MovementType nextStep = *std::min_element(AllMovementTypes.begin(), AllMovementTypes.end() - MovementTypeIndex);
+    if (MovementSpeedStep > nextStep) {
+      newMovementType = nextStep;
+      MovementTypeIndex++;
+      logging::Logger::LogDebug("MovementType: " + std::string(MovementTypeToString(newMovementType)));
     }
 
     // If we have stepped up to the next speed, get the new percentage increase and multiply by the base speed
@@ -148,5 +147,6 @@ void Camera::ResetMovementSpeedStep() {
   MovementSpeedDeltaT = 0;
   MovementSpeedStep = 0;
   MovementSpeed = DEFAULT_SPEED;
+  MovementTypeIndex = 0;
   logging::Logger::LogDebug("MovementType reset");
 }

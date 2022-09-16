@@ -33,7 +33,7 @@ constexpr const char* MovementTypeToString(MovementType t) throw()
         case MovementType::JOG: return "Jog";
         case MovementType::RUN: return "Run";
         case MovementType::SPRINT: return "Sprint";
-        case MovementType::DEFAULT: return "DEFAULT";
+        case MovementType::DEFAULT: return "Default";
         default: throw std::invalid_argument("Unimplemented item");
     };
 };
@@ -49,7 +49,7 @@ const float DEFAULT_SENSITIVITY =  0.1f;
 const float DEFAULT_ZOOM        =  45.0f;
 
 // Movement speed ladder threshold
-const float MOVEMENT_SPEED_DELTAT_STEP_THRESHOLD = 0.01f; // Increase the step when time delta since the last incease is above the threshold
+const float MOVEMENT_SPEED_DELTA_T_STEP_THRESHOLD = 0.01f; // Increase the step when time delta since the last incease is above the threshold
 
 // Default vectors
 const glm::vec3 DEFAULT_POSITION    = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -69,6 +69,7 @@ class Camera {
         float Pitch;
         // camera options
         float MovementSpeed;
+        int MovementTypeIndex = 0;
         int SpeedThreshold;
         float MouseSensitivity;
         float Zoom;
