@@ -1,5 +1,6 @@
 #include <Camera.hpp>
 #include <Logger.hpp>
+#include <algorithm>
 
 using namespace camera;
 
