@@ -44,7 +44,7 @@ constexpr const std::array<MovementType, 4> AllMovementTypes = { MovementType::S
 // Default camera values
 const float DEFAULT_YAW         = -90.0f;
 const float DEFAULT_PITCH       =  0.0f;
-const float DEFAULT_SPEED       =  2.5;
+const float DEFAULT_SPEED       =  2.5f;
 const float DEFAULT_SENSITIVITY =  0.1f;
 const float DEFAULT_ZOOM        =  45.0f;
 
@@ -87,8 +87,8 @@ class Camera {
         void HandleMouseScroll(float);
 
         // Control the rate of movement speed increase by step up over time delta
-        void UpdateMovementSpeedLadder(int, float);
-        void ResetMovementSpeedLadder();
+        void UpdateMovementSpeedStep(int, float);
+        void ResetMovementSpeedStep();
 
     private:
         void UpdateVectors();

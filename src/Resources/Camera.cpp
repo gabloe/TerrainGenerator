@@ -111,7 +111,7 @@ void Camera::UpdateVectors(){
   Up    = glm::normalize(glm::cross(Right, Front));
 }
 
-void Camera::UpdateMovementSpeedLadder(int increase, float deltaT) {
+void Camera::UpdateMovementSpeedStep(int increase, float deltaT) {
   // Don't step up if we are already at the highest step
   if (MovementSpeedStep >= *std::max_element(AllMovementTypes.begin(), AllMovementTypes.end())) {
     return;
@@ -143,7 +143,7 @@ void Camera::UpdateMovementSpeedLadder(int increase, float deltaT) {
   }
 }
 
-void Camera::ResetMovementSpeedLadder() {
+void Camera::ResetMovementSpeedStep() {
   MovementSpeedDeltaT = 0;
   MovementSpeedStep = 0;
   MovementSpeed = DEFAULT_SPEED;
