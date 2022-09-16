@@ -129,9 +129,12 @@ void TerrainGenerator::handleKeyboardEvent(GLFWwindow* window,
                                             int action,
                                             int mods) {
   if (mods == GLFW_MOD_SHIFT) {
-    speed = running_speed;
-  } else {
-    speed = walking_speed;
+    camera.UpdateMovementSpeedLadder(50, getFrameDeltaTime());
+  }
+  if (key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) {
+    if (action == GLFW_RELEASE) {
+      camera.ResetMovementSpeedLadder();
+    }
   }
   if (key == GLFW_KEY_F && action == GLFW_PRESS) {
     setFullScreen(!isFullScreen());

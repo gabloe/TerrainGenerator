@@ -48,11 +48,6 @@ class TerrainGenerator : public OGLApplication {
   size_t num_vertices;
   size_t num_indexes;
 
-  // Movement speed
-  const float running_speed = 0.5f;
-  const float walking_speed = 0.01f;
-  float speed = walking_speed;
-
   // Model
   std::string modelPath;
 
