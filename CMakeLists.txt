@@ -75,6 +75,11 @@ add_subdirectory(lib/json EXCLUDE_FROM_ALL)
 set(BUILD_SHARED_LIBS ON)
 add_subdirectory(lib/freetype EXCLUDE_FROM_ALL)
 
+IF (WIN32)
+ELSE()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
+ENDIF()
+
 target_link_libraries(terrain-generator
   PRIVATE glfw
   PRIVATE glm
