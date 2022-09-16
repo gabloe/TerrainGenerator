@@ -14,9 +14,12 @@
 #include <exception>
 #include <stdexcept>
 
-constexpr int ExitSuccess = 0;
-constexpr int ExitOnException = ExitSuccess + 1;
-constexpr int ExitOnUnknownException = ExitOnException + 1;
+// Literally the same as a list of integers. Not just formalized.
+enum ExitCode {
+  ExitSuccess = 0,
+  ExitOnException = 1,
+  ExitOnUnknownException = 2,
+};
 
 int main(int argc, const char* argv[]) {
   std::string configPath = asset::Asset::Instance().CONFIG_PATH;
@@ -50,13 +53,14 @@ int main(int argc, const char* argv[]) {
   } catch (const std::exception& ex) {
     logging::Logger::LogError("An exception was thrown: " +
                               std::string{ex.what()});
-    return ExitOnException;
+    return ExitCode::ExitOnException;
   } catch (...) {
-    // I am honestly not sure how to handle these, you would think that there would
-    // be better things to do here other than "There was an error, sorry!".
+    // I am honestly not sure how to handle these, you would think that there
+    // would be better things to do here other than "There was an error,
+    // sorry!".
     logging::Logger::LogError("An untyped exception was thrown");
-    return ExitOnUnknownException;
+    return ExitCode::ExitOnUnknownException;
   }
 
-  return ExitSuccess;
+  return ExitCode::ExitSuccess;
 }
