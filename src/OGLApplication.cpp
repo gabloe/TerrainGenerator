@@ -118,6 +118,12 @@ OGLApplication::OGLApplication()
         static_cast<OGLApplication*>(glfwGetWindowUserPointer(win))
             ->mouseMoved(win, x, y);
       });
+
+  glfwSetScrollCallback(_window, +[](GLFWwindow* win, double x, double y) {
+        static_cast<OGLApplication*>(glfwGetWindowUserPointer(win))
+            ->mouseScroll(win, x, y);
+  });
+
   glfwSetWindowSizeCallback(
       _window, +[](GLFWwindow* win, int cx, int cy) {
         static_cast<OGLApplication*>(glfwGetWindowUserPointer(win))
@@ -267,6 +273,11 @@ float OGLApplication::getWindowRatio() {
 
 void OGLApplication::mouseMoved(GLFWwindow* window, double x, double y) {
   logging::Logger::LogInfo("Mouse moved to <" + std::to_string(x) + "," +
+                           std::to_string(y) + ">");
+}
+
+void OGLApplication::mouseScroll(GLFWwindow* window, double x, double y) {
+    logging::Logger::LogInfo("Mouse scrolled by <" + std::to_string(x) + "," +
                            std::to_string(y) + ">");
 }
 

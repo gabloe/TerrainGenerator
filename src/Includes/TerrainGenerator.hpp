@@ -19,14 +19,12 @@
 #include <memory>
 #include <ConfigReader.hpp>
 
+#include <Camera.hpp>
+
 class TerrainGenerator : public OGLApplication {
  public:
   TerrainGenerator(config::ConfigReader& configReader);
-  glm::vec3 cameraPos;
-  glm::vec3 cameraFront;
-  glm::vec3 cameraUp;
-  glm::vec3 cameraTarget;
-  glm::vec3 cameraDirection;
+  camera::Camera camera;
 
   std::vector<std::shared_ptr<models::Model>> models;
   bool firstMouse = true;
@@ -41,6 +39,7 @@ class TerrainGenerator : public OGLApplication {
  protected:
   virtual void render();
   virtual void mouseMoved(GLFWwindow*, double, double);
+  virtual void mouseScroll(GLFWwindow*, double, double);
   virtual void handleKeyboardEvent(GLFWwindow*, int, int, int, int);
 
  private:
