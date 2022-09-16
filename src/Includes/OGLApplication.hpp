@@ -101,6 +101,7 @@ class OGLApplication {
 
   virtual void render();
   virtual void mouseMoved(GLFWwindow*, double, double);
+  virtual void mouseScroll(GLFWwindow*, double, double);
   virtual void handleKeyboardEvent(GLFWwindow*, int, int, int, int);
 };
 

@@ -19,7 +19,9 @@ namespace fs = std::filesystem;
 std::unique_ptr<Asset> Asset::instance;
 
 
-#if defined(__APPLE__) || defined(__MACH__) || defined(__linux__)
+#if defined(__APPLE__) || defined(__MACH__)
+uint32_t path_length = PATH_MAX;
+#elif defined(__linux__)
 constexpr uint32_t path_length = PATH_MAX;
 #else
 constexpr uint32_t path_length = 255;
