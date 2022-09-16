@@ -77,7 +77,7 @@ add_subdirectory(lib/freetype EXCLUDE_FROM_ALL)
 
 IF (WIN32)
 ELSE()
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration" CACHE STRING "CMAKE C flags")
 ENDIF()
 
 target_link_libraries(terrain-generator
