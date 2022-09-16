@@ -71,6 +71,8 @@ add_subdirectory(lib/assimp EXCLUDE_FROM_ALL)
 add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
 add_subdirectory(lib/glad EXCLUDE_FROM_ALL)
 add_subdirectory(lib/json EXCLUDE_FROM_ALL)
+
+set(BUILD_SHARED_LIBS ON)
 add_subdirectory(lib/freetype EXCLUDE_FROM_ALL)
 
 target_link_libraries(terrain-generator
