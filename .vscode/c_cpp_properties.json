@@ -1,19 +1,21 @@
 {
     "configurations": [
         {
-            "name": "Windows",
+            "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/lib/assimp/include",
                 "${workspaceFolder}/lib/glfw/include",
                 "${workspaceFolder}/lib/glm/",
                 "${workspaceFolder}/lib/json/single_include",
+                "${workspaceFolder}/lib/freetype/include",
                 "${workspaceFolder}/lib/",
                 "${workspaceFolder}/src/",
                 "${workspaceFolder}/**"
             ],
             "defines": [],
             "cStandard": "c17",
-            "cppStandard": "c++17"
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64"
         },
         {
             "name": "Mac",

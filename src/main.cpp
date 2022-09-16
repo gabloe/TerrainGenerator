@@ -8,8 +8,11 @@
 
 #include <TerrainGenerator.hpp>
 
-#include <Logger.hpp>
 #include <Asset.hpp>
+#include <Logger.hpp>
+
+#include <exception>
+#include <stdexcept>
 
 int main(int argc, const char* argv[]) {
   std::string configPath = asset::Asset::Instance().CONFIG_PATH;
@@ -37,7 +40,14 @@ int main(int argc, const char* argv[]) {
   }
 
   TerrainGenerator app{configReader};
-  app.run();
+  try {
+    app.run();
+  } catch (const std::exception& ex) {
+    logging::Logger::LogError("An exception was thrown: " +
+                              std::string{ex.what()});
+  } catch (...) {
+    logging::Logger::LogError("An untyped exception was thrown");
+  }
 
   return 0;
 }

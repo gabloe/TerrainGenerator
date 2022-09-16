@@ -31,5 +31,6 @@ namespace asset {
 		const std::string SHADERS_DIR;
 		const std::string MODELS_DIR;
 		const std::string CONFIG_PATH;
+		const std::string FONT_DIR;
 	};
 } // namespace asset

@@ -35,7 +35,7 @@ endif ()
 
 
 #includes
-include_directories(src/Includes lib/stb lib/json/single_include)
+include_directories(src/Includes lib/stb lib/json/single_include lib/freetype/include)
 
 file(GLOB terrain-generator-code
      "src/**/*.hpp"
@@ -71,12 +71,14 @@ add_subdirectory(lib/assimp EXCLUDE_FROM_ALL)
 add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
 add_subdirectory(lib/glad EXCLUDE_FROM_ALL)
 add_subdirectory(lib/json EXCLUDE_FROM_ALL)
+add_subdirectory(lib/freetype EXCLUDE_FROM_ALL)
 
 target_link_libraries(terrain-generator
   PRIVATE glfw
   PRIVATE glm
   PRIVATE assimp
   PRIVATE glad
+  PRIVATE freetype
   ${OUR_LIBRARIES}
 )
 
