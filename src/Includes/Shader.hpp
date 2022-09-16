@@ -80,6 +80,12 @@ class ShaderProgram {
   void setUniform(const std::string& name, float val);
   void setUniform(const std::string& name, int val);
 
+  void setVec3(const std::string&, const glm::vec3&);
+  void setVec3(const std::string&, float, float, float);
+  void setVec4(const std::string&, const glm::vec4&);
+  void setVec4(const std::string&, float, float, float, float);
+  void setFloat(const std::string&, float);
+  
   ~ShaderProgram();
 
  private:

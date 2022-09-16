@@ -213,6 +213,26 @@ void ShaderProgram::setUniform(const std::string& name, int val) {
   glUniform1i(uniform(name), val);
 }
 
+void ShaderProgram::setVec3(const std::string& name, const glm::vec3& value) { 
+  glUniform3fv(uniform(name), 1, &value[0]); 
+}
+
+void ShaderProgram::setVec3(const std::string& name, float x, float y, float z) {
+  glUniform3f(uniform(name), x, y, z); 
+}
+
+void ShaderProgram::setVec4(const std::string& name, const glm::vec4& value) { 
+  glUniform4fv(uniform(name), 1, &value[0]); 
+}
+
+void ShaderProgram::setVec4(const std::string& name, float x, float y, float z, float w) {
+  glUniform4f(uniform(name), x, y, z, w); 
+}
+
+void ShaderProgram::setFloat(const std::string& name, float value) {
+  glUniform1f(uniform(name), value); 
+}
+
 ShaderProgram::~ShaderProgram() {
   // glDeleteProgram(handle);
 }
