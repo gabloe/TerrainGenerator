@@ -141,9 +141,10 @@ void ShaderProgram::setAttribute(const std::string& name,
                                  GLboolean normalize,
                                  GLenum type) {
   GLint loc = attribute(name);
+  char * ptr = reinterpret_cast<char*>(0) + offset;
   glEnableVertexAttribArray(loc);
   glVertexAttribPointer(loc, size, type, normalize, stride,
-                        reinterpret_cast<void*>(offset));
+                        reinterpret_cast<void*>(ptr));
 }
 
 void ShaderProgram::setAttribute(const std::string& name,
