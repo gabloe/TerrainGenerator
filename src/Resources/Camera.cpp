@@ -1,4 +1,6 @@
 #include <Camera.hpp>
+#include <Logger.hpp>
+#include <algorithm>
 
 using namespace camera;
 
@@ -63,27 +65,27 @@ void Camera::HandleKeyboardInput(MovementDirection direction, float deltaTime) {
 }
 
 void Camera::HandleMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
-    xoffset *= MouseSensitivity;
-    yoffset *= MouseSensitivity;
+  xoffset *= MouseSensitivity;
+  yoffset *= MouseSensitivity;
 
-    Yaw   += xoffset;
-    Pitch += yoffset;
+  Yaw   += xoffset;
+  Pitch += yoffset;
 
-    // make sure that when pitch is out of bounds, screen doesn't get flipped
-    if (constrainPitch) {
-      if (Pitch > 89.0f) {
-        Pitch = 89.0f;
-      }
-      if (Pitch < -89.0f) {
-        Pitch = -89.0f;
-      }
+  // make sure that when pitch is out of bounds, screen doesn't get flipped
+  if (constrainPitch) {
+    if (Pitch > 89.0f) {
+      Pitch = 89.0f;
     }
+    if (Pitch < -89.0f) {
+      Pitch = -89.0f;
+    }
+  }
 
-    // Update the vectors using updated euler angles
-    UpdateVectors();
+  // Update the vectors using updated euler angles
+  UpdateVectors();
 }
 
-void camera::Camera::HandleMouseScroll(float yoffset) {
+void Camera::HandleMouseScroll(float yoffset) {
   Zoom -= yoffset;
   if (Zoom < 1.0f) {
     Zoom = 1.0f;
@@ -94,18 +96,57 @@ void camera::Camera::HandleMouseScroll(float yoffset) {
 }
 
 void Camera::UpdateVectors(){
-    // Recalculate the front vector
-    glm::vec3 front;
-    front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    front.y = sin(glm::radians(Pitch));
-    front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+  // Recalculate the front vector
+  glm::vec3 front;
+  front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+  front.y = sin(glm::radians(Pitch));
+  front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
 
-    // Make sure to normalize
-    Front = glm::normalize(front);
+  // Make sure to normalize
+  Front = glm::normalize(front);
 
-    // Recalculate the right vector
-    Right = glm::normalize(glm::cross(Front, WorldUp));
+  // Recalculate the right vector
+  Right = glm::normalize(glm::cross(Front, WorldUp));
 
-    // Recalculate the up vector
-    Up    = glm::normalize(glm::cross(Right, Front));
+  // Recalculate the up vector
+  Up    = glm::normalize(glm::cross(Right, Front));
+}
+
+void Camera::UpdateMovementSpeedStep(int increase, float deltaT) {
+  // Don't step up if we are already at the highest step
+  if (MovementTypeIndex > AllMovementTypes.size() - 1) {
+    return;
+  }
+
+  // Increase the time delta until we hit the step up threshold
+  MovementSpeedDeltaT += deltaT;
+
+  if (MovementSpeedDeltaT >= MOVEMENT_SPEED_DELTA_T_STEP_THRESHOLD) {
+    // Reset the speed time delta and test whether movement speed should increase
+    MovementSpeedDeltaT = 0;
+    MovementSpeedStep += increase; // Update the speed % increase
+    const MovementType movementTypeTest = static_cast<MovementType>(MovementSpeedStep);
+    MovementType newMovementType = MovementType::DEFAULT;
+
+    // Test if the new movement speed is at or above the next step
+    MovementType nextStep = *std::min_element(AllMovementTypes.begin(), AllMovementTypes.end() - MovementTypeIndex);
+    if (MovementSpeedStep > nextStep) {
+      newMovementType = nextStep;
+      MovementTypeIndex++;
+      logging::Logger::LogDebug("MovementType: " + std::string(MovementTypeToString(newMovementType)));
+    }
+
+    // If we have stepped up to the next speed, get the new percentage increase and multiply by the base speed
+    if (newMovementType != MovementType::DEFAULT) {
+      MovementSpeed = newMovementType / 100.0f * DEFAULT_SPEED;
+    }
+  }
+}
+
+void Camera::ResetMovementSpeedStep() {
+  MovementSpeedDeltaT = 0;
+  MovementSpeedStep = 0;
+  MovementSpeed = DEFAULT_SPEED;
+  MovementTypeIndex = 0;
+  logging::Logger::LogDebug("MovementType reset");
 }

@@ -11,6 +11,7 @@
 #include <stdexcept>
 
 #include <Logger.hpp>
+#include <iostream>
 
 using namespace std;
 
