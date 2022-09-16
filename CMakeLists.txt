@@ -72,13 +72,13 @@ add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
 add_subdirectory(lib/glad EXCLUDE_FROM_ALL)
 add_subdirectory(lib/json EXCLUDE_FROM_ALL)
 
-set(BUILD_SHARED_LIBS ON)
-add_subdirectory(lib/freetype EXCLUDE_FROM_ALL)
-
+# set(BUILD_SHARED_LIBS ON)
 IF (WIN32)
 ELSE()
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration" CACHE STRING "CMAKE C flags")
 ENDIF()
+add_subdirectory(lib/freetype EXCLUDE_FROM_ALL)
+
 
 target_link_libraries(terrain-generator
   PRIVATE glfw
