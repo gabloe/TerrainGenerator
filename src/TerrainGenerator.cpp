@@ -55,7 +55,7 @@ TerrainGenerator::TerrainGenerator(config::ConfigReader& configReader)
   }
 
   // setup the camera
-  camera::Camera camera = camera::Camera(glm::vec3(0.0f, 0.0f, 1000.0f));
+  camera::Camera camera = camera::Camera(glm::vec3(0.0f, 0.0f, 100.0f));
 
   Init();
 }
