@@ -4,28 +4,28 @@
 using namespace models;
 
 Material::Material(const aiScene* scene, const aiMesh* mesh)
-  : _scene(scene), _mesh(mesh), _material{scene->mMaterials[mesh->mMaterialIndex]} {
+  : _material{scene->mMaterials[mesh->mMaterialIndex]} {
 
-  Color = GetColor();
-  Shininess = GetShininess();
-  ShininessStrength = GetShininessStrength();
+  SetColor();
+  SetShininess();
+  SetShininessStrength();
 }
 
-const float Material::GetShininessStrength() {
+void Material::SetShininessStrength() {
   float shininess_strength = 1.0f;
   _material->Get(AI_MATKEY_SHININESS_STRENGTH, shininess_strength);
   logging::Logger::LogDebug("Material has shininess strength " + std::to_string(shininess_strength));
-  return shininess_strength;
+  ShininessStrength = shininess_strength;
 }
 
-const float Material::GetShininess() {
+void Material::SetShininess() {
   float shininess = 1.0f;
   _material->Get(AI_MATKEY_SHININESS, shininess);
   logging::Logger::LogDebug("Material has shininess " + std::to_string(shininess));
-  return shininess;
+  Shininess = shininess;
 }
 
-const MaterialColor Material::GetColor() {
+const MaterialColor Material::SetColor() {
   MaterialColor result;
 
   // Diffuse component
@@ -70,5 +70,5 @@ const MaterialColor Material::GetColor() {
       " Blue=" + std::to_string(result.ambient.b));
   }
 
-  return result;
+  Color = result;
 }

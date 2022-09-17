@@ -42,12 +42,8 @@ namespace models {
 
     private:
       const aiMaterial* _material;
-      const aiScene* _scene;
-      const aiMesh* _mesh;
-
-    protected:
-      const MaterialColor GetColor();
-      const float GetShininess();
-      const float GetShininessStrength();
+      const MaterialColor SetColor();
+      void SetShininess();
+      void SetShininessStrength();
   };
 }

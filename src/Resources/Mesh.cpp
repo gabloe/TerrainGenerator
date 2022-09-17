@@ -228,11 +228,11 @@ void Mesh::Draw(ShaderProgram& shader) const {
   }
 
   // Set up material properties
-  shader.setVec4("material.ambient", material.Color.to_vec4(AMBIENT));
-  shader.setVec4("material.diffuse", material.Color.to_vec4(DIFFUSE));
-  shader.setVec4("material.specular", material.Color.to_vec4(SPECULAR));
-  shader.setFloat("material.shininess", material.Shininess);
-  shader.setFloat("material.shininess_strength", material.ShininessStrength);
+  shader.setUniform("material.ambient", material.Color.to_vec4(AMBIENT));
+  shader.setUniform("material.diffuse", material.Color.to_vec4(DIFFUSE));
+  shader.setUniform("material.specular", material.Color.to_vec4(SPECULAR));
+  shader.setUniform("material.shininess", material.Shininess);
+  shader.setUniform("material.shininess_strength", material.ShininessStrength);
 
   // draw mesh
   glBindVertexArray(VAO);

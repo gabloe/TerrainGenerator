@@ -38,8 +38,8 @@ void main(void)
     vec3 viewDir = normalize(camera - fPosition.xyz);
     vec3 reflectDir = reflect(-lightDir, norm);
 
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess * material.shininess_strength);
-    vec3 specular = lightColor * (spec * material.specular.xyz);     
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    vec3 specular = lightColor * (spec * material.specular.xyz) * material.shininess_strength;
 
     // Result
     vec4 result = vec4(ambient + diffuse + specular, 1.0);
