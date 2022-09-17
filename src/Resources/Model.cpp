@@ -22,7 +22,7 @@ void Model::Load(std::string fileName) {
   this->path = fileName;
 
   logging::Logger::LogDebug("Processing root node");
-  ProcessNode(scene->mRootNode, scene);
+  ProcessNode(scene->mRootNode, scene, aiMatrix4x4{});
 
   logging::Logger::LogInfo("Model " + fileName + " loaded successfully");
 }
@@ -35,16 +35,19 @@ void Model::Draw(ShaderProgram& shader) const {
   }
 }
 
-void Model::ProcessNode(aiNode* node, const aiScene* scene) {
-  auto nodeTransformation = node->mTransformation;
+void Model::ProcessNode(aiNode* node,
+                        const aiScene* scene,
+                        aiMatrix4x4 tranformationMatrix) {
+  auto nodeTransformation = tranformationMatrix * node->mTransformation;
+  auto transposedNodeMatrix = nodeTransformation.Transpose();
   glm::mat4 transform;
 
   std::stringstream ss;
   for (int row = 0; row < 4; row++) {
     ss << "{";
     for (int col = 0; col < 4; col++) {
-      transform[col][row] = nodeTransformation[row][col];
-      ss << transform[col][row] << (col == 3 ? "" : ", ");
+      transform[row][col] = transposedNodeMatrix[row][col];
+      ss << transform[row][col] << (col == 3 ? "" : ", ");
     }
     ss << "}\n";
   }
@@ -60,6 +63,6 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene) {
 
   for (unsigned int i = 0; i < node->mNumChildren; i++) {
     logging::Logger::LogDebug("Processing child node " + std::to_string(i));
-    ProcessNode(node->mChildren[i], scene);
+    ProcessNode(node->mChildren[i], scene, nodeTransformation);
   }
 }

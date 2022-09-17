@@ -18,7 +18,9 @@ class Model {
   std::vector<Texture>
       textures_loaded;  // Unsure a texture is only loaded once.
 
-  void ProcessNode(aiNode* node, const aiScene* scene);
+  void ProcessNode(aiNode* node,
+                   const aiScene* scene,
+                   aiMatrix4x4 tranformationMatrix);
 
  public:
   /// @brief Load the model from the provided file.
