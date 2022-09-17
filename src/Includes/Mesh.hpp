@@ -5,9 +5,9 @@
 
 #include <assimp/scene.h>
 
+#include <Material.hpp>
 #include <Shader.hpp>
 #include <Texture.hpp>
-#include <Material.hpp>
 
 #include <memory>
 #include <optional>
@@ -41,8 +41,12 @@ class Mesh {
   Material material;
   /// @brief Loads the mesh data from the scene and assimp mesh object.
   /// @param scene The assimp scene object.
+  /// @param transform The mesh transformation.
   /// @param mesh The assimp mesh object.
-  void Load(const aiScene* scene, const aiMesh* mesh, std::optional<std::string> relativePath = std::nullopt);
+  void Load(const aiScene* scene,
+            const aiMesh* mesh,
+            glm::mat4 transform,
+            std::optional<std::string> relativePath = std::nullopt);
 
   /// @brief Draw the mesh to the screen.
   /// @param shader The shader we want to use when drawing.

@@ -13,12 +13,10 @@ using namespace models;
 
 void Mesh::Load(const aiScene* scene,
                 const aiMesh* mesh,
+                glm::mat4 transform,
                 std::optional<std::string> relativePath) {
-  
   // Load the material
   material = Material(scene, mesh);
-
-  float scale = 2.0;
 
   const auto num_vertices = mesh->mNumVertices;
   const auto color_channels = mesh->GetNumColorChannels();
@@ -47,14 +45,23 @@ void Mesh::Load(const aiScene* scene,
     }
 
     VertexType vert;
-    vert.Position.x = mesh->mVertices[i].x / scale;
-    vert.Position.y = mesh->mVertices[i].y / scale;
-    vert.Position.z = mesh->mVertices[i].z / scale;
+
+    {
+      glm::vec4 tmp;
+      tmp.x = mesh->mVertices[i].x;
+      tmp.y = mesh->mVertices[i].y;
+      tmp.z = mesh->mVertices[i].z;
+      tmp = transform * tmp;
+      vert.Position = tmp;
+    }
 
     if (has_normals) {
-      vert.Normal.x = mesh->mNormals[i].x;
-      vert.Normal.y = mesh->mNormals[i].y;
-      vert.Normal.z = mesh->mNormals[i].z;
+      glm::vec4 tmp;
+      tmp.x = mesh->mNormals[i].x;
+      tmp.y = mesh->mNormals[i].y;
+      tmp.z = mesh->mNormals[i].z;
+      tmp = transform * tmp;
+      vert.Normal = tmp;
     }
 
     if (mesh->HasTextureCoords(0) && mesh->mTextureCoords[0]) {

@@ -36,10 +36,17 @@ void Model::Draw(ShaderProgram& shader) const {
 }
 
 void Model::ProcessNode(aiNode* node, const aiScene* scene) {
+  auto nodeTransformation = node->mTransformation;
+  glm::mat4 transform;
+  for (int row = 0; row < 4; row++) {
+    for (int col = 0; col < 4; col++) {
+      transform[row][col] = nodeTransformation[row][col];
+    }
+  }
   for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
     logging::Logger::LogDebug("Loading mesh " + std::to_string(i));
     Mesh mesh;
-    mesh.Load(scene, scene->mMeshes[i], this->path);
+    mesh.Load(scene, scene->mMeshes[i], transform, this->path);
     this->meshes.push_back(mesh);
   }
 
