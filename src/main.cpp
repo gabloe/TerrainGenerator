@@ -8,8 +8,18 @@
 
 #include <TerrainGenerator.hpp>
 
-#include <Logger.hpp>
 #include <Asset.hpp>
+#include <Logger.hpp>
+
+#include <exception>
+#include <stdexcept>
+
+// Literally the same as a list of integers. Not just formalized.
+enum ExitCode {
+  ExitSuccess = 0,
+  ExitOnException = 1,
+  ExitOnUnknownException = 2,
+};
 
 int main(int argc, const char* argv[]) {
   std::string configPath = asset::Asset::Instance().CONFIG_PATH;
@@ -37,7 +47,20 @@ int main(int argc, const char* argv[]) {
   }
 
   TerrainGenerator app{configReader};
-  app.run();
 
-  return 0;
+  try {
+    app.run();
+  } catch (const std::exception& ex) {
+    logging::Logger::LogError("An exception was thrown: " +
+                              std::string{ex.what()});
+    return ExitCode::ExitOnException;
+  } catch (...) {
+    // I am honestly not sure how to handle these, you would think that there
+    // would be better things to do here other than "There was an error,
+    // sorry!".
+    logging::Logger::LogError("An untyped exception was thrown");
+    return ExitCode::ExitOnUnknownException;
+  }
+
+  return ExitCode::ExitSuccess;
 }

@@ -2,6 +2,15 @@
 cmake_minimum_required (VERSION 3.1)
 project (terrain-generator)
 
+
+# set(BUILD_SHARED_LIBS ON)
+IF (WIN32)
+ELSE()
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration" CACHE STRING "CMAKE C flags")
+ENDIF()
+add_subdirectory(lib/freetype EXCLUDE_FROM_ALL)
+
 #
 # OpenGL is required.
 #
@@ -35,7 +44,7 @@ endif ()
 
 
 #includes
-include_directories(src/Includes lib/stb lib/json/single_include)
+include_directories(src/Includes lib/stb lib/json/single_include lib/freetype/include)
 
 file(GLOB terrain-generator-code
      "src/**/*.hpp"
@@ -77,6 +86,7 @@ target_link_libraries(terrain-generator
   PRIVATE glm
   PRIVATE assimp
   PRIVATE glad
+  PRIVATE freetype
   ${OUR_LIBRARIES}
 )
 
