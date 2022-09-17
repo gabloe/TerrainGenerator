@@ -25,7 +25,7 @@ void Material::SetShininess() {
   Shininess = shininess;
 }
 
-const MaterialColor Material::SetColor() {
+void Material::SetColor() {
   MaterialColor result;
 
   // Diffuse component

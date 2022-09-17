@@ -42,7 +42,7 @@ namespace models {
 
     private:
       const aiMaterial* _material;
-      const MaterialColor SetColor();
+      void SetColor();
       void SetShininess();
       void SetShininessStrength();
   };
