@@ -14,6 +14,10 @@ using namespace models;
 void Mesh::Load(const aiScene* scene,
                 const aiMesh* mesh,
                 std::optional<std::string> relativePath) {
+  
+  // Load the material
+  material = Material(scene, mesh);
+
   float scale = 2.0;
 
   const auto num_vertices = mesh->mNumVertices;
@@ -34,25 +38,6 @@ void Mesh::Load(const aiScene* scene,
 
   int print = 0;
 
-  const aiMaterial* mtl = scene->mMaterials[mesh->mMaterialIndex];
-
-  aiColor4D material_color = aiColor4D(1.0f, 1.0f, 1.0f, 1.0f);
-  if (AI_SUCCESS !=
-          aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &material_color) &&
-      mesh->HasVertexColors(0) && mesh->mColors[0]) {
-    material_color = *mesh->mColors[0];
-
-    logging::Logger::LogDebug(
-        "Mesh does not have a diffuse color, using default: Red=" +
-        std::to_string(material_color.r) +
-        " Green=" + std::to_string(material_color.g) +
-        " Blue=" + std::to_string(material_color.b));
-  } else {
-    logging::Logger::LogDebug(
-        "Mesh has a diffuse color: Red=" + std::to_string(material_color.r) +
-        " Green=" + std::to_string(material_color.g) +
-        " Blue=" + std::to_string(material_color.b));
-  }
   for (unsigned int i = 0; i < num_vertices; ++i) {
     double per_done = (100 * i) / num_vertices;
 
@@ -95,10 +80,15 @@ void Mesh::Load(const aiScene* scene,
       vert.Bitangent.z = mesh->mBitangents[i].z;
     }
 
-    vert.Color.r = material_color.r;
-    vert.Color.g = material_color.g;
-    vert.Color.b = material_color.b;
-    vert.Color.w = material_color.a;
+    // Set the vertex color, if defined
+    aiColor4D vertex_color = aiColor4D(1.0f, 1.0f, 1.0f, 1.0f);
+    if (mesh->HasVertexColors(0) && mesh->mColors[0]) {
+      vertex_color = *mesh->mColors[0];
+    }
+    vert.Color.r = vertex_color.r;
+    vert.Color.g = vertex_color.g;
+    vert.Color.b = vertex_color.b;
+    vert.Color.w = vertex_color.a;
 
     vertices.push_back(vert);
   }
@@ -236,6 +226,13 @@ void Mesh::Draw(ShaderProgram& shader) const {
     // and finally bind the texture
     glBindTexture(GL_TEXTURE_2D, textures[i]->Id());
   }
+
+  // Set up material properties
+  shader.setUniform("material.ambient", material.Color.to_vec4(AMBIENT));
+  shader.setUniform("material.diffuse", material.Color.to_vec4(DIFFUSE));
+  shader.setUniform("material.specular", material.Color.to_vec4(SPECULAR));
+  shader.setUniform("material.shininess", material.Shininess);
+  shader.setUniform("material.shininess_strength", material.ShininessStrength);
 
   // draw mesh
   glBindVertexArray(VAO);

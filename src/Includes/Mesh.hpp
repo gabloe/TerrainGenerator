@@ -7,6 +7,7 @@
 
 #include <Shader.hpp>
 #include <Texture.hpp>
+#include <Material.hpp>
 
 #include <memory>
 #include <optional>
@@ -37,6 +38,7 @@ class Mesh {
   void Setup();
 
  public:
+  Material material;
   /// @brief Loads the mesh data from the scene and assimp mesh object.
   /// @param scene The assimp scene object.
   /// @param mesh The assimp mesh object.
