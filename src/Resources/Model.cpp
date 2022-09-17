@@ -40,19 +40,7 @@ void Model::ProcessNode(aiNode* node,
                         aiMatrix4x4 tranformationMatrix) {
   auto nodeTransformation = tranformationMatrix * node->mTransformation;
   auto transposedNodeMatrix = nodeTransformation.Transpose();
-  glm::mat4 transform;
-
-  std::stringstream ss;
-  for (int row = 0; row < 4; row++) {
-    ss << "{";
-    for (int col = 0; col < 4; col++) {
-      transform[row][col] = transposedNodeMatrix[row][col];
-      ss << transform[row][col] << (col == 3 ? "" : ", ");
-    }
-    ss << "}\n";
-  }
-
-  logging::Logger::LogInfo("transform:\n" + ss.str());
+  aiMatrix4x4 transform = aiMatrix4x4(transposedNodeMatrix);
 
   for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
     logging::Logger::LogDebug("Loading mesh " + std::to_string(i));

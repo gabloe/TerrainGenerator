@@ -13,7 +13,7 @@ using namespace models;
 
 void Mesh::Load(const aiScene* scene,
                 const aiMesh* mesh,
-                glm::mat4 transform,
+                aiMatrix4x4 transform,
                 std::optional<std::string> relativePath) {
   // Load the material
   material = Material(scene, mesh);
@@ -46,15 +46,15 @@ void Mesh::Load(const aiScene* scene,
 
     VertexType vert;
 
-    {
-      glm::vec4 tmp;
-      tmp.x = mesh->mVertices[i].x;
-      tmp.y = mesh->mVertices[i].y;
-      tmp.z = mesh->mVertices[i].z;
-      tmp.w = 1;
-      tmp = transform * tmp;
-      vert.Position = tmp;
-    }
+    glm::mat4 trans = aiMatrix4x4ToGlmMat4(transform);
+
+    glm::vec4 tmp;
+    tmp.x = mesh->mVertices[i].x;
+    tmp.y = mesh->mVertices[i].y;
+    tmp.z = mesh->mVertices[i].z;
+    tmp.w = 1;
+    tmp = trans * tmp;
+    vert.Position = tmp;
 
     if (has_normals) {
       glm::vec4 tmp;
@@ -62,7 +62,7 @@ void Mesh::Load(const aiScene* scene,
       tmp.y = mesh->mNormals[i].y;
       tmp.z = mesh->mNormals[i].z;
       tmp.w = 1;
-      tmp = transform * tmp;
+      tmp = trans * tmp;
       vert.Normal = tmp;
     }
 
