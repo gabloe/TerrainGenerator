@@ -51,6 +51,7 @@ void Mesh::Load(const aiScene* scene,
       tmp.x = mesh->mVertices[i].x;
       tmp.y = mesh->mVertices[i].y;
       tmp.z = mesh->mVertices[i].z;
+      tmp.w = 1;
       tmp = transform * tmp;
       vert.Position = tmp;
     }
@@ -60,6 +61,7 @@ void Mesh::Load(const aiScene* scene,
       tmp.x = mesh->mNormals[i].x;
       tmp.y = mesh->mNormals[i].y;
       tmp.z = mesh->mNormals[i].z;
+      tmp.w = 1;
       tmp = transform * tmp;
       vert.Normal = tmp;
     }

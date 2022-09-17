@@ -1,9 +1,9 @@
 
+#include <Logger.hpp>
 #include <Model.hpp>
 
+#include <sstream>
 #include <stdexcept>
-
-#include <Logger.hpp>
 
 using namespace models;
 
@@ -38,11 +38,19 @@ void Model::Draw(ShaderProgram& shader) const {
 void Model::ProcessNode(aiNode* node, const aiScene* scene) {
   auto nodeTransformation = node->mTransformation;
   glm::mat4 transform;
+
+  std::stringstream ss;
   for (int row = 0; row < 4; row++) {
+    ss << "{";
     for (int col = 0; col < 4; col++) {
-      transform[row][col] = nodeTransformation[row][col];
+      transform[col][row] = nodeTransformation[row][col];
+      ss << transform[col][row] << (col == 3 ? "" : ", ");
     }
+    ss << "}\n";
   }
+
+  logging::Logger::LogInfo("transform:\n" + ss.str());
+
   for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
     logging::Logger::LogDebug("Loading mesh " + std::to_string(i));
     Mesh mesh;
