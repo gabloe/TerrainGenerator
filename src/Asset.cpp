@@ -10,7 +10,7 @@
 #include <Windows.h>
 #elif defined(__linux__)
 #include <unistd.h>
-#include <errno>
+#include <cerrno>
 #endif
 
 using namespace asset;
