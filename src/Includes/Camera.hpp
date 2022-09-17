@@ -22,7 +22,7 @@ enum MovementType {
   DEFAULT
 };
 
-constexpr const char* MovementTypeToString(MovementType t) throw() {
+constexpr const char* MovementTypeToString(MovementType t) {
   switch (t) {
     case MovementType::WALK:
       return "Walk";

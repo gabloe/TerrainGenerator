@@ -10,6 +10,7 @@
 #include <Windows.h>
 #elif defined(__linux__)
 #include <unistd.h>
+#include <errno>
 #endif
 
 using namespace asset;
@@ -17,11 +18,10 @@ namespace fs = std::filesystem;
 
 std::unique_ptr<Asset> Asset::instance;
 
-
 #if defined(__APPLE__) || defined(__MACH__)
-uint32_t path_length = PATH_MAX;
+const uint32_t path_length = PATH_MAX;
 #elif defined(__linux__)
-constexpr uint32_t path_length = PATH_MAX;
+const uint32_t path_length = PATH_MAX;
 #else
 constexpr uint32_t path_length = 255;
 #endif
@@ -36,27 +36,36 @@ const std::string asset::getExecutablePath() {
   fs::path executable_path;
 
 #if defined(__APPLE__) || defined(__MACH__)
-  if (_NSGetExecutablePath(&path_buf[0], &path_length) == 0) {
-    executable_path = path_buf;
+  auto result = _NSGetExecutablePath(&path_buf[0], &path_length);
+  if (error != 0) {
+    auto msg = "Failed call: _NSGetExecutablePath" + std::to_string(error);
+    logging::Logger::LogError(msg);
+    throw new std::runtime_error{msg};
   }
+
+  executable_path = path_buf;
 #elif defined(__WINDOWS__) || defined(_WIN32) || defined(_WIN64)
-  logging::Logger::LogInfo("WINDOWS");
 
   auto error = GetModuleFileName(NULL, &path_buf[0], path_length);
   if (IS_ERROR(error)) {
-    logging::Logger::LogInfo("ERROR");
-    throw new std::runtime_error{"Failed call: GetModuleFileName" +
-                                 std::to_string(error)};
+    auto msg = "Failed call: GetModuleFileName" + std::to_string(error);
+    logging::Logger::LogError(msg);
+    throw new std::runtime_error{msg};
   }
 
-  logging::Logger::LogInfo("SUCCESS");
   executable_path = path_buf;
+  // Windows includes the executable in the name
+  // so we need to remove it.
   executable_path = executable_path.parent_path();
-
 #elif defined(__linux__)
-  if (readlink("/proc/self/exe", &path_buf[0], path_length) > 0) {
-    executable_path = path_buf;
+  auto bytes = readlink("/proc/self/exe", &path_buf[0], path_length);
+  if (bytes == -1) {
+    auto msg = "Failed call: readlink" + std::to_string(errno);
+    logging::Logger::LogError(msg);
+    throw new std::runtime_error{msg};
   }
+
+  executable_path = path_buf;
 #else
   throw new std::runtime_error{"Invalid operating system"};
 #endif
@@ -64,7 +73,9 @@ const std::string asset::getExecutablePath() {
   if (!executable_path.empty()) {
     return executable_path.parent_path().string();
   } else {
-    throw new std::runtime_error{"Could not determine current executable path"};
+    auto msg = "Could not determine current executable path";
+    logging::Logger::LogError(msg);
+    throw new std::runtime_error{msg};
   }
 }
 
