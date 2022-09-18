@@ -8,6 +8,7 @@
 
 #include <glad/glad.h>
 #include <string>
+#include <filesystem>
 
 #include <exception>
 #include <sstream>
@@ -19,6 +20,8 @@ using namespace models;
 unsigned int Load(std::string path) {
   unsigned int textureID;
   glGenTextures(1, &textureID);
+
+  path = std::filesystem::path(path).make_preferred().string();
 
   int width, height, nrComponents;
   unsigned char* data =

@@ -19,8 +19,8 @@
 
 #include <ConfigReader.hpp>
 
-#include <Logger.hpp>
 #include <Asset.hpp>
+#include <Logger.hpp>
 
 struct VertexType {
   glm::vec3 position;
@@ -33,29 +33,31 @@ TerrainGenerator::TerrainGenerator(config::ConfigReader& configReader)
       modelPath(asset::Asset::Instance().MODELS_DIR + "/tree.DAE"),
       vertexShaderPath(asset::Asset::Instance().SHADERS_DIR + "/shader.vert"),
       fragmentShaderPath(asset::Asset::Instance().SHADERS_DIR + "/shader.frag"),
-      camera{glm::vec3(0.0f, 0.0f, 50.0f)} {
+      camera{glm::vec3(0.0f, 0.0f, 1.0f)} {
   if (configReader.ContainsKey("model")) {
     std::string modelName = configReader.ReadString("model");
     modelPath = asset::Asset::Instance().MODELS_DIR + "/" + modelName;
-    logging::Logger::LogInfo("Overriding default model vale: " + modelPath);
+    logging::Logger::LogInfo("Overriding default model value: " + modelPath);
   }
 
   if (configReader.ContainsKey("vertexShader")) {
     std::string vertexShaderName = configReader.ReadString("vertexShader");
-    vertexShaderPath = asset::Asset::Instance().SHADERS_DIR + "/" + vertexShaderName;
+    vertexShaderPath =
+        asset::Asset::Instance().SHADERS_DIR + "/" + vertexShaderName;
     logging::Logger::LogInfo("Overriding default vertex value: " +
-                              vertexShaderPath);
+                             vertexShaderPath);
   }
 
   if (configReader.ContainsKey("fragmentShader")) {
     std::string fragmentShaderName = configReader.ReadString("fragmentShader");
-    fragmentShaderPath = asset::Asset::Instance().SHADERS_DIR + "/" + fragmentShaderName;
+    fragmentShaderPath =
+        asset::Asset::Instance().SHADERS_DIR + "/" + fragmentShaderName;
     logging::Logger::LogInfo("Overriding default fragment value: " +
-                              fragmentShaderPath);
+                             fragmentShaderPath);
   }
 
   // setup the camera
-  camera::Camera camera = camera::Camera(glm::vec3(0.0f, 0.0f, 1000.0f));
+  camera = camera::Camera(glm::vec3(0.0f, 0.0f, 1.0f));
 
   Init();
 }
@@ -82,8 +84,8 @@ void TerrainGenerator::render() {
   processInput(getWindow());
 
   // set matrix : projection + view
-  projection =
-      glm::perspective(glm::radians(camera.Zoom), getWindowRatio(), znear, zfar);
+  projection = glm::perspective(glm::radians(camera.Zoom), getWindowRatio(),
+                                znear, zfar);
 
   // glm::lookAt(eye, center, up)
   view = camera.GetViewMatrix();
@@ -97,13 +99,14 @@ void TerrainGenerator::render() {
 
   // send uniforms
   shaderProgram->setUniform("camera", camera.Position);
-  shaderProgram->setUniform("model", model);
   shaderProgram->setUniform("projection", projection);
   shaderProgram->setUniform("view", view);
 
   for (size_t i = 0; i < this->models.size(); i++) {
     this->models[i]->Draw(*shaderProgram);
   }
+
+  shaderProgram->unuse();
 }
 
 void TerrainGenerator::mouseMoved(GLFWwindow* window, double x, double y) {
@@ -124,10 +127,10 @@ void TerrainGenerator::mouseMoved(GLFWwindow* window, double x, double y) {
 }
 
 void TerrainGenerator::handleKeyboardEvent(GLFWwindow* window,
-                                            int key,
-                                            int scancode,
-                                            int action,
-                                            int mods) {
+                                           int key,
+                                           int scancode,
+                                           int action,
+                                           int mods) {
   if (mods == GLFW_MOD_SHIFT) {
     camera.UpdateMovementSpeedStep(50, getFrameDeltaTime());
   }
@@ -148,21 +151,27 @@ void TerrainGenerator::handleKeyboardEvent(GLFWwindow* window,
   }
 }
 
-void TerrainGenerator::mouseScroll(GLFWwindow* window, double xoffset, double yoffset) {
+void TerrainGenerator::mouseScroll(GLFWwindow* window,
+                                   double xoffset,
+                                   double yoffset) {
   camera.HandleMouseScroll(static_cast<float>(yoffset));
 }
 
 void TerrainGenerator::processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera.HandleKeyboardInput(camera::MovementDirection::FORWARD, getFrameDeltaTime());
+    camera.HandleKeyboardInput(camera::MovementDirection::FORWARD,
+                               getFrameDeltaTime());
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera.HandleKeyboardInput(camera::MovementDirection::BACKWARD, getFrameDeltaTime());
+    camera.HandleKeyboardInput(camera::MovementDirection::BACKWARD,
+                               getFrameDeltaTime());
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera.HandleKeyboardInput(camera::MovementDirection::LEFT, getFrameDeltaTime());
+    camera.HandleKeyboardInput(camera::MovementDirection::LEFT,
+                               getFrameDeltaTime());
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera.HandleKeyboardInput(camera::MovementDirection::RIGHT, getFrameDeltaTime());
+    camera.HandleKeyboardInput(camera::MovementDirection::RIGHT,
+                               getFrameDeltaTime());
   }
 }

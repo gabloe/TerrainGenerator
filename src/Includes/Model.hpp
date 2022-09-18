@@ -6,19 +6,26 @@
 
 #include <Mesh.hpp>
 #include <Shader.hpp>
+
+#include <memory>
 #include <vector>
 
 namespace models {
 
 class Model {
  private:
+  struct Node {
+    aiNode* node;
+    std::shared_ptr<Node> parent;
+  };
+
   std::string path;
 
   std::vector<models::Mesh> meshes;
   std::vector<Texture>
       textures_loaded;  // Unsure a texture is only loaded once.
 
-  void ProcessNode(aiNode* node, const aiScene* scene);
+  void ProcessNode(aiNode* node, const aiScene* scene, aiMatrix4x4 mat);
 
  public:
   /// @brief Load the model from the provided file.

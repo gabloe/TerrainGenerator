@@ -1,24 +1,47 @@
 
 #include <Mesh.hpp>
 
+#include <Logger.hpp>
+#include <ResourceManager.hpp>
+
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 
-#include <ResourceManager.hpp>
+#include <sstream>
 
-#include <Logger.hpp>
+#include <glError.hpp>
 
 using namespace models;
 
+std::string ToString(glm::mat4& mat) {
+  std::stringstream ss;
+  for (int row = 0; row < 4; row++) {
+    ss << "{";
+    for (int col = 0; col < 4; col++) {
+      ss << mat[row][col];
+      if (col != 3) {
+        ss << ", ";
+      }
+    }
+    ss << "}\n";
+  }
+  return ss.str();
+}
+
 void Mesh::Load(const aiScene* scene,
                 const aiMesh* mesh,
+                aiMatrix4x4 transform,
                 std::optional<std::string> relativePath) {
-  
+  // Save this for when we render
+
+  this->globalTransform = aiMatrix4x4ToGlmMat4(transform.Transpose());
+
+  logging::Logger::LogInfo("globalTransform: \n" +
+                           ToString(this->globalTransform));
+
   // Load the material
   material = Material(scene, mesh);
-
-  float scale = 2.0;
 
   const auto num_vertices = mesh->mNumVertices;
   const auto color_channels = mesh->GetNumColorChannels();
@@ -47,9 +70,10 @@ void Mesh::Load(const aiScene* scene,
     }
 
     VertexType vert;
-    vert.Position.x = mesh->mVertices[i].x / scale;
-    vert.Position.y = mesh->mVertices[i].y / scale;
-    vert.Position.z = mesh->mVertices[i].z / scale;
+
+    vert.Position.x = mesh->mVertices[i].x;
+    vert.Position.y = mesh->mVertices[i].y;
+    vert.Position.z = mesh->mVertices[i].z;
 
     if (has_normals) {
       vert.Normal.x = mesh->mNormals[i].x;
@@ -229,10 +253,17 @@ void Mesh::Draw(ShaderProgram& shader) const {
 
   // Set up material properties
   shader.setUniform("material.ambient", material.Color.to_vec4(AMBIENT));
+  glCheckError(__FILE__, __LINE__);
   shader.setUniform("material.diffuse", material.Color.to_vec4(DIFFUSE));
+  glCheckError(__FILE__, __LINE__);
   shader.setUniform("material.specular", material.Color.to_vec4(SPECULAR));
+  glCheckError(__FILE__, __LINE__);
   shader.setUniform("material.shininess", material.Shininess);
+  glCheckError(__FILE__, __LINE__);
   shader.setUniform("material.shininess_strength", material.ShininessStrength);
+  glCheckError(__FILE__, __LINE__);
+  shader.setUniform("model", this->globalTransform);
+  glCheckError(__FILE__, __LINE__);
 
   // draw mesh
   glBindVertexArray(VAO);
