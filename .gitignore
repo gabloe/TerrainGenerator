@@ -10,3 +10,5 @@ Debug
 x64
 *.user
 .vscode
+
+.DS_STORE
