@@ -19,7 +19,7 @@ namespace fs = std::filesystem;
 std::unique_ptr<Asset> Asset::instance;
 
 #if defined(__APPLE__) || defined(__MACH__)
-const uint32_t path_length = PATH_MAX;
+uint32_t path_length = PATH_MAX;
 #elif defined(__linux__)
 const uint32_t path_length = PATH_MAX;
 #else
@@ -36,7 +36,7 @@ const std::string asset::getExecutablePath() {
   fs::path executable_path;
 
 #if defined(__APPLE__) || defined(__MACH__)
-  auto result = _NSGetExecutablePath(&path_buf[0], &path_length);
+  auto error = _NSGetExecutablePath(&path_buf[0], &path_length);
   if (error != 0) {
     auto msg = "Failed call: _NSGetExecutablePath" + std::to_string(error);
     logging::Logger::LogError(msg);

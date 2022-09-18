@@ -29,7 +29,7 @@ std::vector<std::shared_ptr<models::Texture>> ResourceManager::LoadTextures(
     if (relativePath.has_value()) {
       std::filesystem::path rPath{relativePath.value()};
 
-      path = rPath.parent_path().append(path).string();
+      path = rPath.parent_path().append(path).make_preferred().string();
     }
 
     auto ptr = this->textures_loaded.find(path);

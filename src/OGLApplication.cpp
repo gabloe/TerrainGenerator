@@ -94,6 +94,8 @@ OGLApplication::OGLApplication()
     glDebugMessageCallback(glDebugOutput, nullptr);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
                           GL_TRUE);
+
+    logging::Logger::LogInfo("Debug callback initialized");
   }
 
   // get version info
@@ -101,8 +103,8 @@ OGLApplication::OGLApplication()
   const GLubyte* version = glGetString(GL_VERSION);
   logging::Logger::LogInfo(
       "Renderer: " + std::string{reinterpret_cast<const char*>(renderer)});
-  logging::Logger::LogInfo(
-      "Version: " + std::string{reinterpret_cast<const char*>(version)});
+  logging::Logger::LogInfo("Version: " +
+                           std::string{reinterpret_cast<const char*>(version)});
 
   // opengl configuration
   glEnable(GL_DEPTH_TEST);  // enable depth-testing
@@ -120,10 +122,11 @@ OGLApplication::OGLApplication()
             ->mouseMoved(win, x, y);
       });
 
-  glfwSetScrollCallback(_window, +[](GLFWwindow* win, double x, double y) {
+  glfwSetScrollCallback(
+      _window, +[](GLFWwindow* win, double x, double y) {
         static_cast<OGLApplication*>(glfwGetWindowUserPointer(win))
             ->mouseScroll(win, x, y);
-  });
+      });
 
   glfwSetWindowSizeCallback(
       _window, +[](GLFWwindow* win, int cx, int cy) {
@@ -278,7 +281,7 @@ void OGLApplication::mouseMoved(GLFWwindow* window, double x, double y) {
 }
 
 void OGLApplication::mouseScroll(GLFWwindow* window, double x, double y) {
-    logging::Logger::LogInfo("Mouse scrolled by <" + std::to_string(x) + "," +
+  logging::Logger::LogInfo("Mouse scrolled by <" + std::to_string(x) + "," +
                            std::to_string(y) + ">");
 }
 
