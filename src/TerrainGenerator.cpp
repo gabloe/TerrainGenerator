@@ -121,13 +121,29 @@ void TerrainGenerator::render() {
 
 void TerrainGenerator::mouseMoved(GLFWwindow* window, double x, double y) {
   OGLApplication::mouseMoved(window, x, y);
-  auto dX = 0.5 - static_cast<float>(x) / getWidth();
-  auto dY = 0.5 - static_cast<float>(y) / getHeight();
+  const float offsetScale = mouseScale * 100.0f;
 
-  logging::Logger::LogInfo(std::to_string(dX) + "," + std::to_string(dY));
+  auto newX = static_cast<float>(x) / getWidth() - 0.5f;
+  auto newY = static_cast<float>(y) / getHeight() - 0.5f;
 
-  const float M = mouseScale;
-  camera.HandleMouseMovement(M * -dX, M * dY, true);
+#ifdef __linux__
+  static float xPosition = 0.5;
+  static float yPosition = 0.5;
+
+  auto offsetX = newX - xPosition;
+  auto offsetY = yPosition - newY;
+#else
+  auto offsetX = newX;
+  auto offsetY = -newY;
+#endif
+
+  camera.HandleMouseMovement(offsetScale * offsetX, offsetScale * offsetY,
+                             true);
+
+#ifdef __linux__
+  xPosition = newX;
+  yPosition = newY;
+#endif
 }
 
 void TerrainGenerator::handleKeyboardEvent(GLFWwindow* window,
