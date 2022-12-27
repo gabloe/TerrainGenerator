@@ -111,16 +111,17 @@ void TerrainGenerator::render() {
 
 void TerrainGenerator::mouseMoved(GLFWwindow* window, double x, double y) {
   OGLApplication::mouseMoved(window, x, y);
-  float xpos = static_cast<float>(x);
-  float ypos = static_cast<float>(y);
+  float xpos = mouseScale * 100.0f * static_cast<float>(x) / getWidth();
+  float ypos = mouseScale * 100.0f * static_cast<float>(y) / getHeight();
   if (firstMouse) {
     lastX = xpos;
     lastY = ypos;
     firstMouse = false;
   }
 
-  float xoffset = 100 *(xpos - lastX) / getWidth();
-  float yoffset = 100 * (lastY - ypos) / getHeight();
+  float xoffset = xpos - lastX;
+  float yoffset = lastY - ypos;
+
   lastX = xpos;
   lastY = ypos;
 
