@@ -29,8 +29,6 @@ class TerrainGenerator : public OGLApplication {
   std::vector<std::shared_ptr<models::Model>> models;
   bool firstMouse = true;
   float mouseScale = 5.0f;
-  float lastX = getWidth() / 2.0f;
-  float lastY = getHeight() / 2.0f;
   float yaw = -90.0f;
   float pitch = 0.0f;
   float fov = 45.0;
