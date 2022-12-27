@@ -25,6 +25,11 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
 
+glm::vec3 pointLightPositions[] = {
+  glm::vec3( 0.7f,  0.2f,  2.0f),
+  glm::vec3( 2.3f, -3.3f, -4.0f)
+};
+
 struct VertexType {
   glm::vec3 position;
   glm::vec3 normal;
@@ -103,14 +108,42 @@ void TerrainGenerator::render() {
   // Rotate the light position by a small amount
   if (getTime() - light_rotation_timestamp >= 1.0f / 1000.0f) {
     light_rotation_timestamp = getTime();
-    global_light_position = glm::rotateY(global_light_position, 1.0f / 360.0f);
+    rotating_light = glm::rotateY(rotating_light, 1.0f / 360.0f);
   }
 
   // send uniforms
   shaderProgram->setUniform("camera", camera.Position);
   shaderProgram->setUniform("projection", projection);
   shaderProgram->setUniform("view", view);
-  shaderProgram->setUniform("global_light_position", global_light_position);
+
+  // Add directional lights
+  shaderProgram->setUniform("dirLight[0].direction", -0.2f, -1.0f, -0.3f);
+  shaderProgram->setUniform("dirLight[0].ambient", 0.005f, 0.005f, 0.005f);
+  shaderProgram->setUniform("dirLight[0].diffuse", 0.04f, 0.04f, 0.04f);
+  shaderProgram->setUniform("dirLight[0].specular", 0.05f, 0.05f, 0.05f);
+  shaderProgram->setUniform("dirLight[1].direction", rotating_light);
+  shaderProgram->setUniform("dirLight[1].ambient", 1.0f, 1.0f, 1.0f);
+  shaderProgram->setUniform("dirLight[1].diffuse", 0.8f, 0.8f, 0.8f);
+  shaderProgram->setUniform("dirLight[1].specular", 0.9f, 0.9f, 0.9f);
+
+  // Add point lights
+  // point light 1
+  shaderProgram->setUniform("pointLights[0].position", pointLightPositions[0]);
+  shaderProgram->setUniform("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+  shaderProgram->setUniform("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+  shaderProgram->setUniform("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+  shaderProgram->setUniform("pointLights[0].constant", 1.0f);
+  shaderProgram->setUniform("pointLights[0].linear", 0.09f);
+  shaderProgram->setUniform("pointLights[0].quadratic", 0.032f);
+
+  // point light 2
+  shaderProgram->setUniform("pointLights[1].position", pointLightPositions[1]);
+  shaderProgram->setUniform("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+  shaderProgram->setUniform("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+  shaderProgram->setUniform("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+  shaderProgram->setUniform("pointLights[1].constant", 1.0f);
+  shaderProgram->setUniform("pointLights[1].linear", 0.09f);
+  shaderProgram->setUniform("pointLights[1].quadratic", 0.032f);
 
   for (size_t i = 0; i < this->models.size(); i++) {
     this->models[i]->Draw(*shaderProgram);
