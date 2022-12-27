@@ -27,21 +27,31 @@ struct Material {
 
 uniform Material material;
 
+uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_height1;
+uniform sampler2D texture_specular1;
+uniform sampler2D texture_normal1;
+
 void main(void)
-{   
+{
+    vec3 specular_tex = texture(texture_specular1, TexCoords).rgb;
+    vec3 diffuse_tex = texture(texture_diffuse1, TexCoords).rgb;
+    vec3 normal_tex = texture(texture_normal1, TexCoords).rgb;
+    vec3 height_tex = texture(texture_height1, TexCoords).rgb;
+
+    vec3 norm = normalize(Normal * 2.0 - 1.0);
+    vec3 lightDir = normalize(LightPosition - FragPos);
+    vec3 viewDir = normalize(camera - FragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+
     // Ambient
     vec3 ambient = material.ambient.xyz * lightColor;
 
     // Diffuse
-    vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(LightPosition - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = lightColor * (diff * material.diffuse.xyz);
+    vec3 diffuse = lightColor * diff * material.diffuse.xyz;
 
     // Specular
-    vec3 viewDir = normalize(camera - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec3 specular = material.shininess_strength * spec * material.specular.xyz * lightColor;
 

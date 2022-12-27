@@ -19,12 +19,15 @@ out vec2 TexCoords;
 
 void main(void)
 {
-    FragPos = vec3(model * vec4(aPos, 1.0));
+    mat4 modelView = model * view;
+    vec4 transformedPosition = modelView * vec4(aPos, 1.0);
+
+    FragPos = vec3(transformedPosition);
 
     // These will not affect the location of the vertices
-    LightPosition       = vec3(model * view * vec4(10.0f, 10.0f, 0.0f, 0.0)); // TODO: This should be a uniform
-    Normal              = mat3(transpose(inverse(model))) * aNormal;
-    FragColor           = aColor;
+    LightPosition       = vec3(modelView * vec4(0.0f, 10.0f, 0.0f, 0.0f)); // TODO: This should be a uniform
+    Normal              = mat3(transpose(inverse(modelView))) * aNormal;
+    FragColor           = aColor; // Pass along the vertex color
     TexCoords           = aTexCoords;
 
     gl_Position         = projection * view * model * vec4(aPos, 1.0);

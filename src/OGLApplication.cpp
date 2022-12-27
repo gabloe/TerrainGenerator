@@ -95,6 +95,9 @@ OGLApplication::OGLApplication()
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
                           GL_TRUE);
 
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glEnable(GL_MULTISAMPLE);
+
     logging::Logger::LogInfo("Debug callback initialized");
   }
 
