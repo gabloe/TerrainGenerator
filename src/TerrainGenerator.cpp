@@ -213,4 +213,12 @@ void TerrainGenerator::processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
     camera.HandleMouseMovement(+1, 0, true);
   }
+
+  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    camera.HandleMouseMovement(0, 1, true);
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    camera.HandleMouseMovement(0, -1, true);
+  }
 }
