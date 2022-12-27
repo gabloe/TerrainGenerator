@@ -119,8 +119,8 @@ void TerrainGenerator::mouseMoved(GLFWwindow* window, double x, double y) {
     firstMouse = false;
   }
 
-  float xoffset = xpos - lastX;
-  float yoffset = lastY - ypos;
+  float xoffset = 100 *(xpos - lastX) / getWidth();
+  float yoffset = 100 * (lastY - ypos) / getHeight();
   lastX = xpos;
   lastY = ypos;
 
@@ -132,29 +132,13 @@ void TerrainGenerator::handleKeyboardEvent(GLFWwindow* window,
                                            int scancode,
                                            int action,
                                            int mods) {
-  if (mods == GLFW_MOD_SHIFT) {
-    camera.UpdateMovementSpeedStep(50, getFrameDeltaTime());
-  }
-  if (key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) {
-    if (action == GLFW_RELEASE) {
-      camera.ResetMovementSpeedStep();
-    }
-  }
-  if (key == GLFW_KEY_F && action == GLFW_PRESS) {
-    setFullScreen(!isFullScreen());
-  }
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-    exit();
-  }
-  if (key == GLFW_KEY_P && action == GLFW_PRESS) {
-    polygonMode = (polygonMode + 1) % 2;
-    glPolygonMode(GL_FRONT_AND_BACK, polygonModes[polygonMode]);
-  }
+  OGLApplication::handleKeyboardEvent(window, key, scancode, action, mods);
 }
 
 void TerrainGenerator::mouseScroll(GLFWwindow* window,
                                    double xoffset,
                                    double yoffset) {
+  OGLApplication::mouseScroll(window, xoffset, yoffset);
   camera.HandleMouseScroll(static_cast<float>(yoffset));
 }
 
@@ -174,5 +158,28 @@ void TerrainGenerator::processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
     camera.HandleKeyboardInput(camera::MovementDirection::RIGHT,
                                getFrameDeltaTime());
+  }
+
+  // If shift is pressed we speed up
+  if (glfwGetKey(window, GLFW_MOD_SHIFT) == GLFW_PRESS) {
+    camera.UpdateMovementSpeedStep(50, getFrameDeltaTime());
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE ||
+      glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_RELEASE) {
+    camera.ResetMovementSpeedStep();
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
+    setFullScreen(!isFullScreen());
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    exit();
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+    polygonMode = (polygonMode + 1) % 2;
+    glPolygonMode(GL_FRONT_AND_BACK, polygonModes[polygonMode]);
   }
 }
