@@ -35,7 +35,7 @@ class TerrainGenerator : public OGLApplication {
   float znear = 0.1f;
   float zfar = 500.0f;
 
-  glm::vec3 global_light_position = glm::vec3(2.0f, 2.0f, 2.0f);
+  glm::vec3 rotating_light = glm::vec3(2.0f, 2.0f, 2.0f);
   float light_rotation_timestamp = 0.0f;
 
  protected:
@@ -73,6 +73,8 @@ class TerrainGenerator : public OGLApplication {
 
   // input handling
   void processInput(GLFWwindow*);
+
+  glm::vec3 pointLightPositions[];
 };
 
 #endif  // OPENGL_CMAKE_TERRAINGENERATOR
