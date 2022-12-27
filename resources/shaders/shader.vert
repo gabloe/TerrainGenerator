@@ -13,7 +13,6 @@ uniform mat4 view;
 
 out vec3 FragPos;
 out vec3 FragColor;
-out vec3 LightPosition;
 out vec3 Normal;
 out vec2 TexCoords;
 
@@ -25,7 +24,6 @@ void main(void)
     FragPos = vec3(transformedPosition);
 
     // These will not affect the location of the vertices
-    LightPosition       = vec3(modelView * vec4(0.0f, 10.0f, 0.0f, 0.0f)); // TODO: This should be a uniform
     Normal              = mat3(transpose(inverse(modelView))) * aNormal;
     FragColor           = aColor; // Pass along the vertex color
     TexCoords           = aTexCoords;

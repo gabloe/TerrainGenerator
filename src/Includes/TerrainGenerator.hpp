@@ -37,6 +37,9 @@ class TerrainGenerator : public OGLApplication {
   float znear = 0.1f;
   float zfar = 500.0f;
 
+  glm::vec3 global_light_position = glm::vec3(2.0f, 2.0f, 2.0f);
+  float light_rotation_timestamp = 0.0f;
+
  protected:
   virtual void render();
   virtual void mouseMoved(GLFWwindow*, double, double);
