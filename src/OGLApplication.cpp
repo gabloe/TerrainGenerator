@@ -194,8 +194,8 @@ float OGLApplication::getTime() const {
 void OGLApplication::run() {
   _state = stateRun;
 
-  // Make the window's context current in the current thread. Once set the window
-  // context will be used to draw onto.
+  // Make the window's context current in the current thread. Once set the
+  // window context will be used to draw onto.
   glfwMakeContextCurrent(_window);
 
   _time = (float)glfwGetTime();
@@ -214,6 +214,8 @@ void OGLApplication::run() {
     glfwSwapBuffers(_window);
 
     glfwPollEvents();
+
+    glfwSetCursorPos(_window, 0.5 * getWidth(), 0.5 * getHeight());
   }
 
   glfwTerminate();
@@ -249,7 +251,7 @@ void OGLApplication::setFullScreen(bool fullscreen) {
 
     // switch to full screen
     glfwSetWindowMonitor(_window, _primaryMonitor, 0, 0, mode.width,
-                         mode.height, 0);
+                         mode.height, GLFW_DONT_CARE);
   } else {
     // restore last window size and position
     glfwSetWindowMonitor(_window, NULL, _windowPosition[0], _windowPosition[1],
@@ -296,9 +298,8 @@ void OGLApplication::handleKeyboardEvent(GLFWwindow* window,
                            ", mods = " + std::to_string(mods));
 }
 
-void OGLApplication::tick()
-{
-    float t = (float)glfwGetTime();
-    _deltaTime = t - _time;
-    _time = t;
+void OGLApplication::tick() {
+  float t = (float)glfwGetTime();
+  _deltaTime = t - _time;
+  _time = t;
 }

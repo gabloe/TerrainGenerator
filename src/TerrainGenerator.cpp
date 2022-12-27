@@ -101,9 +101,9 @@ void TerrainGenerator::render() {
   shaderProgram->use();
 
   // Rotate the light position by a small amount
-  if (getTime() - light_rotation_timestamp >= 1.0f/1000.0f) {
+  if (getTime() - light_rotation_timestamp >= 1.0f / 1000.0f) {
     light_rotation_timestamp = getTime();
-    global_light_position = glm::rotateY(global_light_position, 1.0f/360.0f);
+    global_light_position = glm::rotateY(global_light_position, 1.0f / 360.0f);
   }
 
   // send uniforms
@@ -172,11 +172,12 @@ void TerrainGenerator::processInput(GLFWwindow* window) {
   }
 
   // If shift is pressed we speed up
-  if (glfwGetKey(window, GLFW_MOD_SHIFT) == GLFW_PRESS) {
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS ||
+      glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) {
     camera.UpdateMovementSpeedStep(50, getFrameDeltaTime());
   }
 
-  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE ||
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE &&
       glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_RELEASE) {
     camera.ResetMovementSpeedStep();
   }
@@ -193,9 +194,15 @@ void TerrainGenerator::processInput(GLFWwindow* window) {
     polygonModePressed = false;
     polygonMode = (polygonMode + 1) % 2;
     glPolygonMode(GL_FRONT_AND_BACK, polygonModes[polygonMode]);
-  }
-  else
-  {
+  } else {
     polygonModePressed = glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+    camera.HandleMouseMovement(-1, 0, true);
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+    camera.HandleMouseMovement(+1, 0, true);
   }
 }
