@@ -24,7 +24,7 @@ enum ExitCode {
 int main(int argc, const char* argv[]) {
   std::string configPath = asset::Asset::Instance().CONFIG_PATH;
   if (argc == 2) {
-    configPath = argv[1];
+    configPath = asset::Asset::Instance().RESOURCE_DIR + "/config/" + argv[1];
   }
 
   config::ConfigReader configReader{configPath};

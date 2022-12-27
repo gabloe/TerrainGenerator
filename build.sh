@@ -2,7 +2,8 @@
 
 echo -e
 
-BUILD () {
+function BUILD () {
+    echo "Building"
     mkdir build
     pushd build
     cmake ..
@@ -10,7 +11,7 @@ BUILD () {
     popd
 }
 
-CLEAN () {
+function CLEAN () {
     if [ -d ./build ]
     then
         echo "Deleting build directory"
@@ -20,12 +21,17 @@ CLEAN () {
     fi
 }
 
-RUN () {
+function RUN () {
     if [ ! -d ./build ]
     then
         BUILD
     fi
-    ./build/terrain-generator
+    if [ -z "$@" ]
+    then
+        ./build/terrain-generator
+    else
+        ./build/terrain-generator $@
+    fi
 }
 
 CMD="$1"
@@ -48,5 +54,5 @@ fi
 
 if [ $CMD = "run" ]
 then
-    RUN
+    RUN ${@:2}
 fi
