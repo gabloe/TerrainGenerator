@@ -67,6 +67,7 @@ class TerrainGenerator : public OGLApplication {
   // polygon representation
   GLenum polygonModes[2] = {GL_FILL, GL_LINE};
   int polygonMode = 0;
+  bool polygonModePressed = false;
 
   // input handling
   void processInput(GLFWwindow*);
