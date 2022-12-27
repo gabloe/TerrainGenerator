@@ -145,6 +145,18 @@ void TerrainGenerator::render() {
   shaderProgram->setUniform("pointLights[1].linear", 0.09f);
   shaderProgram->setUniform("pointLights[1].quadratic", 0.032f);
 
+  // spot light
+  shaderProgram->setUniform("spotLight.position", camera.Position);
+  shaderProgram->setUniform("spotLight.direction", camera.Front);
+  shaderProgram->setUniform("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+  shaderProgram->setUniform("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+  shaderProgram->setUniform("spotLight.specular", 1.0f, 1.0f, 1.0f);
+  shaderProgram->setUniform("spotLight.constant", 1.0f);
+  shaderProgram->setUniform("spotLight.linear", 0.09f);
+  shaderProgram->setUniform("spotLight.quadratic", 0.032f);
+  shaderProgram->setUniform("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+  shaderProgram->setUniform("spotLight.outerCutOff", glm::cos(glm::radians(15.0f))); 
+
   for (size_t i = 0; i < this->models.size(); i++) {
     this->models[i]->Draw(*shaderProgram);
   }
