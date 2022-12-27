@@ -110,6 +110,7 @@ void TerrainGenerator::render() {
 }
 
 void TerrainGenerator::mouseMoved(GLFWwindow* window, double x, double y) {
+  OGLApplication::mouseMoved(window, x, y);
   float xpos = static_cast<float>(x);
   float ypos = static_cast<float>(y);
   if (firstMouse) {

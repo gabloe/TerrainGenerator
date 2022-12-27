@@ -189,19 +189,19 @@ float OGLApplication::getTime() const {
   return _time;
 }
 
+/// @brief This is the main loop for the application.
+/// @details This method handles time, viewport, input, rendering, and buffers.
 void OGLApplication::run() {
   _state = stateRun;
 
-  // Make the window's context current
+  // Make the window's context current in the current thread. Once set the window
+  // context will be used to draw onto.
   glfwMakeContextCurrent(_window);
 
   _time = (float)glfwGetTime();
 
   while (_state == stateRun) {
-    // compute new time and delta time
-    float t = (float)glfwGetTime();
-    _deltaTime = t - _time;
-    _time = t;
+    tick();
 
     if (_updateViewport) {
       glfwGetFramebufferSize(_window, &_viewportSize[0], &_viewportSize[1]);
@@ -209,13 +209,10 @@ void OGLApplication::run() {
       _updateViewport = false;
     }
 
-    // execute the frame code
     render();
 
-    // Swap Front and Back buffers (double buffering)
     glfwSwapBuffers(_window);
 
-    // Pool and process events
     glfwPollEvents();
   }
 
@@ -297,4 +294,11 @@ void OGLApplication::handleKeyboardEvent(GLFWwindow* window,
                            ", scancode = " + std::to_string(scancode) +
                            ", action = " + std::to_string(action) +
                            ", mods = " + std::to_string(mods));
+}
+
+void OGLApplication::tick()
+{
+    float t = (float)glfwGetTime();
+    _deltaTime = t - _time;
+    _time = t;
 }

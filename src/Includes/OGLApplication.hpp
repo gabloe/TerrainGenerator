@@ -103,6 +103,8 @@ class OGLApplication {
   virtual void mouseMoved(GLFWwindow*, double, double);
   virtual void mouseScroll(GLFWwindow*, double, double);
   virtual void handleKeyboardEvent(GLFWwindow*, int, int, int, int);
+  
+  void tick();
 };
 
 #endif /* end of include guard: OPENGL_CMAKE_SKELETON_OGLApplication_HPP */
