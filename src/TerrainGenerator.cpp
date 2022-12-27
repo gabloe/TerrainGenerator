@@ -178,8 +178,13 @@ void TerrainGenerator::processInput(GLFWwindow* window) {
     exit();
   }
 
-  if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+  if (polygonModePressed && glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE) {
+    polygonModePressed = false;
     polygonMode = (polygonMode + 1) % 2;
     glPolygonMode(GL_FRONT_AND_BACK, polygonModes[polygonMode]);
+  }
+  else
+  {
+    polygonModePressed = glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS;
   }
 }
