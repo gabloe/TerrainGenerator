@@ -15366,7 +15366,9 @@
   <library_visual_scenes>
     <visual_scene id="RootNode" name="RootNode">
       <node id="Teapot01" name="Teapot01">
-        <translate sid="translate">1,450607 26,647949 0,000000</translate>
+        <translate sid="translate">0 -20 -5</translate>
+        <scale sid="scale">0.15 0.15 0.15</scale>
+        <rotate sid="rotateZ">0 0 1 75</rotate>
         <instance_geometry url="#Teapot01-lib">
           <bind_material>
             <technique_common>
@@ -15377,7 +15379,9 @@
         </instance_geometry>
       </node>
       <node id="Teapot02" name="Teapot02">
-        <translate sid="translate">-28,885887 -24,303772 19,961563</translate>
+        <translate sid="translate">-5 -5 4</translate>
+        <scale sid="scale">0.25 0.25 0.25</scale>
+        <rotate sid="rotateZ">0 0 1 120</rotate>
         <instance_geometry url="#Teapot02-lib">
           <bind_material>
             <technique_common>
@@ -15387,8 +15391,8 @@
         </instance_geometry>
       </node>
       <node id="Teapot03" name="Teapot03">
-        <translate sid="translate">4,957306 -46,053146 0,000000</translate>
-        <scale sid="scale">2,228725 2,228725 2,228725</scale>
+        <translate sid="translate">10 -8 0</translate>
+        <scale sid="scale">0.15 0.15 0.15</scale>
         <instance_geometry url="#Teapot03-lib">
           <bind_material>
             <technique_common>
