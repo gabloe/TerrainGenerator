@@ -116,11 +116,13 @@ void TerrainGenerator::render() {
   shaderProgram->setUniform("projection", projection);
   shaderProgram->setUniform("view", view);
 
-  // Add directional lights
+  // Add fixed directional light
   shaderProgram->setUniform("dirLight[0].direction", -0.2f, -1.0f, -0.3f);
   shaderProgram->setUniform("dirLight[0].ambient", 0.005f, 0.005f, 0.005f);
   shaderProgram->setUniform("dirLight[0].diffuse", 0.04f, 0.04f, 0.04f);
   shaderProgram->setUniform("dirLight[0].specular", 0.05f, 0.05f, 0.05f);
+
+  // Add rotating directional light
   shaderProgram->setUniform("dirLight[1].direction", rotating_light);
   shaderProgram->setUniform("dirLight[1].ambient", 1.0f, 1.0f, 1.0f);
   shaderProgram->setUniform("dirLight[1].diffuse", 0.8f, 0.8f, 0.8f);
