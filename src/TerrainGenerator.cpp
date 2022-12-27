@@ -22,6 +22,9 @@
 #include <Asset.hpp>
 #include <Logger.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/rotate_vector.hpp>
+
 struct VertexType {
   glm::vec3 position;
   glm::vec3 normal;
@@ -57,7 +60,7 @@ TerrainGenerator::TerrainGenerator(config::ConfigReader& configReader)
   }
 
   // setup the camera
-  camera = camera::Camera(glm::vec3(0.0f, 0.0f, 1.0f));
+  camera = camera::Camera();
 
   Init();
 }
@@ -97,10 +100,17 @@ void TerrainGenerator::render() {
 
   shaderProgram->use();
 
+  // Rotate the light position by a small amount
+  if (getTime() - light_rotation_timestamp >= 1.0f/1000.0f) {
+    light_rotation_timestamp = getTime();
+    global_light_position = glm::rotateY(global_light_position, 1.0f/360.0f);
+  }
+
   // send uniforms
   shaderProgram->setUniform("camera", camera.Position);
   shaderProgram->setUniform("projection", projection);
   shaderProgram->setUniform("view", view);
+  shaderProgram->setUniform("global_light_position", global_light_position);
 
   for (size_t i = 0; i < this->models.size(); i++) {
     this->models[i]->Draw(*shaderProgram);

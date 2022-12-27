@@ -2,7 +2,6 @@
 
 in vec3 FragPos;
 in vec3 FragColor;
-in vec3 LightPosition;
 in vec3 Normal;
 in vec2 TexCoords;
 
@@ -26,6 +25,7 @@ struct Material {
 }; 
 
 uniform Material material;
+uniform vec3 global_light_position;
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_height1;
@@ -40,7 +40,7 @@ void main(void)
     vec3 height_tex = texture(texture_height1, TexCoords).rgb;
 
     vec3 norm = normalize(Normal * 2.0 - 1.0);
-    vec3 lightDir = normalize(LightPosition - FragPos);
+    vec3 lightDir = normalize(global_light_position - FragPos);
     vec3 viewDir = normalize(camera - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);
 
