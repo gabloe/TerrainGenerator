@@ -24,7 +24,7 @@ Font::Font(std::string fontName, uint8_t fontSize)
   }
 
   // Windows uses a wchar_t which we don't want to use because we don't
-  // support internationalization.
+  // support internationalization yet.
   char sep = (char)std::filesystem::path::preferred_separator;
   auto fontPath = asset::Asset::Instance().FONT_DIR + sep + fontName;
 
