@@ -126,22 +126,22 @@ void Mesh::Load(const aiScene* scene,
     auto manager = resources::ResourceManager::GetManager();
 
     std::vector<std::shared_ptr<Texture>> diffuseMaps = manager.LoadTextures(
-        material, aiTextureType_DIFFUSE, "texture_diffuse", relativePath);
+        material, aiTextureType_DIFFUSE, "diffuse", relativePath);
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
     // 2. specular maps
     std::vector<std::shared_ptr<Texture>> specularMaps = manager.LoadTextures(
-        material, aiTextureType_SPECULAR, "texture_specular", relativePath);
+        material, aiTextureType_SPECULAR, "specular", relativePath);
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
     // 3. Normal maps
     std::vector<std::shared_ptr<Texture>> normalMaps = manager.LoadTextures(
-        material, aiTextureType_HEIGHT, "texture_normal", relativePath);
+        material, aiTextureType_HEIGHT, "normal", relativePath);
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
     // 4. height maps
     std::vector<std::shared_ptr<Texture>> heightMaps = manager.LoadTextures(
-        material, aiTextureType_AMBIENT, "texture_height", relativePath);
+        material, aiTextureType_AMBIENT, "height", relativePath);
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
   }
 
@@ -226,27 +226,29 @@ void Mesh::Draw(ShaderProgram& shader) const {
   unsigned int normalNr = 1;
   unsigned int heightNr = 1;
 
-  for (unsigned int i = 0; i < textures.size(); i++) {
-    glActiveTexture(GL_TEXTURE0 +
-                    i);  // active proper texture unit before binding
-    // retrieve texture number (the N in diffuse_textureN)
-    std::string number;
-    std::string name = textures[i]->Type();
+  if (textures.size() > 0)
+  {
+    shader.setUniform("material.isTextured", 1);
+  }
+  else
+  {
+    shader.setUniform("material.isTextured", 0);
+  }
 
-    if (name == "texture_diffuse")
-      number = std::to_string(diffuseNr++);
-    else if (name == "texture_specular")
-      number = std::to_string(specularNr++);  // transfer unsigned int to stream
-    else if (name == "texture_normal")
-      number = std::to_string(normalNr++);  // transfer unsigned int to stream
-    else if (name == "texture_height")
-      number = std::to_string(heightNr++);  // transfer unsigned int to stream
+  for (int i = 0; i < textures.size(); i++)
+  {
+    std::string type = textures[i]->Type();
+    if (type == "diffuse")
+    {
+      shader.setUniform("material.diffuseTex", i);
+    }
+    else if (type == "specular")
+    {
+      shader.setUniform("material.specularTex", i);
+    }
 
-    // now set the sampler to the correct texture unit
-    auto location =
-        glGetUniformLocation(shader.getHandle(), (name + number).c_str());
-
-    glUniform1i(location, i);
+    // active proper texture unit before binding
+    glActiveTexture(GL_TEXTURE0 + i);
     // and finally bind the texture
     glBindTexture(GL_TEXTURE_2D, textures[i]->Id());
   }

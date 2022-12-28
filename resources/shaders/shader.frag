@@ -11,9 +11,18 @@ uniform vec3 camera;
 out vec4 OutColor;
 
 struct Material {
+    int isTextured;
+
+    // Textures
+    sampler2D diffuseTex;
+    sampler2D specularTex;
+
+    // Colors
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
+
+    // Properties
     float shininess;
     float shininess_strength;
 }; 
@@ -91,9 +100,22 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     // combine results (NOTE: At some point replace material color with material textures)
-    vec3 ambient  = light.ambient * material.ambient.xyz; // * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse  = light.diffuse  * diff * material.diffuse.xyz; //* vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * material.specular.xyz; //* vec3(texture(material.specular, TexCoords));
+    vec3 ambient  = light.ambient;
+    vec3 diffuse  = light.diffuse  * diff;
+    vec3 specular = light.specular * spec;
+    if (material.isTextured == 1)
+    {
+        ambient     *= vec3(texture(material.diffuseTex, TexCoords));
+        diffuse     *= vec3(texture(material.diffuseTex, TexCoords));
+        specular    *= vec3(texture(material.specularTex, TexCoords));
+    }
+    else
+    {
+        ambient     *= material.ambient.xyz;
+        diffuse     *= material.diffuse.xyz;
+        specular    *= material.specular.xyz;
+    }
+
     return (ambient + diffuse + specular);
 }
 
@@ -110,9 +132,21 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     // combine results
-    vec3 ambient = light.ambient * material.ambient.xyz; // * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse = light.diffuse * diff * material.diffuse.xyz; //* vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * material.specular.xyz; //* vec3(texture(material.specular, TexCoords));
+    vec3 ambient  = light.ambient;
+    vec3 diffuse  = light.diffuse  * diff;
+    vec3 specular = light.specular * spec;
+    if (material.isTextured == 1)
+    {
+        ambient     *= vec3(texture(material.diffuseTex, TexCoords));
+        diffuse     *= vec3(texture(material.diffuseTex, TexCoords));
+        specular    *= vec3(texture(material.specularTex, TexCoords));
+    }
+    else
+    {
+        ambient     *= material.ambient.xyz;
+        diffuse     *= material.diffuse.xyz;
+        specular    *= material.specular.xyz;
+    }
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
@@ -136,9 +170,21 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
     // combine results
-    vec3 ambient = light.ambient * material.ambient.xyz; // * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse = light.diffuse * diff * material.diffuse.xyz; //* vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * material.specular.xyz; //* vec3(texture(material.specular, TexCoords));
+    vec3 ambient  = light.ambient;
+    vec3 diffuse  = light.diffuse  * diff;
+    vec3 specular = light.specular * spec;
+    if (material.isTextured == 1)
+    {
+        ambient     *= vec3(texture(material.diffuseTex, TexCoords));
+        diffuse     *= vec3(texture(material.diffuseTex, TexCoords));
+        specular    *= vec3(texture(material.specularTex, TexCoords));
+    }
+    else
+    {
+        ambient     *= material.ambient.xyz;
+        diffuse     *= material.diffuse.xyz;
+        specular    *= material.specular.xyz;
+    }
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
