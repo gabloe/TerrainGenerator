@@ -117,9 +117,12 @@ void Mesh::Load(const aiScene* scene,
     vertices.push_back(vert);
   }
 
-  logging::Logger::LogDebug("Scene HasMaterials: " +
+  logging::Logger::LogInfo("Scene HasMaterials: " +
                             std::to_string(scene->HasMaterials()));
-  if (scene->HasMaterials()) {
+  if (scene->HasMaterials() && mesh->HasTextureCoords(0) && mesh->mTextureCoords[0]) {
+      logging::Logger::LogInfo("Mesh HasMaterials: " +
+                            std::string(mesh->mName.C_Str()));
+
     // TODO: Handle n > 1
     auto material = scene->mMaterials[0];
 
@@ -220,14 +223,9 @@ void Mesh::Setup() {
 }
 
 void Mesh::Draw(ShaderProgram& shader) const {
-  // bind appropriate textures
-  unsigned int diffuseNr = 1;
-  unsigned int specularNr = 1;
-  unsigned int normalNr = 1;
-  unsigned int heightNr = 1;
-
   if (textures.size() > 0)
   {
+
     shader.setUniform("material.isTextured", 1);
   }
   else
