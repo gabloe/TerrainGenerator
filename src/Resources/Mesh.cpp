@@ -118,34 +118,33 @@ void Mesh::Load(const aiScene* scene,
   }
 
   logging::Logger::LogInfo("Scene HasMaterials: " +
-                            std::to_string(scene->HasMaterials()));
-  if (scene->HasMaterials() && mesh->HasTextureCoords(0) && mesh->mTextureCoords[0]) {
-      logging::Logger::LogInfo("Mesh HasMaterials: " +
-                            std::string(mesh->mName.C_Str()));
+                           std::to_string(scene->HasMaterials()));
+  if (scene->HasMaterials() && mesh->HasTextureCoords(0) &&
+      mesh->mTextureCoords[0]) {
+    logging::Logger::LogInfo("Mesh HasMaterials: " +
+                             std::string(mesh->mName.C_Str()));
 
     // TODO: Handle n > 1
     auto material = scene->mMaterials[0];
 
+    std::map<aiTextureType, std::string> texturesToAdd = {
+        {aiTextureType_DIFFUSE, "diffuse"},
+        {aiTextureType_SPECULAR, "specular"},
+        {aiTextureType_AMBIENT, "ambient"},
+        {aiTextureType_EMISSIVE, "emissive"},
+        {aiTextureType_SHININESS, "shininess"},
+        {aiTextureType_LIGHTMAP, "light_map"},
+        {aiTextureType_NORMALS, "height"},
+        {aiTextureType_HEIGHT, "height"},
+    };
+
     auto manager = resources::ResourceManager::GetManager();
 
-    std::vector<std::shared_ptr<Texture>> diffuseMaps = manager.LoadTextures(
-        material, aiTextureType_DIFFUSE, "diffuse", relativePath);
-    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-
-    // 2. specular maps
-    std::vector<std::shared_ptr<Texture>> specularMaps = manager.LoadTextures(
-        material, aiTextureType_SPECULAR, "specular", relativePath);
-    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-
-    // 3. Normal maps
-    std::vector<std::shared_ptr<Texture>> normalMaps = manager.LoadTextures(
-        material, aiTextureType_HEIGHT, "normal", relativePath);
-    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-
-    // 4. height maps
-    std::vector<std::shared_ptr<Texture>> heightMaps = manager.LoadTextures(
-        material, aiTextureType_AMBIENT, "height", relativePath);
-    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+    for (auto kvp : texturesToAdd) {
+      std::vector<std::shared_ptr<Texture>> maps =
+          manager.LoadTextures(material, kvp.first, kvp.second, relativePath);
+      textures.insert(textures.end(), maps.begin(), maps.end());
+    }
   }
 
   logging::Logger::LogDebug("Mesh has " + std::to_string(mesh->mNumFaces) +
@@ -223,25 +222,17 @@ void Mesh::Setup() {
 }
 
 void Mesh::Draw(ShaderProgram& shader) const {
-  if (textures.size() > 0)
-  {
-
+  if (textures.size() > 0) {
     shader.setUniform("material.isTextured", 1);
-  }
-  else
-  {
+  } else {
     shader.setUniform("material.isTextured", 0);
   }
 
-  for (int i = 0; i < textures.size(); i++)
-  {
+  for (int i = 0; i < textures.size(); i++) {
     std::string type = textures[i]->Type();
-    if (type == "diffuse")
-    {
+    if (type == "diffuse") {
       shader.setUniform("material.diffuseTex", i);
-    }
-    else if (type == "specular")
-    {
+    } else if (type == "specular") {
       shader.setUniform("material.specularTex", i);
     }
 

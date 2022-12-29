@@ -278,12 +278,12 @@ float OGLApplication::getWindowRatio() {
 }
 
 void OGLApplication::mouseMoved(GLFWwindow* window, double x, double y) {
-  logging::Logger::LogInfo("Mouse moved to <" + std::to_string(x) + "," +
+  logging::Logger::LogDebug("Mouse moved to <" + std::to_string(x) + "," +
                            std::to_string(y) + ">");
 }
 
 void OGLApplication::mouseScroll(GLFWwindow* window, double x, double y) {
-  logging::Logger::LogInfo("Mouse scrolled by <" + std::to_string(x) + "," +
+  logging::Logger::LogDebug("Mouse scrolled by <" + std::to_string(x) + "," +
                            std::to_string(y) + ">");
 }
 
@@ -292,7 +292,7 @@ void OGLApplication::handleKeyboardEvent(GLFWwindow* window,
                                          int scancode,
                                          int action,
                                          int mods) {
-  logging::Logger::LogInfo("Keyboard event, key = " + std::to_string(key) +
+  logging::Logger::LogDebug("Keyboard event, key = " + std::to_string(key) +
                            ", scancode = " + std::to_string(scancode) +
                            ", action = " + std::to_string(action) +
                            ", mods = " + std::to_string(mods));
