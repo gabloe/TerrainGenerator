@@ -129,13 +129,13 @@ void Mesh::Load(const aiScene* scene,
 
     std::map<aiTextureType, std::string> texturesToAdd = {
         {aiTextureType_DIFFUSE, "diffuse"},
-        {aiTextureType_SPECULAR, "diffuse"},
-        {aiTextureType_AMBIENT, "diffuse"},
-        {aiTextureType_EMISSIVE, "diffuse"},
-        {aiTextureType_SHININESS, "diffuse"},
-        {aiTextureType_LIGHTMAP, "diffuse"},
-        {aiTextureType_NORMALS, "diffuse"},
-        {aiTextureType_HEIGHT, "diffuse"},
+        {aiTextureType_SPECULAR, "specular"},
+        {aiTextureType_AMBIENT, "ambient"},
+        {aiTextureType_EMISSIVE, "emissive"},
+        {aiTextureType_SHININESS, "shininess"},
+        {aiTextureType_LIGHTMAP, "light_map"},
+        {aiTextureType_NORMALS, "height"},
+        {aiTextureType_HEIGHT, "height"},
     };
 
     auto manager = resources::ResourceManager::GetManager();
