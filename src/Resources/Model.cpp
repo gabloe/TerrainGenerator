@@ -9,7 +9,8 @@ using namespace models;
 
 void Model::Load(std::string fileName) {
   auto constexpr flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-                         aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_MakeLeftHanded;
+                         aiProcess_FlipUVs | aiProcess_CalcTangentSpace |
+                         aiProcess_MakeLeftHanded;
 
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(fileName, flags);
@@ -22,7 +23,7 @@ void Model::Load(std::string fileName) {
   this->path = fileName;
 
   // Scale it back up
-  logging::Logger::LogDebug("Processing root node");
+  logging::Logger::LogInfo("Processing root node");
   {
     auto scale = scene->mRootNode->mTransformation[0][0] == 0.0
                      ? 1.0 / scene->mRootNode->mTransformation[2][2]
@@ -52,16 +53,17 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene, aiMatrix4x4 mat) {
   // Parent * Me (This is what the assimp tool does)
   auto modelMatrix = mat * node->mTransformation;
 
+  logging::Logger::LogInfo("Meshes: " + std::to_string(node->mNumMeshes));
   for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-    logging::Logger::LogDebug("Loading mesh " +
-                              std::to_string(node->mMeshes[i]));
+    logging::Logger::LogInfo("Loading mesh " +
+                             std::to_string(node->mMeshes[i]));
     Mesh mesh;
     mesh.Load(scene, scene->mMeshes[node->mMeshes[i]], modelMatrix, this->path);
     this->meshes.push_back(mesh);
   }
 
   for (unsigned int i = 0; i < node->mNumChildren; i++) {
-    logging::Logger::LogDebug("Processing child node " + std::to_string(i));
+    logging::Logger::LogInfo("Processing child node " + std::to_string(i));
     ProcessNode(node->mChildren[i], scene, modelMatrix);
   }
 }

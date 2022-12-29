@@ -41,7 +41,7 @@ void Mesh::Load(const aiScene* scene,
                            ToString(this->globalTransform));
 
   // Load the material
-  material = Material(scene, mesh);
+  material = Material(scene, mesh, relativePath);
 
   const auto num_vertices = mesh->mNumVertices;
   const auto color_channels = mesh->GetNumColorChannels();
@@ -115,36 +115,6 @@ void Mesh::Load(const aiScene* scene,
     vert.Color.w = vertex_color.a;
 
     vertices.push_back(vert);
-  }
-
-  logging::Logger::LogInfo("Scene HasMaterials: " +
-                           std::to_string(scene->HasMaterials()));
-  if (scene->HasMaterials() && mesh->HasTextureCoords(0) &&
-      mesh->mTextureCoords[0]) {
-    logging::Logger::LogInfo("Mesh HasMaterials: " +
-                             std::string(mesh->mName.C_Str()));
-
-    // TODO: Handle n > 1
-    auto material = scene->mMaterials[0];
-
-    std::map<aiTextureType, std::string> texturesToAdd = {
-        {aiTextureType_DIFFUSE, "diffuse"},
-        {aiTextureType_SPECULAR, "specular"},
-        {aiTextureType_AMBIENT, "ambient"},
-        {aiTextureType_EMISSIVE, "emissive"},
-        {aiTextureType_SHININESS, "shininess"},
-        {aiTextureType_LIGHTMAP, "light_map"},
-        {aiTextureType_NORMALS, "height"},
-        {aiTextureType_HEIGHT, "height"},
-    };
-
-    auto manager = resources::ResourceManager::GetManager();
-
-    for (auto kvp : texturesToAdd) {
-      std::vector<std::shared_ptr<Texture>> maps =
-          manager.LoadTextures(material, kvp.first, kvp.second, relativePath);
-      textures.insert(textures.end(), maps.begin(), maps.end());
-    }
   }
 
   logging::Logger::LogDebug("Mesh has " + std::to_string(mesh->mNumFaces) +
@@ -222,26 +192,9 @@ void Mesh::Setup() {
 }
 
 void Mesh::Draw(ShaderProgram& shader) const {
-  if (textures.size() > 0) {
-    shader.setUniform("material.isTextured", 1);
-  } else {
-    shader.setUniform("material.isTextured", 0);
-  }
 
-  for (int i = 0; i < textures.size(); i++) {
-    std::string type = textures[i]->Type();
-    if (type == "diffuse") {
-      shader.setUniform("material.diffuseTex", i);
-    } else if (type == "specular") {
-      shader.setUniform("material.specularTex", i);
-    }
-
-    // active proper texture unit before binding
-    glActiveTexture(GL_TEXTURE0 + i);
-    // and finally bind the texture
-    glBindTexture(GL_TEXTURE_2D, textures[i]->Id());
-  }
-
+  this->material.Draw(shader);
+  
   // Set up material properties
   shader.setUniform("material.ambient", material.Color.to_vec4(AMBIENT));
   glCheckError(__FILE__, __LINE__);
