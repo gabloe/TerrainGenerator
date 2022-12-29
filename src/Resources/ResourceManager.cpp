@@ -40,6 +40,9 @@ std::vector<std::shared_ptr<models::Texture>> ResourceManager::LoadTextures(
           std::make_shared<models::Texture>(path, typeName);
 
       this->textures_loaded[path] = texture;
+
+      logging::Logger::LogInfo("Loading texture with path=" + path + " with type = " + typeName);
+
       result.push_back(texture);
     }
   }
