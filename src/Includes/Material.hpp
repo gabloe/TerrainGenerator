@@ -38,6 +38,7 @@ class Material {
   MaterialColor Color;
   float Shininess;
   float ShininessStrength;
+  float Opacity;
 
   Material(){};
   Material(const aiScene*, const aiMesh*, const std::optional<std::string>);
@@ -48,9 +49,13 @@ class Material {
   std::optional<std::string> _relativePath;
   std::vector<std::shared_ptr<models::Texture>> _textures;
   aiMaterial* _material;
+  aiShadingMode ShadingMode;
+
   void SetColor();
   void SetShininess();
   void SetShininessStrength();
   void LoadTextures();
+  void SetOpacity();
+  void SetShadingMode();
 };
 }  // namespace models
