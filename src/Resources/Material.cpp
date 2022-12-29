@@ -4,6 +4,86 @@
 
 using namespace models;
 
+std::string to_string(aiShadingMode mode) {
+  switch (mode) {
+    case aiShadingMode::aiShadingMode_Blinn:
+      return "Blinn";
+    case aiShadingMode::aiShadingMode_CookTorrance:
+      return "CookTorrance";
+    case aiShadingMode::aiShadingMode_Flat:
+      return "Flat";
+    case aiShadingMode::aiShadingMode_Fresnel:
+      return "Fresnel";
+    case aiShadingMode::aiShadingMode_Gouraud:
+      return "Gouraud";
+    case aiShadingMode::aiShadingMode_Minnaert:
+      return "Minnaert";
+    case aiShadingMode::aiShadingMode_NoShading:
+      return "NoShading";
+    case aiShadingMode::aiShadingMode_OrenNayar:
+      return "OrenNayar";
+    case aiShadingMode::aiShadingMode_PBR_BRDF:
+      return "PBR_BRDF";
+    case aiShadingMode::aiShadingMode_Phong:
+      return "Phong";
+    case aiShadingMode::aiShadingMode_Toon:
+      return "Toon";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+float ReadFloat(aiMaterial* material,
+                const char* key,
+                unsigned int type,
+                unsigned int index,
+                std::string name,
+                float defaultValue) {
+  float result;
+  if (material->Get(key, type, index, result) != AI_SUCCESS) {
+    logging::Logger::LogInfo(name + " not provided.");
+    return defaultValue;
+  }
+  logging::Logger::LogInfo(name + " set to " + std::to_string(result));
+
+  return result;
+}
+
+int ReadInt(aiMaterial* material,
+            const char* key,
+            unsigned int type,
+            unsigned int index,
+            std::string name,
+            int defaultValue) {
+  int result;
+  if (AI_SUCCESS != aiGetMaterialInteger(material, key, type, index, &result)) {
+    logging::Logger::LogInfo(name + " not set.");
+    return defaultValue;
+  }
+
+  logging::Logger::LogInfo(name + " set to " + std::to_string(result));
+  return result;
+}
+
+void ReadColor(aiMaterial* material,
+               const char* colorName,
+               unsigned int type,
+               unsigned int index,
+               aiColor4D& output,
+               std::string name,
+               aiColor4D defaultValue) {
+  if (AI_SUCCESS !=
+      aiGetMaterialColor(material, colorName, type, index, &output)) {
+    output = defaultValue;
+    logging::Logger::LogDebug(name +
+                              " color not found on mesh. Setting to default.");
+  }
+
+  logging::Logger::LogDebug(name + " color: Red=" + std::to_string(output.r) +
+                            " Green=" + std::to_string(output.g) +
+                            " Blue=" + std::to_string(output.b));
+}
+
 static std::map<aiTextureType, std::string> texturesToAdd = {
     {aiTextureType_DIFFUSE, "diffuse"},
     {aiTextureType_SPECULAR, "specular"},
@@ -29,71 +109,38 @@ Material::Material(const aiScene* scene,
 }
 
 void Material::SetShininessStrength() {
-  float shininess_strength = 1.0f;
-  _material->Get(AI_MATKEY_SHININESS_STRENGTH, shininess_strength);
-  logging::Logger::LogDebug("Material has shininess strength " +
-                            std::to_string(shininess_strength));
-  ShininessStrength = shininess_strength;
+  ShininessStrength = ReadFloat(_material, AI_MATKEY_SHININESS_STRENGTH,
+                                "ShininessStrength", 1.0f);
 }
 
 void Material::SetShininess() {
-  float shininess = 1.0f;
-  _material->Get(AI_MATKEY_SHININESS, shininess);
-  logging::Logger::LogDebug("Material has shininess " +
-                            std::to_string(shininess));
-  Shininess = shininess;
+  Shininess = ReadFloat(_material, AI_MATKEY_SHININESS, "Shininess", 1.0f);
+}
+
+void Material::SetOpacity() {
+  Opacity = ReadFloat(_material, AI_MATKEY_OPACITY, "Opacity", 1.0f);
+}
+
+void Material::SetShadingMode() {
+  ShadingMode = (aiShadingMode)ReadInt(_material, AI_MATKEY_SHADING_MODEL,
+                                       "Shading model", aiShadingMode_Gouraud);
+
+  // Have to log here because the generic logging in ReadInt does not provide
+  // enough information.
+  logging::Logger::LogInfo("Shading mode set to " + to_string(ShadingMode));
 }
 
 void Material::SetColor() {
   MaterialColor result;
 
-  // Diffuse component
-  if (AI_SUCCESS !=
-      aiGetMaterialColor(_material, AI_MATKEY_COLOR_DIFFUSE, &result.diffuse)) {
-    result.diffuse = aiColor4D(1.0f, 1.0f, 1.0f, 1.0f);
-    logging::Logger::LogDebug(
-        "Mesh does not have a diffuse color. Using default: Red=" +
-        std::to_string(result.diffuse.r) +
-        " Green=" + std::to_string(result.diffuse.g) +
-        " Blue=" + std::to_string(result.diffuse.b));
-  } else {
-    logging::Logger::LogDebug(
-        "Mesh has a diffuse color: Red=" + std::to_string(result.diffuse.r) +
-        " Green=" + std::to_string(result.diffuse.g) +
-        " Blue=" + std::to_string(result.diffuse.b));
-  }
+  ReadColor(_material, AI_MATKEY_COLOR_DIFFUSE, result.diffuse, "Diffuse",
+            aiColor4D(1.0f, 1.0f, 1.0f, 1.0f));
 
-  // Specular component
-  if (AI_SUCCESS != aiGetMaterialColor(_material, AI_MATKEY_COLOR_SPECULAR,
-                                       &result.specular)) {
-    result.specular = aiColor4D(1.0f, 1.0f, 1.0f, 1.0f);
-    logging::Logger::LogDebug(
-        "Mesh does not have a ambient color. Using default: Red=" +
-        std::to_string(result.specular.r) +
-        " Green=" + std::to_string(result.specular.g) +
-        " Blue=" + std::to_string(result.specular.b));
-  } else {
-    logging::Logger::LogDebug(
-        "Mesh has a ambient color: Red=" + std::to_string(result.specular.r) +
-        " Green=" + std::to_string(result.specular.g) +
-        " Blue=" + std::to_string(result.specular.b));
-  }
+  ReadColor(_material, AI_MATKEY_COLOR_SPECULAR, result.specular, "Specular",
+            aiColor4D(1.0f, 1.0f, 1.0f, 1.0f));
 
-  // Ambient component
-  if (AI_SUCCESS !=
-      aiGetMaterialColor(_material, AI_MATKEY_COLOR_AMBIENT, &result.ambient)) {
-    result.ambient = aiColor4D(1.0f, 1.0f, 1.0f, 1.0f);
-    logging::Logger::LogDebug(
-        "Mesh does not have a ambient color. Using default: Red=" +
-        std::to_string(result.ambient.r) +
-        " Green=" + std::to_string(result.ambient.g) +
-        " Blue=" + std::to_string(result.ambient.b));
-  } else {
-    logging::Logger::LogDebug(
-        "Mesh has a ambient color: Red=" + std::to_string(result.ambient.r) +
-        " Green=" + std::to_string(result.ambient.g) +
-        " Blue=" + std::to_string(result.ambient.b));
-  }
+  ReadColor(_material, AI_MATKEY_COLOR_AMBIENT, result.ambient, "Ambient",
+            aiColor4D(1.0f, 1.0f, 1.0f, 1.0f));
 
   Color = result;
 }
